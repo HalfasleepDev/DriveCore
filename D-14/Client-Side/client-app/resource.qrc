@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="icons/">
+    <file>../3c1ab251/solar--link-bold.svg</file>
+    <file>../4ad310e2/DriveCore-Logo-V1.png</file>
+    <file>../c2791404/solar--home-2-bold.svg</file>
+    <file>../d5a7d1ff/solar--settings-bold.svg</file>
+    <file>../52be410e/solar--wheel-angle-bold-duotone.svg</file>
+    <file>../a79f9b39/solar--black-hole-line-duotone.svg</file>
+  </qresource>
+</RCC>
