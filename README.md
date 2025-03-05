@@ -4,6 +4,8 @@
 ![PySide6](https://img.shields.io/badge/GUI-PySide6-orange)
 ![Flask](https://img.shields.io/badge/Web-Flask-red)
 ![AI-Ready](https://img.shields.io/badge/AI-Ready-yellow)
+# THIS PROJECT IS ON HOLD UNTIL I CAN GET A NEW RASPBERRY PI
+
 # DriveCore – Modular RC Vehicle Control & AI Framework
 
 DriveCore is a modular and scalable platform designed for controlling RC vehicles, with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.
