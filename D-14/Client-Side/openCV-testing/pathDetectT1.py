@@ -47,6 +47,8 @@ class FloorDetector(QMainWindow):
 
         # Define color range for floor (light gray / beige / off-white)
         lower_floor = np.array([0, 0, 160])    # adjust to match your floor color
+        # TODO: Add an auto detect floor color
+        
         upper_floor = np.array([180, 50, 255]) # light colors, low saturation
 
         # Mask floor-colored regions
