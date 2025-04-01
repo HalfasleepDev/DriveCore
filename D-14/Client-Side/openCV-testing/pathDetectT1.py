@@ -1,78 +1,113 @@
+import sys
 import cv2
 import numpy as np
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow, QWidget, QVBoxLayout
+from PySide6.QtCore import QTimer, Qt
+from PySide6.QtGui import QImage, QPixmap
 
-#Path detection local test
+VIDEO_URL = "http://192.168.0.123:5000/video-feed"  # Video Stream URL
 
-# URL of video stream
-VIDEO_URL = "http://192.168.1.100:5000/video-feed"  # use the flask stream from the raspberry pi
+class FloorDetector(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("DriveCore – Floor/Open Space Detection")
+        self.setGeometry(100, 100, 800, 600)
 
-# Open video stream
-cap = cv2.VideoCapture(VIDEO_URL)
+        self.video_label = QLabel("Connecting to video stream...")
+        self.video_label.setAlignment(Qt.AlignCenter)
 
-if not cap.isOpened():
-    print("Error: Unable to connect to the video stream.")
-    exit()
+        layout = QVBoxLayout()
+        layout.addWidget(self.video_label)
+        central = QWidget()
+        central.setLayout(layout)
+        self.setCentralWidget(central)
 
-def process_frame(frame):
-    """Processes a single frame for path detection."""
-    frame = cv2.resize(frame, (640, 480))  # Resize for consistency
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)  # Reduce noise
+        self.cap = cv2.VideoCapture(VIDEO_URL)
+        if not self.cap.isOpened():
+            self.video_label.setText("Error: Unable to open video stream.")
+            return
 
-    # Edge Detection
-    edges = cv2.Canny(blurred, 50, 150)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)
 
-    # Convert to HSV for color-based path detection
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    def update_frame(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            return
 
-    # Define color range for path detection (Adjust as needed)
-    lower_bound = np.array([20, 100, 100])  # Example: Yellow path
-    upper_bound = np.array([40, 255, 255])
+        frame = cv2.resize(frame, (640, 480))
+        processed = self.detect_floor_region(frame)
+        qt_image = self.convert_cv_qt(processed)
+        self.video_label.setPixmap(qt_image)
 
-    # Create a mask for the path
-    mask = cv2.inRange(hsv, lower_bound, upper_bound)
+    def detect_floor_region(self, frame):
+        # Convert to HSV for more stable color filtering
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Combine edges and color mask
-    combined = cv2.bitwise_or(edges, mask)
+        # Define color range for floor (light gray / beige / off-white)
+        lower_floor = np.array([0, 0, 160])    # adjust to match your floor color
+        upper_floor = np.array([180, 50, 255]) # light colors, low saturation
 
-    # Find contours
-    contours, _ = cv2.findContours(combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Mask floor-colored regions
+        mask = cv2.inRange(hsv, lower_floor, upper_floor)
 
-    # Draw detected path
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
-        cv2.drawContours(frame, [largest_contour], -1, (0, 255, 0), 3)  # Green path outline
+        # Define a region of interest (bottom half of the image)
+        height, width = mask.shape
+        roi = np.zeros_like(mask)
+        roi[int(height / 2):, :] = 255
+        floor_mask = cv2.bitwise_and(mask, roi)
 
-        # Fit a polynomial curve for a smooth path
-        points = np.array(largest_contour).reshape(-1, 2)
-        if len(points) > 5:  # Ensure we have enough points for fitting
-            fit = np.polyfit(points[:, 1], points[:, 0], 2)  # Quadratic fit
-            y_vals = np.linspace(min(points[:, 1]), max(points[:, 1]), num=50)
-            x_vals = np.polyval(fit, y_vals)
+        # Morphological ops to clean mask
+        kernel = np.ones((5, 5), np.uint8)
+        floor_mask = cv2.morphologyEx(floor_mask, cv2.MORPH_OPEN, kernel)
+        floor_mask = cv2.morphologyEx(floor_mask, cv2.MORPH_DILATE, kernel)
 
-            # Draw the fitted curve
-            for i in range(len(x_vals) - 1):
-                cv2.line(frame, (int(x_vals[i]), int(y_vals[i])), (int(x_vals[i + 1]), int(y_vals[i + 1])), (255, 0, 0), 2)  # Blue smooth path
+        # Find contours of detected floor
+        contours, _ = cv2.findContours(floor_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return frame, edges, mask
+        if contours:
+            largest = max(contours, key=cv2.contourArea)
+            cv2.drawContours(frame, [largest], -1, (0, 255, 0), 3)
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Error: Unable to receive frame.")
-        break
+            # Optional: draw center of floor region
+            M = cv2.moments(largest)
+            if M["m00"] > 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                cv2.circle(frame, (cx, cy), 5, (255, 0, 0), -1)
+                cv2.putText(frame, "Floor Center", (cx - 40, cy - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+                
+            # Path tracing
+            pts = np.array(largest).reshape(-1, 2)
+            if len(pts) > 5:
+                try:
+                    poly = np.polyfit(pts[:, 1], pts[:, 0], 2)
+                    y_vals = np.linspace(min(pts[:, 1]), max(pts[:, 1]), 50)
+                    x_vals = np.polyval(poly, y_vals)
+                    for i in range(len(x_vals) - 1):
+                        pt1 = (int(x_vals[i]), int(y_vals[i]))
+                        pt2 = (int(x_vals[i + 1]), int(y_vals[i + 1]))
+                        cv2.line(frame, pt1, pt2, (255, 0, 0), 2)
+                except Exception as e:
+                    print(f"Curve fitting error: {e}")
 
-    processed_frame, edges, mask = process_frame(frame)
+        return frame
 
-    # Display the results
-    cv2.imshow("Original Video", processed_frame)
-    cv2.imshow("Edge Detection", edges)
-    cv2.imshow("Color Mask", mask)
+    def convert_cv_qt(self, cv_img):
+        rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb.shape
+        bytes_per_line = ch * w
+        return QPixmap.fromImage(QImage(rgb.data, w, h, bytes_per_line, QImage.Format_RGB888))
 
-    # Exit on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    def closeEvent(self, event):
+        if self.cap.isOpened():
+            self.cap.release()
+        event.accept()
 
-# Release resources
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = FloorDetector()
+    window.show()
+    sys.exit(app.exec())
