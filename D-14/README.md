@@ -19,7 +19,7 @@
 - On exit, the host "should" stop running
 
 ## Hardware requirements:
-- Raspberry pi A+
+- Raspberry pi 4
 - 8mp raspberry pi cam
 - 20A esc
 - battery pack
@@ -27,7 +27,6 @@
 - led kit (optional)
 
 ## Current issues:
-- Raspberry pi stutters due to hardware limitations
 - `Emergency Disconnect` does not work properly
 - Sometimes multiple commands are sent at once
 - The servo needs to be re-calibrated
@@ -35,5 +34,9 @@
 ## Planned Features:
 - Parking brake
 - Hardware modifications to cool the raspberry pi
+- Path detection (opencv)
+- Reduced input lag
+- Steering and max throttle tunning on the `settings` page
+- Error popups for critical issues
 
 ## Client Tested on Arch Linux(Wayland)

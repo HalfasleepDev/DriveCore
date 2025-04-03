@@ -4,7 +4,6 @@
 ![PySide6](https://img.shields.io/badge/GUI-PySide6-orange)
 ![Flask](https://img.shields.io/badge/Web-Flask-red)
 ![AI-Ready](https://img.shields.io/badge/AI-Ready-yellow)
-# THIS PROJECT IS ON HOLD UNTIL I CAN GET A NEW RASPBERRY PI
 
 # DriveCore – Modular RC Vehicle Control & AI Framework
 
@@ -63,8 +62,11 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 
 ## Tests
 
-To run unit tests for DriveCore:
+**To run unit tests for DriveCore:**
 `DriveCore/D-14/pytest-tests/`  **TBD**
+
+**OpenCV testing section:**
+`DriveCore/D-14/Client-Side/openCV-testing/` **(3 tests so far)**
 
 ## License
 

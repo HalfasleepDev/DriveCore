@@ -23,7 +23,7 @@ PORT = 4444 #TODO: move to settings
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-
+# TODO: Add error popups
 
 class VideoThread(QThread):
     frame_received = Signal(QImage)  # Signal to send new frame to UI
