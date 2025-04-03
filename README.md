@@ -28,6 +28,7 @@ DriveCore is a modular and scalable platform designed for controlling RC vehicle
 DriveCore is built for enthusiasts, researchers, and developers looking to push the boundaries of AI-driven RC control. Whether experimenting with computer vision, autonomous navigation, or real-time control, DriveCore provides the flexibility and power to bring ideas to life.
 
 # Current Version: 1.0 for D-14
+[D-14 Client and Host Section](D-14/README.md)
 
 ## Getting Started
 
@@ -66,7 +67,7 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 `DriveCore/D-14/pytest-tests/`  **TBD**
 
 **OpenCV testing section:**
-`DriveCore/D-14/Client-Side/openCV-testing/` **(3 tests so far)**
+[OpenCv General Testing (D-14)](D-14/Client-Side/openCV-testing/README.md)
 
 ## License
 

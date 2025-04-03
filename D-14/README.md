@@ -27,9 +27,9 @@
 - led kit (optional)
 
 ## Current issues:
-- `Emergency Disconnect` does not work properly
-- Sometimes multiple commands are sent at once
-- The servo needs to be re-calibrated
+- [ ] `Emergency Disconnect` does not work properly.
+- [ ] Sometimes multiple commands are sent at once.
+- [ ] The servo needs to be re-calibrated.
 
 ## Planned Features:
 - Parking brake
