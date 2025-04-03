@@ -22,21 +22,21 @@ Each script is treated as a standalone experiment or iteration, with its purpose
 - **Technique:** Sampling using a predefined color array.
 - **Result:** Subpar outlining of the floor/surface.
 - **GUI Demo:**
-![pathDetectT1.py GUI](T1.GUI.png)
+![Iteration 01 GUI](T1.GUI.png)
 
 ### Iteration 02 - `pathDetectT2.py`
 - **Goal:** Automatically isolate most driveable flat surfaces, map a path(curve), and sample the floor automatically. 
 - **Technique:** Use a box on the lower portion of the screen to sample the HSV values of the floor. Applied Kalman Path Smoothing.
 - **Result:** Clean, predictive path useful for motion planning, and addition of HSV sliders.
 - **GUI Demo:**
-![pathDetectT2.py GUI](T2.GUI.png)
+![Iteration 02 GUI](T2.GUI.png)
 
 ### Iteration 03 - `pathDetectT3.py`
 - **Goal:** Detect non-floor objects and estimate proximity.
 - **Technique:** Canny edge + contour + ROI + color-coded bounding boxes.
 - **Result:** Real-time obstacle alerting with depth-based coloring. Increased resolution to 1280 X 720.
 - **GUI Demo:**
-![pathDetectT3.py GUI](T3.GUI.png)
+![Iteration 03 GUI](T3.GUI.png)
 
 ---
 
