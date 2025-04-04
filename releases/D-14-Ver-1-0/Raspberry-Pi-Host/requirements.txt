@@ -1,0 +1,6 @@
+flask
+pigpio
+requests
+picamera2
+opencv-python-headless
+socket
