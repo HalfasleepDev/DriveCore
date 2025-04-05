@@ -5,7 +5,7 @@
 
 ## Features:
 ### Host:
-- Can move forward, backwards, and any combonation with left or right
+- Can move forward, backward, and any combination with left or right
 - Connection timeout safety stop
 - Command queue for reducing input lag
 - Ease of acceleration for servo and esc
@@ -57,10 +57,10 @@
 - [ ] The servo needs to be re-calibrated.
 
 ## Planned Features:
-- [ ] Parking brake **(Ver 1.1)**
+- [x] Parking brake **(Ver 1.1)**
 - [x] Hardware modifications to cool the raspberry pi
 - [x] Path detection (opencv) **(Ver 1.1)**
-- [ ] Reduced input lag **(Ver 1.1)**
+- [x] Reduced input lag **(Ver 1.1)**
 - [ ] Steering and max throttle tunning on the `settings` page
 - [ ] Error popups for critical issues
 

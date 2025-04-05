@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'MainWindowICskMg.ui'
+## Form generated from reading UI file 'MainWindowpfEaFq.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.2
 ##
@@ -26,11 +26,48 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-            #MainWindow.setObjectName(u"DriveCore Client Ver 1.0")
         MainWindow.resize(1425, 1115)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.centralwidget.setStyleSheet(u"/*Drive page*/\n"
+        self.centralwidget.setStyleSheet(u"/*Settings page*/\n"
+"QLabel#settingsHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"Line#keysettingsHeaderLine{\n"
+"	color: #1e1e21;\n"
+"}\n"
+"QPushButton#emergencyDisconnectBtn{\n"
+"	background-color: #f1f3f3;\n"
+"	color: #1e1e21;\n"
+"    border-style: outset;\n"
+"    border-width: 2px;\n"
+"    border-radius: 30px;\n"
+"    border-color: #f1f3f3;\n"
+"    padding: 6px;\n"
+"}\n"
+"QLabel#emergencyDisconnectLabel{\n"
+"	color: #FF0000;\n"
+"}\n"
+"QWidget#currentPgrmVersionWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 15px;\n"
+"}\n"
+"QLabel#currentPgrmVersionLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QWidget#currentPgrmVersionHeaderWidget{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 15px;\n"
+"}\n"
+"QLabel#currentPgrmVersionHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/*Drive page*/\n"
 "QWidget#videoStreamWidget{\n"
 "	background-color: #f1f3f3;\n"
 "}\n"
@@ -38,7 +75,8 @@ class Ui_MainWindow(object):
 "	color: #f1f3f3;\n"
 "}\n"
 "Line#keyBindingsLine{\n"
-"	color: #1e1e21;\n"
+"	col"
+                        "or: #1e1e21;\n"
 "}\n"
 "QLabel#wKeyLabel{\n"
 "	color: #f1f3f3;\n"
@@ -84,15 +122,15 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*Left home widget*/\n"
-""
-                        "QGroupBox#ipInputBox{\n"
+"QGroupBox#ipInputBox{\n"
 "	border: 1px #f1f3f3;\n"
 "	border-radius: 15px;\n"
 "	background-color: #7a63ff;\n"
 "	margin-top: 6px;\n"
 "}\n"
 "QGroupBox::title#ipInputBox{\n"
-"	subcontrol-origin: margin;\n"
+"	su"
+                        "bcontrol-origin: margin;\n"
 "	left: 10px;\n"
 "	bottom: -10px;\n"
 "	padding: 0 5px;\n"
@@ -130,11 +168,17 @@ class Ui_MainWindow(object):
 "	border: 1px #7a63ff;\n"
 "	border-style: dotted;\n"
 "}\n"
+"QPushButton#ipComboBtn{\n"
+"	background-color: #f1f3f3;\n"
+"	border-radius: 5px;\n"
+"}\n"
+"QPushButton#ipComboBtn:pressed{\n"
+"	background-color: #74e1ef;\n"
+"}\n"
 "\n"
 "\n"
 "\n"
-"/*Right home widget*/"
-                        "\n"
+"/*Right home widget*/\n"
 "QWidget#projectInfoWidget {\n"
 "	background-color: #74e1ef;\n"
 "	border: 1px #74e1ef;\n"
@@ -143,7 +187,8 @@ class Ui_MainWindow(object):
 "QLabel#aboutTitle {\n"
 "	color: #1e1e21;\n"
 "}\n"
-"QLabel#projectTitle {\n"
+""
+                        "QLabel#projectTitle {\n"
 "	color: #1e1e21;\n"
 "}\n"
 "QLabel#githubLink {\n"
@@ -184,8 +229,7 @@ class Ui_MainWindow(object):
 "    border-style: outset;\n"
 "    border-width: 2px;\n"
 "    border-radius: 30px;\n"
-" "
-                        "   border-color: #f1f3f3;\n"
+"    border-color: #f1f3f3;\n"
 "    padding: 6px;\n"
 "}\n"
 "\n"
@@ -195,7 +239,8 @@ class Ui_MainWindow(object):
 "	background-color: #0c0c0d;\n"
 "}\n"
 "QWidget#mainPage{\n"
-"	background-color: #0c0c0d;\n"
+""
+                        "	background-color: #0c0c0d;\n"
 "}\n"
 "QWidget#homePage{\n"
 "	background-color: #0c0c0d;\n"
@@ -229,7 +274,7 @@ class Ui_MainWindow(object):
         self.homeBtn.setToolTipDuration(1)
         self.homeBtn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         icon = QIcon()
-        icon.addFile(u"/home/halfdev/Documents/Projects/DriveCore/D-14/Client-Side/client-app/icons/solar--home-2-bold.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(u"D-14/Client-Side/client-app/icons/solar--home-2-bold.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.homeBtn.setIcon(icon)
         self.homeBtn.setIconSize(QSize(60, 60))
         self.homeBtn.setCheckable(True)
@@ -247,7 +292,7 @@ class Ui_MainWindow(object):
         self.driveBtn.setSizePolicy(sizePolicy)
         self.driveBtn.setMinimumSize(QSize(80, 80))
         icon1 = QIcon()
-        icon1.addFile(u"/home/halfdev/Documents/Projects/DriveCore/D-14/Client-Side/client-app/icons/solar--wheel-angle-bold-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon1.addFile(u"D-14/Client-Side/client-app/icons/solar--wheel-angle-bold-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.driveBtn.setIcon(icon1)
         self.driveBtn.setIconSize(QSize(60, 60))
         self.driveBtn.setCheckable(True)
@@ -271,7 +316,7 @@ class Ui_MainWindow(object):
         self.settingsBtn.setSizePolicy(sizePolicy)
         self.settingsBtn.setMinimumSize(QSize(80, 80))
         icon2 = QIcon()
-        icon2.addFile(u"/home/halfdev/Documents/Projects/DriveCore/D-14/Client-Side/client-app/icons/solar--settings-bold.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon2.addFile(u"D-14/Client-Side/client-app/icons/solar--settings-bold.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.settingsBtn.setIcon(icon2)
         self.settingsBtn.setIconSize(QSize(60, 60))
         self.settingsBtn.setCheckable(True)
@@ -341,17 +386,27 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.horizontalLayout_4.setContentsMargins(15, 15, 15, 15)
         self.recentIpCombo = QComboBox(self.recentIpBox)
+        '''self.recentIpCombo.addItem("")
         self.recentIpCombo.addItem("")
         self.recentIpCombo.addItem("")
         self.recentIpCombo.addItem("")
         self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
+        self.recentIpCombo.addItem("")'''
         self.recentIpCombo.setObjectName(u"recentIpCombo")
         self.recentIpCombo.setMinimumSize(QSize(0, 35))
 
         self.horizontalLayout_4.addWidget(self.recentIpCombo, 0, Qt.AlignmentFlag.AlignBottom)
 
+        self.ipComboBtn = QPushButton(self.recentIpBox)
+        self.ipComboBtn.setObjectName(u"ipComboBtn")
+        self.ipComboBtn.setMinimumSize(QSize(35, 35))
+        self.ipComboBtn.setMaximumSize(QSize(35, 35))
+        icon4 = QIcon()
+        icon4.addFile(u"D-14/Client-Side/client-app/icons/solar--link-bold-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.ipComboBtn.setIcon(icon4)
+        self.ipComboBtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_4.addWidget(self.ipComboBtn, 0, Qt.AlignmentFlag.AlignBottom)
 
         self.verticalLayout_8.addWidget(self.recentIpBox)
 
@@ -380,7 +435,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(320, 240))
         self.label_2.setMaximumSize(QSize(320, 240))
-        self.label_2.setPixmap(QPixmap(u"/home/halfdev/Documents/Projects/DriveCore/D-14/Client-Side/client-app/icons/DriveCore-Logo-V1.png"))
+        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout_9.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -460,18 +515,97 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.homePage)
         self.settingsPage = QWidget()
         self.settingsPage.setObjectName(u"settingsPage")
-        self.verticalLayout_15 = QVBoxLayout(self.settingsPage)
+        self.horizontalLayout_5 = QHBoxLayout(self.settingsPage)
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.settingsLeftWidget = QWidget(self.settingsPage)
+        self.settingsLeftWidget.setObjectName(u"settingsLeftWidget")
+        self.verticalLayout_15 = QVBoxLayout(self.settingsLeftWidget)
+        self.verticalLayout_15.setSpacing(10)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.label = QLabel(self.settingsPage)
-        self.label.setObjectName(u"label")
+        self.settingsHeaderLabel = QLabel(self.settingsLeftWidget)
+        self.settingsHeaderLabel.setObjectName(u"settingsHeaderLabel")
         font3 = QFont()
         font3.setPointSize(24)
-        self.label.setFont(font3)
+        self.settingsHeaderLabel.setFont(font3)
 
-        self.verticalLayout_15.addWidget(self.label, 0, Qt.AlignmentFlag.AlignHCenter)
+        self.verticalLayout_15.addWidget(self.settingsHeaderLabel)
+
+        self.settingsHeaderLine = QFrame(self.settingsLeftWidget)
+        self.settingsHeaderLine.setObjectName(u"settingsHeaderLine")
+        self.settingsHeaderLine.setFrameShape(QFrame.Shape.HLine)
+        self.settingsHeaderLine.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_15.addWidget(self.settingsHeaderLine)
+
+        self.verticalSpacer_9 = QSpacerItem(20, 432, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_15.addItem(self.verticalSpacer_9)
+
+        self.emergencyDisconnectBtn = QPushButton(self.settingsLeftWidget)
+        self.emergencyDisconnectBtn.setObjectName(u"emergencyDisconnectBtn")
+        self.emergencyDisconnectBtn.setFont(font3)
+        icon3 = QIcon()
+        icon3.addFile(u"D-14/Client-Side/client-app/icons/solar--black-hole-line-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.emergencyDisconnectBtn.setIcon(icon3)
+        self.emergencyDisconnectBtn.setIconSize(QSize(60, 60))
+
+        self.verticalLayout_15.addWidget(self.emergencyDisconnectBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        self.emergencyDisconnectLabel = QLabel(self.settingsLeftWidget)
+        self.emergencyDisconnectLabel.setObjectName(u"emergencyDisconnectLabel")
+        self.emergencyDisconnectLabel.setFont(font1)
+
+        self.verticalLayout_15.addWidget(self.emergencyDisconnectLabel, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        self.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_15.addItem(self.verticalSpacer_8)
+
+
+        self.horizontalLayout_5.addWidget(self.settingsLeftWidget)
+
+        self.settingsRightWidget = QWidget(self.settingsPage)
+        self.settingsRightWidget.setObjectName(u"settingsRightWidget")
+        self.verticalLayout_16 = QVBoxLayout(self.settingsRightWidget)
+        self.verticalLayout_16.setObjectName(u"verticalLayout_16")
+        self.verticalSpacer_10 = QSpacerItem(20, 1010, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_16.addItem(self.verticalSpacer_10)
+
+        self.currentPgrmVersionWidget = QWidget(self.settingsRightWidget)
+        self.currentPgrmVersionWidget.setObjectName(u"currentPgrmVersionWidget")
+        self.horizontalLayout_9 = QHBoxLayout(self.currentPgrmVersionWidget)
+        self.horizontalLayout_9.setSpacing(15)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalLayout_9.setContentsMargins(0, 0, 15, 0)
+        self.currentPgrmVersionHeaderWidget = QWidget(self.currentPgrmVersionWidget)
+        self.currentPgrmVersionHeaderWidget.setObjectName(u"currentPgrmVersionHeaderWidget")
+        self.verticalLayout_17 = QVBoxLayout(self.currentPgrmVersionHeaderWidget)
+        self.verticalLayout_17.setObjectName(u"verticalLayout_17")
+        self.currentPgrmVersionHeaderLabel = QLabel(self.currentPgrmVersionHeaderWidget)
+        self.currentPgrmVersionHeaderLabel.setObjectName(u"currentPgrmVersionHeaderLabel")
+        self.currentPgrmVersionHeaderLabel.setFont(font1)
+
+        self.verticalLayout_17.addWidget(self.currentPgrmVersionHeaderLabel, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.horizontalLayout_9.addWidget(self.currentPgrmVersionHeaderWidget)
+
+        self.currentPgrmVersionLabel = QLabel(self.currentPgrmVersionWidget)
+        self.currentPgrmVersionLabel.setObjectName(u"currentPgrmVersionLabel")
+        self.currentPgrmVersionLabel.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+
+        self.horizontalLayout_9.addWidget(self.currentPgrmVersionLabel, 0, Qt.AlignmentFlag.AlignLeft)
+
+
+        self.verticalLayout_16.addWidget(self.currentPgrmVersionWidget, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.horizontalLayout_5.addWidget(self.settingsRightWidget)
 
         self.stackedWidget.addWidget(self.settingsPage)
         self.drivePage = PageWithKeyEvents()
+        self.drivePage.setObjectName(u"drivePage")
         self.verticalLayout_5 = QVBoxLayout(self.drivePage)
         self.verticalLayout_5.setSpacing(9)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
@@ -691,7 +825,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"DriveCore Client Ver 1.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
 #if QT_CONFIG(tooltip)
         self.homeBtn.setToolTip(QCoreApplication.translate("MainWindow", u"Home", None))
 #endif // QT_CONFIG(tooltip)
@@ -705,18 +839,24 @@ class Ui_MainWindow(object):
         self.inputIp.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter an ip address...", None))
         self.recentIpBox.setTitle(QCoreApplication.translate("MainWindow", u"Connect to a recent ip address", None))
         self.recentIpCombo.setItemText(0, "")
+        '''
         self.recentIpCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ip-addr test-1", None))
         self.recentIpCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"ip-addr test-2", None))
         self.recentIpCombo.setItemText(3, QCoreApplication.translate("MainWindow", u"ip-addr test-3", None))
         self.recentIpCombo.setItemText(4, QCoreApplication.translate("MainWindow", u"ip-addr test-4", None))
         self.recentIpCombo.setItemText(5, QCoreApplication.translate("MainWindow", u"ip-addr test-5", None))
-
+        '''
+        self.ipComboBtn.setText("")
         self.label_2.setText("")
         self.projectTitle.setText(QCoreApplication.translate("MainWindow", u"Follow the project on GitHub", None))
         self.githubLink.setText(QCoreApplication.translate("MainWindow", u"https://github.com/HalfasleepDev/DriveCore", None))
         self.aboutTitle.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.description.setText(QCoreApplication.translate("MainWindow", u"DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"WORK IN PROGRESS", None))
+        self.settingsHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
+        self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
+        self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.0 (21-02-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
         self.keyBindingsLabel.setText(QCoreApplication.translate("MainWindow", u"Key Bindings", None))
         self.wKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[W]", None))

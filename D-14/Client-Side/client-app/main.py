@@ -1,5 +1,5 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
+    QMetaObject, QObject, QPoint, QRect, QTimer,
     QSize, QTime, QUrl, QThread, Signal, QEvent, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
@@ -15,6 +15,11 @@ import cv2
 import numpy as np
 import ipaddress
 import socket
+import time
+
+from appFunctions import toggleDebugCV, showError
+
+from openCVFunctions import FrameProcessor
 
 #from appFunctions import PageWithKeyEvents
 from MainWindow import Ui_MainWindow
@@ -33,12 +38,17 @@ class VideoThread(QThread):
         self.stream_url = stream_url
         self.running = True  # Control flag for stopping thread
 
+    def set_processor(self, processor):
+        self.processor = processor
+
     def run(self):
         cap = cv2.VideoCapture(self.stream_url)
 
         while self.running:
             ret, frame = cap.read()
             if ret:
+                # TODO Add openCV Stuff
+                frame = self.processor.detect_floor_region(frame)
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert to RGB
                 h, w, ch = frame.shape
                 bytes_per_line = ch * w
@@ -55,17 +65,32 @@ class VideoThread(QThread):
 
 
 class MainWindow(QMainWindow):
+    # Network Variables
     IP_ADDR = ""
     STREAM_URL = ""
     VEHICLE_CONNECTION = False
+
+    # OpenCV Settings Variables
+    OBJECT_VIS_ENABLED = False
+    FLOOR_VIS_ENABLED = False
+    KALMAN_CENTER_VIS_ENABLED = False
+    AMBIENT_VIS_ENABLED = False
+    FLOOR_SAMPLE_VIS_ENABLED = False
+    PATH_VIS_ENABLED = False
+    COLLISION_ASSIST_ENABLED = False
+    alert_triggered = False
+    alert_triggered_Prev = False
+
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        '''###########################################Network Setup###########################################'''
         self.ui.inputIp.editingFinished.connect(self.setIp)
         self.ui.inputIp.editingFinished.connect(self.add_ip)
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
 
         self.recent_ips = self.load_recent_ips()
         self.ui.recentIpCombo.addItems(self.recent_ips)
@@ -79,13 +104,13 @@ class MainWindow(QMainWindow):
         self.ui.homeBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.homePage))
         self.ui.homeBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
         self.ui.homeBtn.clicked.connect(lambda: self.ui.settingsBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.homeBtn.clicked.connect(lambda: self.thread.stop())
+        self.ui.homeBtn.clicked.connect(lambda: self.stop_thread_safely())
 
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.settingsBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}"))
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.settingsPage))
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.settingsBtn.clicked.connect(lambda: self.thread.stop())
+        self.ui.settingsBtn.clicked.connect(lambda: self.stop_thread_safely())
 
         self.ui.driveBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}"))
         self.ui.driveBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.drivePage))
@@ -94,8 +119,69 @@ class MainWindow(QMainWindow):
 
         self.ui.driveBtn.clicked.connect(lambda: self.iniDrivePage())
         #self.filter = KeyPressFilter()
+        '''###########################################Settings Page###########################################'''
+        # OpenCV Setting Buttons
+        self.ui.ObjectVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(1))
+        self.ui.FloorVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(2))
+        self.ui.KalmanCenterVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(3))
+        self.ui.AmbientVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(4))
+        self.ui.FloorSampleVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(5))
+        self.ui.PathVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(6))
+        self.ui.CollisionAssistBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(7))
+
+        # HSV Sliders
+        # - Set range for sensitivity tuning
+        self.ui.HRowSlider.setRange(0, 50)
+        self.ui.SRowSlider.setRange(0, 100)
+        self.ui.VRowSlider.setRange(0, 100)
+
+        self.ui.HRowSlider.valueChanged.connect(lambda val: self.ui.HRowValueLabel.setText(str(val)))
+        self.ui.SRowSlider.valueChanged.connect(lambda val: self.ui.SRowValueLabel.setText(str(val)))
+        self.ui.VRowSlider.valueChanged.connect(lambda val: self.ui.VRowValueLabel.setText(str(val)))
+
+        # - Set default values
+        self.ui.HRowSlider.setValue(35)
+        self.ui.SRowSlider.setValue(40)
+        self.ui.VRowSlider.setValue(50)
+        
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
+
+        '''###########################################OpenCV Variables & Functions'''
+        #TODO: self.init_kalman_filter()
+        self.timer = QTimer()
+        
+        self.timer.start(30)
+
+        self.frame_counter = 0
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=200, varThreshold=100, detectShadows=False)
+        self.last_floor_contour = None
+
+        self.alert_line_y = 680  # e.g. bottom quarter of 480p frame
+        
+
+
+    def stop_thread_safely(self):
+        try:
+            self.thread.stop()
+        except Exception as e:
+            print(f"Error stopping thread: {e}")
     
+    def toggleSettingOpenCvBtns(self, select):
+        match select:
+            case 1:
+                self.OBJECT_VIS_ENABLED = toggleDebugCV(self.ui.ObjectVisBtn, self.OBJECT_VIS_ENABLED, "Object Vis: ")
+            case 2:
+                self.FLOOR_VIS_ENABLED = toggleDebugCV(self.ui.FloorVisBtn, self.FLOOR_VIS_ENABLED, "Floor Vis: ")
+            case 3:
+                self.KALMAN_CENTER_VIS_ENABLED = toggleDebugCV(self.ui.KalmanCenterVisBtn, self.KALMAN_CENTER_VIS_ENABLED, "Kalman Center Vis: ")
+            case 4:
+                self.AMBIENT_VIS_ENABLED = toggleDebugCV(self.ui.AmbientVisBtn, self.AMBIENT_VIS_ENABLED, "Ambient Vis: ")
+            case 5:
+                self.FLOOR_SAMPLE_VIS_ENABLED = toggleDebugCV(self.ui.FloorSampleVisBtn, self.FLOOR_SAMPLE_VIS_ENABLED, "Floor Sample Vis: ")
+            case 6:
+                self.PATH_VIS_ENABLED = toggleDebugCV(self.ui.PathVisBtn, self.PATH_VIS_ENABLED, "Path Vis: ")
+            case 7:
+                self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
 
     def add_ip(self):
         """ Adds the entered IP to the combo box and saves it. """
@@ -111,7 +197,7 @@ class MainWindow(QMainWindow):
 
     def load_recent_ips(self):
         """ Loads recent IP addresses from a file. """
-        filename = "recent_ips.txt"
+        filename = "D-14/Client-Side/client-app/recent_ips.txt"
         if os.path.exists(filename):
             with open(filename, "r") as file:
                 return [line.strip() for line in file.readlines()]
@@ -183,14 +269,18 @@ class MainWindow(QMainWindow):
     def iniDrivePage(self):
         print('yay')
         print(self.STREAM_URL)
-        if self.is_ip_address(self.IP_ADDR):
+        if self.is_ip_address(self.IP_ADDR) and self.VEHICLE_CONNECTION:
             self.thread = VideoThread(self.STREAM_URL)
+            self.processor = FrameProcessor(self, self.thread)
+            self.processor.initKalmanFilter()
+            self.thread.set_processor(self.processor)
             self.thread.frame_received.connect(self.update_frame)
             self.thread.start()
             #self.ui.drivePage.installEventFilter(self.filter)
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
             self.ui.drivePage.commandSignal.connect(self.send_command)
+            
         else:
             self.ui.videoStreamLabel.setStyleSheet("QLabel{color: #1e1e21;}")
 
@@ -220,6 +310,11 @@ class MainWindow(QMainWindow):
             self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;")
             self.ui.sKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
             self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+        elif command == "BRAKE":
+            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;")
+            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #FFA500;}")
+            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}") 
 
     def send_command(self, command):
         """Send command to Raspberry Pi"""
@@ -234,6 +329,11 @@ class MainWindow(QMainWindow):
     def update_frame(self, q_img):
         """Update QLabel with new frame."""
         self.ui.videoStreamLabel.setPixmap(QPixmap.fromImage(q_img))
+        if self.alert_triggered and self.COLLISION_ASSIST_ENABLED and self.alert_triggered_Prev == False:
+                self.alert_triggered_Prev = True
+                self.ui.drivePage.send_brake_burst(1,20)
+        else:
+            self.alert_triggered_Prev = False
 
     def closeEvent(self, event):
         """Release resources when closing the window."""
@@ -250,6 +350,6 @@ if __name__ == '__main__':
 
     window = MainWindow()
     window.show()
-    window.setWindowTitle("Drive Core Client Ver 1.0")
+    window.setWindowTitle("Drive Core Client Ver 1.1")
 
     sys.exit(app.exec())

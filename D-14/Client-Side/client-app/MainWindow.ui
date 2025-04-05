@@ -1310,7 +1310,7 @@ QWidget#drivePage{
                         <number>0</number>
                        </property>
                        <item>
-                        <widget class="QLabel" name="HRowValueLabel">
+                        <widget class="QLabel" name="HRowLabel">
                          <property name="minimumSize">
                           <size>
                            <width>65</width>
@@ -1364,7 +1364,7 @@ QWidget#drivePage{
                         </widget>
                        </item>
                        <item alignment="Qt::AlignmentFlag::AlignRight">
-                        <widget class="QLabel" name="HRowLabel">
+                        <widget class="QLabel" name="HRowValueLabel">
                          <property name="minimumSize">
                           <size>
                            <width>25</width>

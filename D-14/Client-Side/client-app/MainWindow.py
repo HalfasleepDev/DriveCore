@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'MainWindowpfEaFq.ui'
+## Form generated from reading UI file 'MainWindowMWeDpd.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.8.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -18,7 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLayout,
     QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+    QSlider, QSpacerItem, QStackedWidget, QVBoxLayout,
+    QWidget)
 import resource
 from appFunctions import PageWithKeyEvents
 
@@ -29,15 +30,181 @@ class Ui_MainWindow(object):
         MainWindow.resize(1425, 1115)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.centralwidget.setStyleSheet(u"/*Settings page*/\n"
+        self.centralwidget.setStyleSheet(u"/*========Settings page=======*/\n"
 "QLabel#settingsHeaderLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
 "Line#keysettingsHeaderLine{\n"
 "	color: #1e1e21;\n"
 "}\n"
+"\n"
+"/*OpenCV Settings*/\n"
+"QLabel#OpenCVHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"Line#OpenCVHeaderLine{\n"
+"	color: #1e1e21;\n"
+"}\n"
+"\n"
+"QLabel#DebugCVHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"/*ObjectVisBtn*/\n"
+"QPushButton#ObjectVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#ObjectVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*FloorVisBtn*/\n"
+"QPushButton#FloorVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#FloorVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*KalmanCenterVisBtn*/\n"
+"QPushButton#KalmanCe"
+                        "nterVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#KalmanCenterVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*AmbientVisBtn*/\n"
+"QPushButton#AmbientVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#AmbientVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*FloorSampleVisBtn*/\n"
+"QPushButton#FloorSampleVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#FloorSampleVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*PathVisBtn*/\n"
+"QPushButton#PathVisBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	bor"
+                        "der-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#PathVisBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"/*CollisionAssistBtn*/\n"
+"QPushButton#CollisionAssistBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#CollisionAssistBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
+"	border: 1px #7a63ff;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"/*HSV Sliders*/\n"
+"QSlider::handle:horizontal{\n"
+"	background: #7a63ff;\n"
+"	width: 10px;\n"
+"	margin: -5px -1px;\n"
+"	border-radius: 5px;\n"
+"}\n"
+"QSlider::add-page:horizontal{\n"
+"	background: #f1f3f3;\n"
+"	border-radius: 2px;\n"
+"}\n"
+"QSlider::sub-page:horizontal{\n"
+"	background: #7a63ff;\n"
+"	border-radius: 2px;\n"
+"}\n"
+"\n"
+"QWidget#HSVSliderWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#HRowValueLabel{\n"
+""
+                        "	color: #f1f3f3;\n"
+"}\n"
+"QLabel#HRowLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#SRowLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#SRowValueLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#VRowLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#VRowValueLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#HSVSettingsHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"QLabel#CollisionAssistHeaderLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"/*Emergency Disconnect*/\n"
 "QPushButton#emergencyDisconnectBtn{\n"
 "	background-color: #f1f3f3;\n"
+"	color: #1e1e21;\n"
+"    border-style: outset;\n"
+"    border-width: 2px;\n"
+"    border-radius: 30px;\n"
+"    border-color: #f1f3f3;\n"
+"    padding: 6px;\n"
+"}\n"
+"QPushButton#emergencyDisconnectBtn:pressed{\n"
+"	background-color: #7a63ff;\n"
 "	color: #1e1e21;\n"
 "    border-style: outset;\n"
 "    border-width: 2px;\n"
@@ -48,7 +215,8 @@ class Ui_MainWindow(object):
 "QLabel#emergencyDisconnectLabel{\n"
 "	color: #FF0000;\n"
 "}\n"
-"QWidget#currentPgrmVersionWidget{\n"
+"QWidget#currentPgrmVers"
+                        "ionWidget{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 15px;\n"
@@ -67,7 +235,7 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "\n"
-"/*Drive page*/\n"
+"/*=======Drive page=======*/\n"
 "QWidget#videoStreamWidget{\n"
 "	background-color: #f1f3f3;\n"
 "}\n"
@@ -75,8 +243,7 @@ class Ui_MainWindow(object):
 "	color: #f1f3f3;\n"
 "}\n"
 "Line#keyBindingsLine{\n"
-"	col"
-                        "or: #1e1e21;\n"
+"	color: #1e1e21;\n"
 "}\n"
 "QLabel#wKeyLabel{\n"
 "	color: #f1f3f3;\n"
@@ -96,13 +263,14 @@ class Ui_MainWindow(object):
 "QLabel#turnLeftLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
-"QLabel#reverseBreakLabel{\n"
+"QLabel#reverseBrakeLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
 "QLabel#turnRightLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
-"QWidget#connectionVehicleTypeWidget{\n"
+"QWidget#conne"
+                        "ctionVehicleTypeWidget{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 15px;\n"
@@ -121,7 +289,7 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "\n"
-"/*Left home widget*/\n"
+"/*=======Left home widget=======*/\n"
 "QGroupBox#ipInputBox{\n"
 "	border: 1px #f1f3f3;\n"
 "	border-radius: 15px;\n"
@@ -129,8 +297,7 @@ class Ui_MainWindow(object):
 "	margin-top: 6px;\n"
 "}\n"
 "QGroupBox::title#ipInputBox{\n"
-"	su"
-                        "bcontrol-origin: margin;\n"
+"	subcontrol-origin: margin;\n"
 "	left: 10px;\n"
 "	bottom: -10px;\n"
 "	padding: 0 5px;\n"
@@ -150,7 +317,8 @@ class Ui_MainWindow(object):
 "}\n"
 "QGroupBox::title#recentIpBox{\n"
 "	subcontrol-origin: margin;\n"
-"	left: 10px;\n"
+""
+                        "	left: 10px;\n"
 "	bottom: -10px;\n"
 "	padding: 0 5px;\n"
 "	color: #f1f3f3;\n"
@@ -178,7 +346,7 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "\n"
-"/*Right home widget*/\n"
+"/*=======Right home widget=======*/\n"
 "QWidget#projectInfoWidget {\n"
 "	background-color: #74e1ef;\n"
 "	border: 1px #74e1ef;\n"
@@ -187,8 +355,7 @@ class Ui_MainWindow(object):
 "QLabel#aboutTitle {\n"
 "	color: #1e1e21;\n"
 "}\n"
-""
-                        "QLabel#projectTitle {\n"
+"QLabel#projectTitle {\n"
 "	color: #1e1e21;\n"
 "}\n"
 "QLabel#githubLink {\n"
@@ -200,14 +367,15 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "\n"
-"/*Left menu*/\n"
+"/*=======Left menu=======*/\n"
 "QWidget#leftMenu {\n"
 "	background-color: #1e1e21;\n"
-"}\n"
+""
+                        "}\n"
 "\n"
 "\n"
 "\n"
-"/*Left menu buttons*/\n"
+"/*=======Left menu buttons=======*/\n"
 "QPushButton#homeBtn {\n"
 "	background-color: #f1f3f3;\n"
 "    border-style: outset;\n"
@@ -233,14 +401,13 @@ class Ui_MainWindow(object):
 "    padding: 6px;\n"
 "}\n"
 "\n"
-"/*Main background*/\n"
+"/*=======Main background=======*/\n"
 "\n"
 "QWidget#centralWidget{\n"
 "	background-color: #0c0c0d;\n"
 "}\n"
 "QWidget#mainPage{\n"
-""
-                        "	background-color: #0c0c0d;\n"
+"	background-color: #0c0c0d;\n"
 "}\n"
 "QWidget#homePage{\n"
 "	background-color: #0c0c0d;\n"
@@ -354,7 +521,7 @@ class Ui_MainWindow(object):
         self.ipInputBox = QGroupBox(self.leftHomeWidget)
         self.ipInputBox.setObjectName(u"ipInputBox")
         self.ipInputBox.setMinimumSize(QSize(0, 90))
-        self.ipInputBox.setMaximumSize(QSize(350, 16777215))
+        self.ipInputBox.setMaximumSize(QSize(350, 16777215)) #400
         font = QFont()
         font.setPointSize(15)
         font.setBold(False)
@@ -379,7 +546,7 @@ class Ui_MainWindow(object):
         self.recentIpBox = QGroupBox(self.leftHomeWidget)
         self.recentIpBox.setObjectName(u"recentIpBox")
         self.recentIpBox.setMinimumSize(QSize(0, 90))
-        self.recentIpBox.setMaximumSize(QSize(350, 16777215))
+        self.recentIpBox.setMaximumSize(QSize(350, 16777215)) #400
         self.recentIpBox.setFont(font)
         self.horizontalLayout_4 = QHBoxLayout(self.recentIpBox)
         self.horizontalLayout_4.setSpacing(15)
@@ -435,7 +602,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(320, 240))
         self.label_2.setMaximumSize(QSize(320, 240))
-        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1.png"))
+        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-1.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout_9.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -519,6 +686,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.settingsLeftWidget = QWidget(self.settingsPage)
         self.settingsLeftWidget.setObjectName(u"settingsLeftWidget")
+        self.settingsLeftWidget.setMaximumSize(QSize(825, 16777215))
         self.verticalLayout_15 = QVBoxLayout(self.settingsLeftWidget)
         self.verticalLayout_15.setSpacing(10)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
@@ -537,9 +705,236 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_15.addWidget(self.settingsHeaderLine)
 
-        self.verticalSpacer_9 = QSpacerItem(20, 432, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.OpenCVSettingsWidget = QWidget(self.settingsLeftWidget)
+        self.OpenCVSettingsWidget.setObjectName(u"OpenCVSettingsWidget")
+        self.OpenCVSettingsWidget.setMinimumSize(QSize(0, 500))
+        self.verticalLayout_18 = QVBoxLayout(self.OpenCVSettingsWidget)
+        self.verticalLayout_18.setSpacing(6)
+        self.verticalLayout_18.setObjectName(u"verticalLayout_18")
+        self.verticalLayout_18.setContentsMargins(9, 0, 9, 0)
+        self.OpenCVHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.OpenCVHeaderLabel.setObjectName(u"OpenCVHeaderLabel")
+        self.OpenCVHeaderLabel.setMinimumSize(QSize(0, 30))
+        self.OpenCVHeaderLabel.setMaximumSize(QSize(16777215, 35))
+        self.OpenCVHeaderLabel.setFont(font1)
 
-        self.verticalLayout_15.addItem(self.verticalSpacer_9)
+        self.verticalLayout_18.addWidget(self.OpenCVHeaderLabel)
+
+        self.OpenCVHeaderLine = QFrame(self.OpenCVSettingsWidget)
+        self.OpenCVHeaderLine.setObjectName(u"OpenCVHeaderLine")
+        self.OpenCVHeaderLine.setFrameShape(QFrame.Shape.HLine)
+        self.OpenCVHeaderLine.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_18.addWidget(self.OpenCVHeaderLine)
+
+        self.DebugCVHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.DebugCVHeaderLabel.setObjectName(u"DebugCVHeaderLabel")
+        self.DebugCVHeaderLabel.setMaximumSize(QSize(16777215, 22))
+
+        self.verticalLayout_18.addWidget(self.DebugCVHeaderLabel)
+
+        self.DebugCVWidget_1 = QWidget(self.OpenCVSettingsWidget)
+        self.DebugCVWidget_1.setObjectName(u"DebugCVWidget_1")
+        self.DebugCVWidget_1.setMaximumSize(QSize(16777215, 50))
+        self.horizontalLayout_10 = QHBoxLayout(self.DebugCVWidget_1)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, -1, 0, -1)
+        self.ObjectVisBtn = QPushButton(self.DebugCVWidget_1)
+        self.ObjectVisBtn.setObjectName(u"ObjectVisBtn")
+        self.ObjectVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_10.addWidget(self.ObjectVisBtn)
+
+        self.FloorVisBtn = QPushButton(self.DebugCVWidget_1)
+        self.FloorVisBtn.setObjectName(u"FloorVisBtn")
+        self.FloorVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_10.addWidget(self.FloorVisBtn)
+
+        self.KalmanCenterVisBtn = QPushButton(self.DebugCVWidget_1)
+        self.KalmanCenterVisBtn.setObjectName(u"KalmanCenterVisBtn")
+        self.KalmanCenterVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_10.addWidget(self.KalmanCenterVisBtn)
+
+
+        self.verticalLayout_18.addWidget(self.DebugCVWidget_1)
+
+        self.DebugCVWidget_2 = QWidget(self.OpenCVSettingsWidget)
+        self.DebugCVWidget_2.setObjectName(u"DebugCVWidget_2")
+        self.DebugCVWidget_2.setMaximumSize(QSize(16777215, 50))
+        self.horizontalLayout_11 = QHBoxLayout(self.DebugCVWidget_2)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(0, -1, 0, -1)
+        self.AmbientVisBtn = QPushButton(self.DebugCVWidget_2)
+        self.AmbientVisBtn.setObjectName(u"AmbientVisBtn")
+        self.AmbientVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_11.addWidget(self.AmbientVisBtn)
+
+        self.FloorSampleVisBtn = QPushButton(self.DebugCVWidget_2)
+        self.FloorSampleVisBtn.setObjectName(u"FloorSampleVisBtn")
+        self.FloorSampleVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_11.addWidget(self.FloorSampleVisBtn)
+
+        self.PathVisBtn = QPushButton(self.DebugCVWidget_2)
+        self.PathVisBtn.setObjectName(u"PathVisBtn")
+        self.PathVisBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_11.addWidget(self.PathVisBtn)
+
+
+        self.verticalLayout_18.addWidget(self.DebugCVWidget_2)
+
+        self.HSVSettingsHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.HSVSettingsHeaderLabel.setObjectName(u"HSVSettingsHeaderLabel")
+        self.HSVSettingsHeaderLabel.setMaximumSize(QSize(16777215, 22))
+
+        self.verticalLayout_18.addWidget(self.HSVSettingsHeaderLabel)
+
+        self.HSVSliderWidget = QWidget(self.OpenCVSettingsWidget)
+        self.HSVSliderWidget.setObjectName(u"HSVSliderWidget")
+        self.HSVSliderWidget.setMaximumSize(QSize(16777215, 130))
+        self.verticalLayout_19 = QVBoxLayout(self.HSVSliderWidget)
+        self.verticalLayout_19.setSpacing(0)
+        self.verticalLayout_19.setObjectName(u"verticalLayout_19")
+        self.verticalLayout_19.setContentsMargins(0, 0, 0, 0)
+        self.HRowWidget = QWidget(self.HSVSliderWidget)
+        self.HRowWidget.setObjectName(u"HRowWidget")
+        self.horizontalLayout_12 = QHBoxLayout(self.HRowWidget)
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(9, -1, 0, -1)
+        self.HRowLabel = QLabel(self.HRowWidget)
+        self.HRowLabel.setObjectName(u"HRowLabel")
+        self.HRowLabel.setMinimumSize(QSize(65, 0))
+        self.HRowLabel.setMaximumSize(QSize(65, 16777215))
+
+        self.horizontalLayout_12.addWidget(self.HRowLabel)
+
+        self.horizontalSpacer = QSpacerItem(2, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_12.addItem(self.horizontalSpacer)
+
+        self.HRowSlider = QSlider(self.HRowWidget)
+        self.HRowSlider.setObjectName(u"HRowSlider")
+        self.HRowSlider.setMinimumSize(QSize(675, 0))
+        self.HRowSlider.setMaximumSize(QSize(675, 16777215))
+        self.HRowSlider.setOrientation(Qt.Orientation.Horizontal)
+
+        self.horizontalLayout_12.addWidget(self.HRowSlider, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        self.HRowValueLabel = QLabel(self.HRowWidget)
+        self.HRowValueLabel.setObjectName(u"HRowValueLabel")
+        self.HRowValueLabel.setMinimumSize(QSize(25, 0))
+        self.HRowValueLabel.setMaximumSize(QSize(25, 16777215))
+        self.HRowValueLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.horizontalLayout_12.addWidget(self.HRowValueLabel, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.verticalLayout_19.addWidget(self.HRowWidget)
+
+        self.SRowWidget = QWidget(self.HSVSliderWidget)
+        self.SRowWidget.setObjectName(u"SRowWidget")
+        self.horizontalLayout_13 = QHBoxLayout(self.SRowWidget)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setContentsMargins(-1, -1, 0, -1)
+        self.SRowLabel = QLabel(self.SRowWidget)
+        self.SRowLabel.setObjectName(u"SRowLabel")
+        self.SRowLabel.setMinimumSize(QSize(65, 0))
+        self.SRowLabel.setMaximumSize(QSize(65, 16777215))
+
+        self.horizontalLayout_13.addWidget(self.SRowLabel, 0, Qt.AlignmentFlag.AlignLeft)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_13.addItem(self.horizontalSpacer_2)
+
+        self.SRowSlider = QSlider(self.SRowWidget)
+        self.SRowSlider.setObjectName(u"SRowSlider")
+        self.SRowSlider.setMinimumSize(QSize(675, 0))
+        self.SRowSlider.setMaximumSize(QSize(675, 16777215))
+        self.SRowSlider.setOrientation(Qt.Orientation.Horizontal)
+
+        self.horizontalLayout_13.addWidget(self.SRowSlider, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        self.SRowValueLabel = QLabel(self.SRowWidget)
+        self.SRowValueLabel.setObjectName(u"SRowValueLabel")
+        self.SRowValueLabel.setMinimumSize(QSize(25, 0))
+        self.SRowValueLabel.setMaximumSize(QSize(20, 16777215))
+        self.SRowValueLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.horizontalLayout_13.addWidget(self.SRowValueLabel)
+
+
+        self.verticalLayout_19.addWidget(self.SRowWidget)
+
+        self.VRowWidget = QWidget(self.HSVSliderWidget)
+        self.VRowWidget.setObjectName(u"VRowWidget")
+        self.horizontalLayout_14 = QHBoxLayout(self.VRowWidget)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(-1, -1, 0, -1)
+        self.VRowLabel = QLabel(self.VRowWidget)
+        self.VRowLabel.setObjectName(u"VRowLabel")
+        self.VRowLabel.setMinimumSize(QSize(65, 0))
+        self.VRowLabel.setMaximumSize(QSize(65, 16777215))
+
+        self.horizontalLayout_14.addWidget(self.VRowLabel, 0, Qt.AlignmentFlag.AlignLeft)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_3)
+
+        self.VRowSlider = QSlider(self.VRowWidget)
+        self.VRowSlider.setObjectName(u"VRowSlider")
+        self.VRowSlider.setMinimumSize(QSize(675, 0))
+        self.VRowSlider.setMaximumSize(QSize(675, 16777215))
+        self.VRowSlider.setOrientation(Qt.Orientation.Horizontal)
+
+        self.horizontalLayout_14.addWidget(self.VRowSlider)
+
+        self.VRowValueLabel = QLabel(self.VRowWidget)
+        self.VRowValueLabel.setObjectName(u"VRowValueLabel")
+        self.VRowValueLabel.setMinimumSize(QSize(25, 0))
+        self.VRowValueLabel.setMaximumSize(QSize(20, 16777215))
+        self.VRowValueLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.horizontalLayout_14.addWidget(self.VRowValueLabel)
+
+
+        self.verticalLayout_19.addWidget(self.VRowWidget)
+
+
+        self.verticalLayout_18.addWidget(self.HSVSliderWidget)
+
+        self.CollisionAssistHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.CollisionAssistHeaderLabel.setObjectName(u"CollisionAssistHeaderLabel")
+        self.CollisionAssistHeaderLabel.setMaximumSize(QSize(16777215, 22))
+
+        self.verticalLayout_18.addWidget(self.CollisionAssistHeaderLabel)
+
+        self.CollisionAssistWidget = QWidget(self.OpenCVSettingsWidget)
+        self.CollisionAssistWidget.setObjectName(u"CollisionAssistWidget")
+        self.CollisionAssistWidget.setMaximumSize(QSize(16777215, 50))
+        self.horizontalLayout_15 = QHBoxLayout(self.CollisionAssistWidget)
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.horizontalLayout_15.setContentsMargins(0, -1, 0, -1)
+        self.CollisionAssistBtn = QPushButton(self.CollisionAssistWidget)
+        self.CollisionAssistBtn.setObjectName(u"CollisionAssistBtn")
+        self.CollisionAssistBtn.setMinimumSize(QSize(0, 25))
+
+        self.horizontalLayout_15.addWidget(self.CollisionAssistBtn)
+
+
+        self.verticalLayout_18.addWidget(self.CollisionAssistWidget)
+
+
+        self.verticalLayout_15.addWidget(self.OpenCVSettingsWidget)
+
+        self.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_15.addItem(self.verticalSpacer_8)
 
         self.emergencyDisconnectBtn = QPushButton(self.settingsLeftWidget)
         self.emergencyDisconnectBtn.setObjectName(u"emergencyDisconnectBtn")
@@ -556,10 +951,6 @@ class Ui_MainWindow(object):
         self.emergencyDisconnectLabel.setFont(font1)
 
         self.verticalLayout_15.addWidget(self.emergencyDisconnectLabel, 0, Qt.AlignmentFlag.AlignHCenter)
-
-        self.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_15.addItem(self.verticalSpacer_8)
 
 
         self.horizontalLayout_5.addWidget(self.settingsLeftWidget)
@@ -731,11 +1122,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_12.addWidget(self.turnLeftLabel)
 
-        self.reverseBreakLabel = QLabel(self.keyInfoWitget)
-        self.reverseBreakLabel.setObjectName(u"reverseBreakLabel")
-        self.reverseBreakLabel.setFont(font1)
+        self.reverseBrakeLabel = QLabel(self.keyInfoWitget)
+        self.reverseBrakeLabel.setObjectName(u"reverseBrakeLabel")
+        self.reverseBrakeLabel.setFont(font1)
 
-        self.verticalLayout_12.addWidget(self.reverseBreakLabel)
+        self.verticalLayout_12.addWidget(self.reverseBrakeLabel)
 
         self.turnRightLabel = QLabel(self.keyInfoWitget)
         self.turnRightLabel.setObjectName(u"turnRightLabel")
@@ -853,10 +1244,27 @@ class Ui_MainWindow(object):
         self.aboutTitle.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.description.setText(QCoreApplication.translate("MainWindow", u"DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.", None))
         self.settingsHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.OpenCVHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"OpenCV", None))
+        self.DebugCVHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Debug Options:", None))
+        self.ObjectVisBtn.setText(QCoreApplication.translate("MainWindow", u"Object Vis: OFF", None))
+        self.FloorVisBtn.setText(QCoreApplication.translate("MainWindow", u"Floor Vis: OFF", None))
+        self.KalmanCenterVisBtn.setText(QCoreApplication.translate("MainWindow", u"Kalman Center Vis: OFF", None))
+        self.AmbientVisBtn.setText(QCoreApplication.translate("MainWindow", u"Ambient Vis: OFF", None))
+        self.FloorSampleVisBtn.setText(QCoreApplication.translate("MainWindow", u"Floor Sample Vis: OFF", None))
+        self.PathVisBtn.setText(QCoreApplication.translate("MainWindow", u"Path Vis: OFF", None))
+        self.HSVSettingsHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Min HSV Sensitivity Margins:", None))
+        self.HRowLabel.setText(QCoreApplication.translate("MainWindow", u"H Margin", None))
+        self.HRowValueLabel.setText(QCoreApplication.translate("MainWindow", u"0", None))
+        self.SRowLabel.setText(QCoreApplication.translate("MainWindow", u"S Margin", None))
+        self.SRowValueLabel.setText(QCoreApplication.translate("MainWindow", u"0", None))
+        self.VRowLabel.setText(QCoreApplication.translate("MainWindow", u"V Margin", None))
+        self.VRowValueLabel.setText(QCoreApplication.translate("MainWindow", u"0", None))
+        self.CollisionAssistHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Collision Assist:", None))
+        self.CollisionAssistBtn.setText(QCoreApplication.translate("MainWindow", u"OFF", None))
         self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
         self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
         self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
-        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.0 (21-02-2025)", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.1 (05-04-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
         self.keyBindingsLabel.setText(QCoreApplication.translate("MainWindow", u"Key Bindings", None))
         self.wKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[W]", None))
@@ -865,7 +1273,7 @@ class Ui_MainWindow(object):
         self.dKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[D]", None))
         self.accelerateLabel.setText(QCoreApplication.translate("MainWindow", u":     Accelerate", None))
         self.turnLeftLabel.setText(QCoreApplication.translate("MainWindow", u":     Turn Left", None))
-        self.reverseBreakLabel.setText(QCoreApplication.translate("MainWindow", u":    Reverse/Break", None))
+        self.reverseBrakeLabel.setText(QCoreApplication.translate("MainWindow", u":    Reverse/Brake", None))
         self.turnRightLabel.setText(QCoreApplication.translate("MainWindow", u":    Turn Right", None))
         self.currentVehicleLabel.setText(QCoreApplication.translate("MainWindow", u"Current vehicle connected to:", None))
         self.vehicleTypeLabel.setText(QCoreApplication.translate("MainWindow", u"Unknown", None))
