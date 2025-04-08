@@ -27,8 +27,11 @@ DriveCore is a modular and scalable platform designed for controlling RC vehicle
 
 DriveCore is built for enthusiasts, researchers, and developers looking to push the boundaries of AI-driven RC control. Whether experimenting with computer vision, autonomous navigation, or real-time control, DriveCore provides the flexibility and power to bring ideas to life.
 
+---
+
 # Current Version: 1.1 for D-14
-[D-14 Client and Host Section](D-14/README.md)
+
+- [D-14 Client and Host Section](D-14/README.md)
 
 <details>
 
@@ -37,6 +40,15 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 ![Settings Page Ver 1.1](D-14/Diagrams-Concepts/Ver-1-1/CvOverlayV1-1.png)
 
 </details>
+
+---
+
+## Vehicles:
+
+- [D-14](D-14/README.md)
+- [Probe-33](Probe-33/README.md) *(New vehicle in progress..)*
+
+---
 
 ## Getting Started
 
@@ -61,6 +73,8 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 ### Launch the Client Application
 `python3 DriveCore/D-14/Client-Side/client-app/main.py`
 
+---
+
 ## System Requirements
 
 - Raspberry Pi 4 or later (2+ gb of ram)
@@ -69,6 +83,8 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 - OpenCV for computer vision processing
 - `pigpio` daemon running
 
+---
+
 ## Tests
 
 **To run unit tests for DriveCore:**
@@ -76,6 +92,8 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 
 **OpenCV testing section:**
 [OpenCv General Testing (D-14)](D-14/Client-Side/openCV-testing/README.md)
+
+---
 
 ## License
 

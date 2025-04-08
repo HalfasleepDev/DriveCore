@@ -186,16 +186,62 @@
 
 ---
 
-## Planned Features:
+## Version Roadmap **(Upcomming)**:
+<details>
 
-- [ ] Steering and max throttle tunning on the `settings` page
-- [ ] Client-Host communication & verification
-- [ ] Drive model *(HOST)*
-- [ ] Acceleration curves *(CLIENT)*
+<summary>Version 1.2</summary>
+
+### Version 1.2 - "Control Tuning & UI Foundations"
+- [ ] Framework for steering and max throttle tuning on the `settings` page
 - [ ] UI design consistency
+- [ ] Add UI element foundations for **Ver 1.3**
 - [ ] Upgrade `settings` page
-- [ ] Application packaging
+
+</details>
+
+<details>
+
+<summary>Version 1.3</summary>
+
+### Version 1.3 – “Control System & Communication Layer”
+- [ ] Drive model *(HOST)*
+- [ ] Client-Host communication & verification
+- [ ] Acceleration curves *(CLIENT)*
 - [ ] Vehicle status info *(CLIENT)*
+- [ ] Application packaging
+- [ ] Client-Host logging
+
+</details>
+
+<details>
+
+<summary>Version 1.4</summary>
+
+### Version 1.4 – “Intelligent Perception Update”
+ - [ ] Integrate MiDaS depth estimation for floor & obstacle awareness
+ - [ ] Use MiDaS depth to improve obstacle detection & safety logic
+ ...
+
+ </details>
+
+<details>
+
+<summary>Version 1.5</summary>
+
+### Version 1.5 – “Autonomy Foundations”
+- [ ] Add Kalman-filtered path following (auto-drive down a detected path/auto cruise control)
+- [ ] Add basic AI behavior tree or rule-based autonomy modes
+...
+
+</details>
+
+### Stretch Features(v1.5+) *(TBD)*
+- [ ] UI overhall *(Post v1.5)*
+- [ ] Raspberry pi based autonomy <-- *If the raspberry pi is too weak, I'll make a new vehicle*
+    - [ ] Map tracking
+    - [ ] Route mapping
+    - [ ] Waypoint Navagation *(TBD)*
+    - [ ] Return to Home
 
 <details>
 

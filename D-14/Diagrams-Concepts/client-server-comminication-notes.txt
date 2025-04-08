@@ -1,0 +1,90 @@
+- Should use json udp packets
+
+
+# "Handshake"
+Step 1:
+    Host: 
+    - asks for identification (i.e. Username/psswd)
+    
+    Client:
+    - Sends credentials
+
+Step 2: 
+    Client:
+    - Asks for DriveCore version info
+
+    Host:
+    - Sends current version info
+    - Asks for DriveCore Client version info
+
+    Client:
+    - Sends current version info
+
+Step 3:
+    Client:
+    - Asks "version specific" setup info:
+        + Vehicle Model
+        + Control scheme
+        + Number of cameras
+        + Number of sensors
+            * Type of each sensor
+        + Local prossesing enabled
+        + Https camera address
+    
+    Host:
+    - Sends "version specific" setup info
+
+    Client:
+    - Sends any tune data:
+        + MIN/MAX DUTY for servo or esc
+
+# "Control scheme"
+Manual "w" "a" "s" "d" control:
+    Client:
+    - sends the type of keypress:
+        * `COMMAND + TYPE + ASSIST + TIMESTAMP`
+    - Waits to hear if the Host recieves the COMMAND
+
+    Host: 
+    - Executes the COMMAND
+    - Sends the status of the recieved COMMAND
+        * `ACTION + TYPE + ASSIST + TIMESTAMP`
+    - Waits for a COMMAND within a given timeframe:
+        * if a COMMAND is not recieved within a given timeframe, do emergency actions
+    
+# New COMMANDS
+Controls:
+    Keypresses: 
+        - "UP" = 'w'
+        - "DOWN" = 's'
+        - "LEFT" = 'a'
+        - "LEFTUP" = 'a' + 'w'
+        - "LEFTDOWN" = 'a' + 's'
+        - "RIGHT" = 'd'
+        - "RIGHTUP" = 'd' + 'w'
+        - "RIGHTDOWN" = 'd' + 's'
+        - "BRAKE" = 'space bar'
+
+    Assist Commands:
+        - "EMERGENCY_BRAKE" = Tells the vehicle to preform an emergency brake (check every 1000ms if another command has been sent before clearing)
+        - "ASSIST_LEFT" = Steering assist from path detection
+        - "ASSIST_RIGHT" = Steering assist from path detection
+        - "ASSIST_SLOW" = Limit vehicle speed and acceleration temp
+        ...
+    
+    Other Commands:
+        - "NEUTRAL" = return to neutral duty esc (acts as if a key is not pressed)
+
+Settings:
+    Client:
+    - Sends a command for "settings mode"
+
+    Host:
+    - Recevies command and enters "settings mode"
+        + MIN and MAX duty values can be altered
+        + Live testing enviroment
+    
+    Client:
+    - Sends a command to exit settings mode
+
+
