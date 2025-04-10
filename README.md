@@ -93,6 +93,9 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 **OpenCV testing section:**
 [OpenCv General Testing (D-14)](D-14/Client-Side/openCV-testing/README.md)
 
+**GUI Prototype section:**
+[GUI General Prototypes (D-14)](D-14/Client-Side/ui-prototypes/README.md)
+
 ---
 
 ## License
