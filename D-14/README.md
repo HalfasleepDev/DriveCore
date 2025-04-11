@@ -169,12 +169,14 @@
 ---
 
 ## Hardware requirements:
+- WPL D14 Suzuki Carry - RTR
 - Raspberry pi 4
 - 8mp raspberry pi cam
-- 20A esc
+- 30A esc
 - battery pack
 - wifi extender
 - led kit (optional)
+- Follow the [Electronic Diagram](Diagrams-Concepts/D-14-Electronic-Diagram.pdf)
 
 ---
 
