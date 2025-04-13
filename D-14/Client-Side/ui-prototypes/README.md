@@ -19,6 +19,7 @@
 - `Keybindings` will be moved and minimized vertically to the bottom.
 
 ![Vehicle Control Vis](ver-1-2/vehicleControlGuiVis.png)
+
 [Vehicle Control Code](ver-1-2/vehicleControlGuiVis.py)
 
 </details>
@@ -36,7 +37,27 @@
 - It will replace the Throttle Visualization from [Infotainment GUI](ver-1-2/vehicleControlGuiVis.py)
 
 ![Speedometer Vis](ver-1-2/speedometerGuiVis.png)
+
 [Speedometer Code](ver-1-2/speedometerGuiVis.py)
+
+
+</details>
+
+<details>
+
+<summary>Steer Angle GUI</summary>
+
+#### Features
+- Customizable µs range
+- Smooth animation
+- Curve Path Visualization
+
+#### How will this be applied?
+- It will replace the Steering Visualization from [Infotainment GUI](ver-1-2/vehicleControlGuiVis.py)
+
+![Steer Angle Vis](ver-1-2/steerAngleGuiVis.png)
+
+[Steer Angle Code](ver-1-2/steerAngleGuiVis.py)
 
 
 </details>

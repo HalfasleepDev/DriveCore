@@ -3,12 +3,15 @@ import math
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QPainter, QConicalGradient, QFont, QColor, QPen
 from PySide6.QtCore import Qt, QTimer, QRectF
+import os
+
+os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 class SpeedometerWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("DriveCore Speedometer")
-        self.setGeometry(100, 100, 400, 400)
+        self.setGeometry(100, 100, 300, 300) # Maybe use fixed size
 
         # Customizable µs range
         self.min_us = 1310
@@ -111,7 +114,7 @@ class SpeedometerWidget(QWidget):
 
         # Draw µs value
         painter.setPen(QColor("#ffffff"))
-        painter.setFont(QFont("Segoe UI", 28, QFont.Bold))
+        painter.setFont(QFont("Segoe UI", 28, QFont.Bold)) # TODO: Change font and size for main build
         painter.drawText(self.rect(), Qt.AlignCenter, f"{self.current_us} µs")
 
 if __name__ == "__main__":
