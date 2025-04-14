@@ -62,6 +62,24 @@
 
 </details>
 
+<details>
+
+<summary>PRND Selector GUI</summary>
+
+#### Features
+- An animated PRND selector
+- Dynamic animation
+
+#### How will this be applied?
+- It will replace the PRND Visualization from [Infotainment GUI](ver-1-2/vehicleControlGuiVis.py)
+
+![PRND Selector Vis](ver-1-2/prndGuiVis.png)
+
+[PRND Selector Code](ver-1-2/prndGuiVis.py)
+
+
+</details>
+
 
 ### Log Page
 
