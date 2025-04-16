@@ -117,6 +117,23 @@
 
 </details>
 
+<details>
+
+<summary>Alert Assist GUI</summary>
+
+#### Features
+- A red flashing alert to notify an issue
+- A button toggle for drive assist (obstacle avoidance)
+
+#### How will this be applied?
+- It will be on the bottom right of the Infotainment widgets.
+
+![Alert Assist Vis](ver-1-2/alertAssistGuiVis.png)
+
+[Alert Assist Code](ver-1-2/alertAssistGuiVis.py)
+
+
+</details>
 
 ### Log Page
 
