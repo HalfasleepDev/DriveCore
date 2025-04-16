@@ -1,1 +1,0 @@
-# TODO: Create a widget for showing logs

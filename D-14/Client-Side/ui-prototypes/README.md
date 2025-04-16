@@ -3,6 +3,24 @@
 ## GUI (v1.2)
 ---
 ### Home Page
+<details>
+
+<summary>General Logs GUI (Connection Logs)</summary>
+
+#### Features
+- A General Logs Widget that can be used to display specific logs
+- Scrollable widget
+- Clear Button for clearing logs
+
+#### How will this be applied?
+- It will be added to the Home Page Next to the Ip input feilds.
+
+![General Logs Vis](ver-1-2/generalLogGuiVis.png)
+
+[General Logs Code](ver-1-2/generalLogGuiVis.py)
+
+
+</details>
 
 ### Drive Page
 <details>
@@ -80,8 +98,30 @@
 
 </details>
 
+<details>
+
+<summary>General Logs GUI (Alert Logs)</summary>
+
+#### Features
+- A General Logs Widget that can be used to display specific logs
+- Scrollable widget
+- Clear Button for clearing logs
+
+#### How will this be applied?
+- It will replace the Alert-Info widget from [Infotainment GUI](ver-1-2/vehicleControlGuiVis.py)
+
+![General Logs Vis](ver-1-2/generalLogGuiVis.png)
+
+[General Logs Code](ver-1-2/generalLogGuiVis.py)
+
+
+</details>
+
 
 ### Log Page
 
+- Nothing to Prototype.
 
 ### Settings Page
+
+ - Nothing to Prototype.

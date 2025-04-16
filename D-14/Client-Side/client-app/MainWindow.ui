@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1425</width>
+    <width>1599</width>
     <height>1115</height>
    </rect>
   </property>
@@ -21,6 +21,18 @@ QLabel#settingsHeaderLabel{
 }
 Line#keysettingsHeaderLine{
 	color: #1e1e21;
+}
+QPushButton#openCVSettingsBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
+	color: #f1f3f3;
+}
+QPushButton#vehicleTuningBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
+	color: #f1f3f3;
 }
 
 /*OpenCV Settings*/
@@ -220,36 +232,58 @@ QLabel#currentPgrmVersionHeaderLabel{
 QWidget#videoStreamWidget{
 	background-color: #f1f3f3;
 }
-QLabel#keyBindingsLabel{
+QWidget#prndWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 15px;
+}
+QWidget#speedometerWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 150px;
+}
+QWidget#steerAngleWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 15px;
+}
+QWidget#alertAssistWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 15px;
+}
+
+QPushButton#accelerateBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
 	color: #f1f3f3;
 }
-Line#keyBindingsLine{
-	color: #1e1e21;
-}
-QLabel#wKeyLabel{
+QPushButton#turnLeftBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
 	color: #f1f3f3;
 }
-QLabel#aKeyLabel{
+QPushButton#reverseBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
 	color: #f1f3f3;
 }
-QLabel#sKeyLabel{
+QPushButton#turnRightBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
 	color: #f1f3f3;
 }
-QLabel#dKeyLabel{
+QPushButton#brakeBtn{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 5px;
 	color: #f1f3f3;
 }
-QLabel#accelerateLabel{
-	color: #f1f3f3;
-}
-QLabel#turnLeftLabel{
-	color: #f1f3f3;
-}
-QLabel#reverseBreakLabel{
-	color: #f1f3f3;
-}
-QLabel#turnRightLabel{
-	color: #f1f3f3;
-}
+
 QWidget#connectionVehicleTypeWidget{
 	background-color: #1e1e21;
 	border: 1px #1e1e21;
@@ -266,8 +300,19 @@ QWidget#currentVehicleLblWidget{
 QLabel#currentVehicleLabel{
 	color: #f1f3f3;
 }
+QWidget#vehicleAlertLogWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 15px;
+}
 
+/*=======Center home widget=======*/
 
+QWidget#connectionLogWidget{
+	background-color: #1e1e21;
+	border: 1px #1e1e21;
+	border-radius: 15px;
+}
 
 /*=======Left home widget=======*/
 QGroupBox#ipInputBox{
@@ -351,8 +396,6 @@ QWidget#leftMenu {
 	background-color: #1e1e21;
 }
 
-
-
 /*=======Left menu buttons=======*/
 QPushButton#homeBtn {
 	background-color: #f1f3f3;
@@ -371,6 +414,14 @@ QPushButton#driveBtn {
     padding: 6px;
 }
 QPushButton#settingsBtn {
+	background-color: #f1f3f3;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 30px;
+    border-color: #f1f3f3;
+    padding: 6px;
+}
+QPushButton#logBtn {
 	background-color: #f1f3f3;
     border-style: outset;
     border-width: 2px;
@@ -526,6 +577,44 @@ QWidget#drivePage{
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="logBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -597,7 +686,7 @@ QWidget#drivePage{
          <widget class="QWidget" name="homePage">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -640,7 +729,7 @@ QWidget#drivePage{
                <widget class="QGroupBox" name="ipInputBox">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>400</width>
                   <height>90</height>
                  </size>
                 </property>
@@ -708,7 +797,7 @@ QWidget#drivePage{
                <widget class="QGroupBox" name="recentIpBox">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>400</width>
                   <height>90</height>
                  </size>
                 </property>
@@ -831,6 +920,109 @@ QWidget#drivePage{
              </layout>
             </widget>
            </item>
+           <item alignment="Qt::AlignmentFlag::AlignLeft">
+            <widget class="QWidget" name="centerHomeWidget" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_20">
+              <property name="spacing">
+               <number>20</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>20</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <spacer name="verticalSpacer_12">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Policy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>301</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QWidget" name="connectionLogWidget" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>450</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>620</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_11">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Policy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Ignored</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10000</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="QWidget" name="rightHomeWidget" native="true">
              <property name="minimumSize">
@@ -930,7 +1122,7 @@ QWidget#drivePage{
                        </font>
                       </property>
                       <property name="text">
-                       <string>Follow the project on GitHub</string>
+                       <string>About</string>
                       </property>
                      </widget>
                     </item>
@@ -941,12 +1133,12 @@ QWidget#drivePage{
                       </property>
                      </widget>
                     </item>
-                    <item>
+                    <item alignment="Qt::AlignmentFlag::AlignTop">
                      <widget class="QLabel" name="githubLink">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>0</height>
+                        <height>200</height>
                        </size>
                       </property>
                       <property name="maximumSize">
@@ -956,7 +1148,13 @@ QWidget#drivePage{
                        </size>
                       </property>
                       <property name="text">
-                       <string>https://github.com/HalfasleepDev/DriveCore</string>
+                       <string>DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.</string>
+                      </property>
+                      <property name="textFormat">
+                       <enum>Qt::TextFormat::MarkdownText</enum>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
                       </property>
                       <property name="wordWrap">
                        <bool>true</bool>
@@ -999,7 +1197,7 @@ QWidget#drivePage{
                        </font>
                       </property>
                       <property name="text">
-                       <string>About</string>
+                       <string>Releases</string>
                       </property>
                      </widget>
                     </item>
@@ -1024,7 +1222,7 @@ QWidget#drivePage{
                        </font>
                       </property>
                       <property name="text">
-                       <string>DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.</string>
+                       <string>Release here:</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::TextFormat::MarkdownText</enum>
@@ -1063,15 +1261,71 @@ QWidget#drivePage{
                <number>10</number>
               </property>
               <item>
-               <widget class="QLabel" name="settingsHeaderLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>24</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Settings</string>
-                </property>
+               <widget class="QWidget" name="widget" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_17">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="settingsHeaderLabel">
+                   <property name="font">
+                    <font>
+                     <pointsize>24</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Settings</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="openCVSettingsBtn">
+                   <property name="minimumSize">
+                    <size>
+                     <width>25</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Open CV</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="vehicleTuningBtn">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Vehicle Tuning</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item>
@@ -1082,524 +1336,526 @@ QWidget#drivePage{
                </widget>
               </item>
               <item>
-               <widget class="QWidget" name="OpenCVSettingsWidget" native="true">
+               <widget class="QStackedWidget" name="settingsStackedWidget">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>500</height>
                  </size>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_18">
-                 <property name="spacing">
-                  <number>6</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>9</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>9</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="OpenCVHeaderLabel">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>35</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <pointsize>15</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>OpenCV</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="Line" name="OpenCVHeaderLine">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="DebugCVHeaderLabel">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Debug Options:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="DebugCVWidget_1" native="true">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_10">
-                    <property name="leftMargin">
-                     <number>0</number>
+                <widget class="QWidget" name="OpenCVSettingsPage" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_18">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>9</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>9</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="OpenCVHeaderLabel">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
                     </property>
-                    <property name="rightMargin">
-                     <number>0</number>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>35</height>
+                     </size>
                     </property>
-                    <item>
-                     <widget class="QPushButton" name="ObjectVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Object Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="FloorVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Floor Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="KalmanCenterVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Kalman Center Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="DebugCVWidget_2" native="true">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_11">
-                    <property name="leftMargin">
-                     <number>0</number>
+                    <property name="font">
+                     <font>
+                      <pointsize>15</pointsize>
+                     </font>
                     </property>
-                    <property name="rightMargin">
-                     <number>0</number>
+                    <property name="text">
+                     <string>OpenCV</string>
                     </property>
-                    <item>
-                     <widget class="QPushButton" name="AmbientVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Ambient Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="FloorSampleVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>FloorSample Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="PathVisBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Path Vis: OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="HSVSettingsHeaderLabel">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Min HSV Sensitivity Margins:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="HSVSliderWidget" native="true">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>130</height>
-                    </size>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_19">
-                    <property name="spacing">
-                     <number>0</number>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="Line" name="OpenCVHeaderLine">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
                     </property>
-                    <property name="leftMargin">
-                     <number>0</number>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="DebugCVHeaderLabel">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>22</height>
+                     </size>
                     </property>
-                    <property name="topMargin">
-                     <number>0</number>
+                    <property name="text">
+                     <string>Debug Options:</string>
                     </property>
-                    <property name="rightMargin">
-                     <number>0</number>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="DebugCVWidget_1" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>50</height>
+                     </size>
                     </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QWidget" name="HRowWidget" native="true">
-                      <layout class="QHBoxLayout" name="horizontalLayout_12">
-                       <property name="leftMargin">
-                        <number>9</number>
+                    <layout class="QHBoxLayout" name="horizontalLayout_10">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QPushButton" name="ObjectVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
                        </property>
-                       <property name="rightMargin">
-                        <number>0</number>
+                       <property name="text">
+                        <string>Object Vis: OFF</string>
                        </property>
-                       <item>
-                        <widget class="QLabel" name="HRowLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>65</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>65</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>H Margin</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <spacer name="horizontalSpacer">
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                         <property name="sizeType">
-                          <enum>QSizePolicy::Policy::Minimum</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>2</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item alignment="Qt::AlignmentFlag::AlignVCenter">
-                        <widget class="QSlider" name="HRowSlider">
-                         <property name="minimumSize">
-                          <size>
-                           <width>675</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>675</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item alignment="Qt::AlignmentFlag::AlignRight">
-                        <widget class="QLabel" name="HRowValueLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>25</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>25</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>0</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QWidget" name="SRowWidget" native="true">
-                      <layout class="QHBoxLayout" name="horizontalLayout_13">
-                       <property name="rightMargin">
-                        <number>0</number>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="FloorVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
                        </property>
-                       <item alignment="Qt::AlignmentFlag::AlignLeft">
-                        <widget class="QLabel" name="SRowLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>65</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>65</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>S Margin</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <spacer name="horizontalSpacer_2">
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>40</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item alignment="Qt::AlignmentFlag::AlignVCenter">
-                        <widget class="QSlider" name="SRowSlider">
-                         <property name="minimumSize">
-                          <size>
-                           <width>675</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>675</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="SRowValueLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>25</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>20</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>0</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QWidget" name="VRowWidget" native="true">
-                      <layout class="QHBoxLayout" name="horizontalLayout_14">
-                       <property name="rightMargin">
-                        <number>0</number>
+                       <property name="text">
+                        <string>Floor Vis: OFF</string>
                        </property>
-                       <item alignment="Qt::AlignmentFlag::AlignLeft">
-                        <widget class="QLabel" name="VRowLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>65</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>65</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>V Margin</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <spacer name="horizontalSpacer_3">
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>40</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item>
-                        <widget class="QSlider" name="VRowSlider">
-                         <property name="minimumSize">
-                          <size>
-                           <width>675</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>675</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Horizontal</enum>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="VRowValueLabel">
-                         <property name="minimumSize">
-                          <size>
-                           <width>25</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>20</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>0</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="CollisionAssistHeaderLabel">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Collision Assist:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="CollisionAssistWidget" native="true">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_15">
-                    <property name="leftMargin">
-                     <number>0</number>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="KalmanCenterVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Kalman Center Vis: OFF</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="DebugCVWidget_2" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>50</height>
+                     </size>
                     </property>
-                    <property name="rightMargin">
-                     <number>0</number>
+                    <layout class="QHBoxLayout" name="horizontalLayout_11">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QPushButton" name="AmbientVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Ambient Vis: OFF</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="FloorSampleVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>FloorSample Vis: OFF</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="PathVisBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Path Vis: OFF</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="HSVSettingsHeaderLabel">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>22</height>
+                     </size>
                     </property>
-                    <item>
-                     <widget class="QPushButton" name="CollisionAssistBtn">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>OFF</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
+                    <property name="text">
+                     <string>Min HSV Sensitivity Margins:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="HSVSliderWidget" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>130</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_19">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QWidget" name="HRowWidget" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_12">
+                        <property name="leftMargin">
+                         <number>9</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="HRowLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>65</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>65</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>H Margin</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeType">
+                           <enum>QSizePolicy::Policy::Minimum</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>2</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item alignment="Qt::AlignmentFlag::AlignVCenter">
+                         <widget class="QSlider" name="HRowSlider">
+                          <property name="minimumSize">
+                           <size>
+                            <width>675</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>675</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item alignment="Qt::AlignmentFlag::AlignRight">
+                         <widget class="QLabel" name="HRowValueLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>25</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>25</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                          <property name="alignment">
+                           <set>Qt::AlignmentFlag::AlignCenter</set>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="SRowWidget" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_13">
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <item alignment="Qt::AlignmentFlag::AlignLeft">
+                         <widget class="QLabel" name="SRowLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>65</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>65</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>S Margin</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_2">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item alignment="Qt::AlignmentFlag::AlignVCenter">
+                         <widget class="QSlider" name="SRowSlider">
+                          <property name="minimumSize">
+                           <size>
+                            <width>675</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>675</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="SRowValueLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>25</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>20</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                          <property name="alignment">
+                           <set>Qt::AlignmentFlag::AlignCenter</set>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="VRowWidget" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_14">
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <item alignment="Qt::AlignmentFlag::AlignLeft">
+                         <widget class="QLabel" name="VRowLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>65</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>65</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>V Margin</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_3">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QSlider" name="VRowSlider">
+                          <property name="minimumSize">
+                           <size>
+                            <width>675</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>675</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="VRowValueLabel">
+                          <property name="minimumSize">
+                           <size>
+                            <width>25</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>20</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                          <property name="alignment">
+                           <set>Qt::AlignmentFlag::AlignCenter</set>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="CollisionAssistHeaderLabel">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>22</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Collision Assist:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="CollisionAssistWidget" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_15">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QPushButton" name="CollisionAssistBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>OFF</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
               <item>
@@ -1656,14 +1912,29 @@ QWidget#drivePage{
             <widget class="QWidget" name="settingsRightWidget" native="true">
              <layout class="QVBoxLayout" name="verticalLayout_16">
               <item>
+               <widget class="QStackedWidget" name="settingsInfoStackedWidget">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>800</height>
+                 </size>
+                </property>
+                <widget class="QWidget" name="openCVSettingsInfoPage"/>
+                <widget class="QWidget" name="vehicleTuningInfoPage"/>
+               </widget>
+              </item>
+              <item>
                <spacer name="verticalSpacer_10">
                 <property name="orientation">
                  <enum>Qt::Orientation::Vertical</enum>
                 </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Policy::Fixed</enum>
+                </property>
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>20</width>
-                  <height>1010</height>
+                  <height>100</height>
                  </size>
                 </property>
                </spacer>
@@ -1848,206 +2119,257 @@ QWidget#drivePage{
               </size>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
-              <item alignment="Qt::AlignmentFlag::AlignLeft">
-               <widget class="QWidget" name="activeKeyBindingsWidget" native="true">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="vehicleGaugeClusterWidget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>800</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>1000</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
-                  <widget class="QLabel" name="keyBindingsLabel">
+                  <widget class="QWidget" name="clusterWidget" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>40</height>
+                     <height>300</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>40</height>
+                     <height>300</height>
                     </size>
                    </property>
-                   <property name="font">
-                    <font>
-                     <pointsize>24</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Key Bindings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="Line" name="keyBindingsLine">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="keyBindListWidget" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <layout class="QHBoxLayout" name="horizontalLayout_16">
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
                     <property name="bottomMargin">
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QWidget" name="keyActiveWidget" native="true">
+                     <widget class="QWidget" name="prndWidget" native="true">
                       <property name="minimumSize">
                        <size>
-                        <width>60</width>
-                        <height>0</height>
+                        <width>75</width>
+                        <height>300</height>
                        </size>
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>60</width>
-                        <height>16777215</height>
+                        <width>75</width>
+                        <height>300</height>
                        </size>
                       </property>
-                      <layout class="QVBoxLayout" name="verticalLayout_11">
-                       <property name="spacing">
-                        <number>0</number>
-                       </property>
-                       <property name="leftMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <widget class="QLabel" name="wKeyLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>[W]</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="aKeyLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>[A]</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="sKeyLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>[S]</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="dKeyLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>[D]</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QWidget" name="keyInfoWitget" native="true">
-                      <layout class="QVBoxLayout" name="verticalLayout_12">
-                       <property name="spacing">
-                        <number>0</number>
-                       </property>
-                       <property name="leftMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <widget class="QLabel" name="accelerateLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>:     Accelerate</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="turnLeftLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>:     Turn Left</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="reverseBreakLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>:    Reverse/Break</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="turnRightLabel">
-                         <property name="font">
-                          <font>
-                           <pointsize>15</pointsize>
-                          </font>
-                         </property>
-                         <property name="text">
-                          <string>:    Turn Right</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                     <spacer name="horizontalSpacer_6">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="speedometerWidget" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>300</width>
+                        <height>300</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>300</width>
+                        <height>300</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_7">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="steerAngleWidget" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>300</width>
+                        <height>300</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>300</width>
+                        <height>300</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="QWidget" name="vehicleKeyInfoWidget" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>800</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="accelerateBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Accelerate : [W]</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="turnLeftBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Turn Left : [A]</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="reverseBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Reverse : [S]</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="turnRightBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Turn Right : [D]</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="brakeBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Brake : [SPACE]</string>
+                      </property>
                      </widget>
                     </item>
                    </layout>
@@ -2055,6 +2377,48 @@ QWidget#drivePage{
                  </item>
                 </layout>
                </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Policy::Expanding</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QWidget" name="alertAssistWidget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>180</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Policy::Ignored</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>180</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item alignment="Qt::AlignmentFlag::AlignRight">
                <widget class="QWidget" name="vehicleStatusWidget" native="true">
@@ -2071,6 +2435,9 @@ QWidget#drivePage{
                  </size>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QWidget" name="connectionVehicleTypeWidget" native="true">
                    <property name="minimumSize">
@@ -2194,6 +2561,16 @@ QWidget#drivePage{
                     </size>
                    </property>
                   </spacer>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="vehicleAlertLogWidget" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>250</height>
+                    </size>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>

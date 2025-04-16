@@ -11,7 +11,7 @@ class SpeedometerWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("DriveCore Speedometer")
-        self.setGeometry(100, 100, 300, 300) # Maybe use fixed size
+        self.setFixedSize(300, 300) # Maybe use fixed size
 
         # Customizable µs range
         self.min_us = 1310
@@ -54,7 +54,7 @@ class SpeedometerWidget(QWidget):
 
         # Draw background circle
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor("#222"))
+        painter.setBrush(QColor("#0c0c0d"))
         painter.drawEllipse(center, radius, radius)
 
         # Full arc span
@@ -88,7 +88,7 @@ class SpeedometerWidget(QWidget):
             gradient.setColorAt(1.0, QColor("#74e1ef"))
 
         # Draw background arc
-        painter.setPen(QPen(QColor("#333"), 18, Qt.SolidLine, Qt.RoundCap))
+        painter.setPen(QPen(QColor("#1e1e21"), 18, Qt.SolidLine, Qt.RoundCap))
         painter.drawArc(
             QRectF(center.x() - radius, center.y() - radius, radius * 2, radius * 2),
             arc_start_angle * 16,
@@ -113,8 +113,8 @@ class SpeedometerWidget(QWidget):
             )
 
         # Draw µs value
-        painter.setPen(QColor("#ffffff"))
-        painter.setFont(QFont("Segoe UI", 28, QFont.Bold)) # TODO: Change font and size for main build
+        painter.setPen(QColor("#f1f3f3"))
+        painter.setFont(QFont("Adwaita Sans", 26, QFont.Bold)) # TODO: Change font and size for main build
         painter.drawText(self.rect(), Qt.AlignCenter, f"{self.current_us} µs")
 
 if __name__ == "__main__":

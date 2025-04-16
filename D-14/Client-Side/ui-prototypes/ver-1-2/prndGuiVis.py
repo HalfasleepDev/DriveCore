@@ -9,7 +9,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 class PRNDWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(100, 300) 
+        self.setFixedSize(75, 300) 
         self.setWindowTitle("PRND Gear Selector")
 
         self.gears = ["P", "R", "N", "D"]
