@@ -157,7 +157,25 @@
 
 ### Log Page
 
-- Nothing to Prototype.
+<details>
+
+<summary>System Log Page GUI</summary>
+
+#### Features
+- Shows system logs of the current session
+- Different tags for each log 
+- Save, clear, or load different logs
+- Keyword search area
+
+#### How will this be applied?
+- It will be added as a new Log page.
+
+![System Log Page Vis](ver-1-2/systemLogPageGuiVis.png)
+
+[System Log Page Code](ver-1-2/systemLogPageGuiVis.py)
+
+
+</details>
 
 ### Settings Page
 

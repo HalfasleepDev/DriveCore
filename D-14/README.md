@@ -194,9 +194,9 @@
 <summary>Version 1.2</summary>
 
 ### Version 1.2 - "Control Tuning & UI Foundations"
-- [ ] Framework for steering and max throttle tuning on the `settings` page
+- [x] Framework for steering and max throttle tuning on the `settings` page
 - [ ] UI design consistency
-- [ ] Add UI element foundations for **Ver 1.3**
+- [x] Add UI element foundations for **Ver 1.3** *(All UI protoyping for Ver 1.2 is done)*
 - [ ] Upgrade `settings` page
 
 - [UI Preview](Diagrams-Concepts/DriveCore-Ver-1-2.pdf)

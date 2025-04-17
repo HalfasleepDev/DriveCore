@@ -1,0 +1,13 @@
+
+
+
+
+1) Midas/yolo  ---> Create a map ---> Display a 3D Point Cloud(SLAM)
+
+2) Detect objects ---> Track objects ---> Create a path 
+
+3) Convert path into measurements (NEW VEHICLE REQUIRED)
+
+4) Convert servo into angle ---> Determine acceleration/movement ---> Follow path (NEW VEHICLE REQUIRED)
+
+5) Create a waypoint follow system (NEW VEHICLE REQUIRED)
