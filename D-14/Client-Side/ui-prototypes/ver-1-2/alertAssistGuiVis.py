@@ -4,7 +4,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer, QSize
 from PySide6.QtGui import QColor, QFont, QPalette
+import os
 
+os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 class DriveAssistWidget(QWidget):
     def __init__(self):

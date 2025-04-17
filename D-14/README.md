@@ -199,6 +199,8 @@
 - [ ] Add UI element foundations for **Ver 1.3**
 - [ ] Upgrade `settings` page
 
+- [UI Preview](Diagrams-Concepts/DriveCore-Ver-1-2.pdf)
+
 </details>
 
 <details>

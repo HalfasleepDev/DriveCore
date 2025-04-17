@@ -22,6 +22,26 @@
 
 </details>
 
+<details>
+
+<summary>Project Info GUI</summary>
+
+#### Features
+- Provides:
+    - A project description
+    - A button that links to the github
+    - Shows the most recent release
+
+#### How will this be applied?
+- It will be added to the Home Page to replace the about section.
+
+![Project Info Vis](ver-1-2/projectInfoGuiVis.png)
+
+[Project Info Code](ver-1-2/projectInfoGuiVis.py)
+
+
+</details>
+
 ### Drive Page
 <details>
 
