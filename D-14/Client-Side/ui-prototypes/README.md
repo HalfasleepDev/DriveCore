@@ -161,4 +161,20 @@
 
 ### Settings Page
 
- - Nothing to Prototype.
+<details>
+
+<summary>Vehicle Calibration GUI</summary>
+
+#### Features
+- A settings section to set and tune esc and servo µs values.
+- Servo values can be adjusted continuously to find the center alignment
+
+#### How will this be applied?
+- It will be a new settings page section.
+
+![Vehicle Calibration Vis](ver-1-2/vehicleCalibrationGuiVis.png)
+
+[Vehicle Calibration Code](ver-1-2/vehicleCalibrationGuiVis.py)
+
+
+</details>
