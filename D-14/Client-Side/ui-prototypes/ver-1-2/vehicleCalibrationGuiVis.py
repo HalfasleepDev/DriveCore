@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGroupBox,
-    QDoubleSpinBox, QPushButton, QFormLayout, QSlider
+    QDoubleSpinBox, QPushButton, QFormLayout, QSlider, QSpinBox
 )
 from PySide6.QtCore import Qt , QSize
 import os
@@ -63,6 +63,48 @@ class CalibrationWidget(QWidget):
         super().__init__()
 
         self.setStyleSheet("""
+            QSpinBox {
+                font-family: 'Adwaita Sans';
+                font-size: 11px;
+                padding: 4px;
+                padding-left: 5px;
+                border-width: 3px;
+                background: #f1f3f3;
+                color: #1e1e21;
+                border-radius: 5px;
+                border: none;
+            }
+            QSpinBox::up-button,
+            QSpinBox::down-button {
+                subcontrol-origin: border;
+                width: 20px;
+                background: #1e1e21;
+                border: none;
+                border-radius: 5px;
+                margin: 1px;
+            }
+            QSpinBox::up-arrow {
+                width: 0;
+                height: 3;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 2px solid #f1f3f3;
+                margin: 1px;
+            }
+
+            QSpinBox::down-arrow {
+                width: 0;
+                height: 3;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-bottom: 2px solid #f1f3f3;
+                margin: 1px;
+            }
+            /* Hover effects (optional) */
+            QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+                background: #7a63ff;
+            }
+                           
             QDoubleSpinBox {
                 font-family: 'Adwaita Sans';
                 font-size: 11px;
@@ -204,6 +246,35 @@ class CalibrationWidget(QWidget):
         esc_group.setLayout(esc_form)
         main_layout.addWidget(esc_group)
 
+        # === Network Port Settings ===
+        port_group = QGroupBox("Network Port Configuration")
+        port_layout = QFormLayout()
+
+        self.comm_port = QSpinBox()
+        self.comm_port.setRange(1024, 65535)
+        self.comm_port.setValue(4444)  # Default or current communication port
+
+        self.cam_port = QSpinBox()
+        self.cam_port.setRange(1024, 65535)
+        self.cam_port.setValue(5000)  # Default or current camera stream port
+
+        self.comm_label = QLabel(f"Current: {self.comm_port.value()}")
+        self.cam_label = QLabel(f"Current: {self.cam_port.value()}")
+
+        # Apply button
+        apply_btn = QPushButton("Apply Port Settings")
+        apply_btn.setMinimumSize(QSize(0, 25))
+        apply_btn.clicked.connect(self.apply_port_settings)
+
+        port_layout.addRow("Comm Port:", self.comm_port)
+        port_layout.addRow(self.comm_label)
+        port_layout.addRow("Webcam Port:", self.cam_port)
+        port_layout.addRow(self.cam_label)
+        port_layout.addRow(apply_btn)
+
+        port_group.setLayout(port_layout)
+        main_layout.addWidget(port_group)
+
         # === Future Curve Configuration ===
         curve_group = QGroupBox("Acceleration / Deceleration Curves")
         curve_layout = QVBoxLayout()
@@ -213,6 +284,7 @@ class CalibrationWidget(QWidget):
         curve_group.setLayout(curve_layout)
 
         main_layout.addWidget(curve_group)
+
         main_layout.addStretch()
 
     # === Preview callbacks ===
@@ -231,6 +303,14 @@ class CalibrationWidget(QWidget):
         print(f"Min: {self.esc_min.value()} µs")
         print(f"Mid: {self.esc_mid.value()} µs")
         print(f"Max: {self.esc_max.value()} µs")
+    
+    def apply_port_settings(self):
+        comm = self.comm_port.value()
+        cam = self.cam_port.value()
+        self.comm_label.setText(f"Current: {comm}")
+        self.cam_label.setText(f"Current: {cam}")
+        print(f"[PORT] Comm: {comm} | Webcam: {cam}")
+        # TODO: Send updated config to networking system
 
 if __name__ == "__main__":
     from PySide6.QtWidgets import QApplication

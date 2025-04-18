@@ -186,6 +186,7 @@
 #### Features
 - A settings section to set and tune esc and servo µs values.
 - Servo values can be adjusted continuously to find the center alignment
+- Adjust port values
 
 #### How will this be applied?
 - It will be a new settings page section.
