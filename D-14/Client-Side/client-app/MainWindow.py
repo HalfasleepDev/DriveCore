@@ -23,9 +23,12 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QSlider, QSpacerItem, QStackedWidget, QVBoxLayout,
     QWidget)
 import resource
+
 from appFunctions import PageWithKeyEvents
+
 from appUiElements import (GitHubInfoPanel, SystemLogViewer, CalibrationWidget,
-    DescriptionWidget)
+    DescriptionWidget, LogConsoleWidget, DriveAssistWidget, PRNDWidget,
+    SpeedometerWidget, SteeringPathWidget)
 
 import os
 
@@ -265,7 +268,7 @@ class Ui_MainWindow(object):
 "	border-radius: 15px;\n"
 "}\n"
 "QWidget#speedometerWidget{\n"
-"	background-color: #1e1e21;\n"
+"	background-color: #0c0c0d;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 150px;\n"
 "}\n"
@@ -1428,7 +1431,39 @@ class Ui_MainWindow(object):
         # ------ Vehicle Calibration ------
         self.settingsInfoVehicleCalibrationWidget = DescriptionWidget("D-14/Client-Side/client-app/markdown-descriptions/vehicleTuningSettingsTab.md")
         self.settingsInfoStackedWidget.addWidget(self.settingsInfoVehicleCalibrationWidget)
+        
+        #* IMPORTANT: add home page LogConsoleWidget widget to connectionLogWidget
+        self.networkConnectionLogWidget = LogConsoleWidget()
+        self.horizontalLayout_CLW = QHBoxLayout(self.connectionLogWidget)
+        self.horizontalLayout_CLW .addWidget(self.networkConnectionLogWidget)
 
+        #* IMPORTANT: add drive page LogConsoleWidget widget to vehicleAlertLogWidget
+        self.vehicleSystemAlertLogWidget = LogConsoleWidget()
+        self.horizontalLayout_VALW = QHBoxLayout(self.vehicleAlertLogWidget)
+        self.horizontalLayout_VALW.addWidget(self.vehicleSystemAlertLogWidget)
+
+        #* IMPORTANT: add DriveAssistWidget to alertAssistWidget
+        self.driveAssistWidget = DriveAssistWidget()
+        self.horizontalLayout_AAW = QHBoxLayout(self.alertAssistWidget)
+        self.horizontalLayout_AAW.addWidget(self.driveAssistWidget)
+
+        #* IMPORTANT: add PRNDWidget to prndWidget
+        self.PRNDWidget = PRNDWidget()
+        self.horizontalLayout_PRNDW = QHBoxLayout(self.prndWidget)
+        self.horizontalLayout_PRNDW.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_PRNDW.addWidget(self.PRNDWidget)
+
+        #* IMPORTANT: add SpeedometerWidget to speedometerWidget
+        self.vehicleSpeedometerWidget = SpeedometerWidget()
+        self.horizontalLayout_SW = QHBoxLayout(self.speedometerWidget)
+        self.horizontalLayout_SW.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_SW.addWidget(self.vehicleSpeedometerWidget, 0, Qt.AlignmentFlag.AlignCenter)
+
+        #* IMPROTANT: add SteeringPathWidget to steerAngleWidget
+        self.steerPathWidget = SteeringPathWidget()
+        self.horizontalLayout_SAW = QHBoxLayout(self.steerAngleWidget)
+        self.horizontalLayout_SAW.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_SAW.addWidget(self.steerPathWidget, 0, Qt.AlignmentFlag.AlignCenter)
     # setupUi
 
     def retranslateUi(self, MainWindow):

@@ -160,7 +160,6 @@ class MainWindow(QMainWindow):
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
         ''' ====== OpenCV Variables & Functions ====== '''
-        #self.init_kalman_filter()
         self.timer = QTimer()
         
         self.timer.start(30)
@@ -169,12 +168,11 @@ class MainWindow(QMainWindow):
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=200, varThreshold=100, detectShadows=False)
         self.last_floor_contour = None
 
-        self.alert_line_y = 680  # e.g. bottom quarter of 480p frame
+        self.alert_line_y = 680 # Set where an object enters it stops the vehicle, could move to settings?
 
         ''' ====== Drive Page ====== '''
+        # ------ tooltip ------
         self.tooltip = AnimatedToolTip("", self)
-
-        #self.animated_tip = AnimatedToolTip("Turn On/Off collision braking", self)
         self.ui.alertAssistWidget.installEventFilter(self)
         self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
     
@@ -431,13 +429,17 @@ if __name__ == '__main__':
     #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
-    def launch_main():
+    #!ENABLE LTR
+    '''def launch_main():
         window = MainWindow()
         window.setWindowTitle("Drive Core Client Ver 1.2")
-        window.show()
+        window.show()'''
 
-    loading = LoadingScreen(on_finished_callback=launch_main)
-    loading.show()
+    #loading = LoadingScreen(on_finished_callback=launch_main)
+    #loading.show()
 
+    window = MainWindow()
+    window.setWindowTitle("Drive Core Client Ver 1.2")
+    window.show()
 
     sys.exit(app.exec())

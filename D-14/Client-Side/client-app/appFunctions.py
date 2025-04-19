@@ -106,3 +106,5 @@ def showError(self, title: str, message: str):
     msg_box.setText(message)
     msg_box.exec()
 
+#def logToSystem()
+
