@@ -83,9 +83,9 @@ class SpeedometerWidget(QWidget):
             gradient.setColorAt(1.0, QColor("#d97bff"))
         else:
             gradient = QConicalGradient(center, arc_start_angle)
-            gradient.setColorAt(0.0, QColor("#74e1ef"))
+            gradient.setColorAt(0.0, QColor("#7a63ff"))
             gradient.setColorAt(0.5, QColor("#33aaff"))
-            gradient.setColorAt(1.0, QColor("#74e1ef"))
+            gradient.setColorAt(1.0, QColor("#7a63ff"))
 
         # Draw background arc
         painter.setPen(QPen(QColor("#1e1e21"), 18, Qt.SolidLine, Qt.RoundCap))

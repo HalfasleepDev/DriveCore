@@ -19,6 +19,8 @@ import time
 
 from appFunctions import toggleDebugCV, showError
 
+from appUiAnimations import AnimatedToolTip, LoadingScreen
+
 from openCVFunctions import FrameProcessor
 
 #from appFunctions import PageWithKeyEvents
@@ -123,8 +125,9 @@ class MainWindow(QMainWindow):
 
         ''' ====== Settings Page ====== '''
         # ------ Top Nav Buttons ------ 
-        self.ui.openCVSettingsBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.openCVSettingsBtn, self.ui.OpenCVSettingsPage))
-        self.ui.vehicleTuningBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.vehicleTuningBtn, self.ui.VehicleTuningSettingsPage))
+        self.ui.openCVSettingsBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+        self.ui.openCVSettingsBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.openCVSettingsBtn, self.ui.OpenCVSettingsPage, 2))
+        self.ui.vehicleTuningBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.vehicleTuningBtn, self.ui.VehicleTuningSettingsPage, 3))
         
         # ------ OpenCV ------
         # OpenCV Setting Buttons
@@ -153,7 +156,7 @@ class MainWindow(QMainWindow):
 
         # ------ Vehicle Tuning ------
 
-        
+        # ------ Emergency Dissconnect ------
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
         ''' ====== OpenCV Variables & Functions ====== '''
@@ -167,8 +170,31 @@ class MainWindow(QMainWindow):
         self.last_floor_contour = None
 
         self.alert_line_y = 680  # e.g. bottom quarter of 480p frame
+
+        ''' ====== Drive Page ====== '''
+        self.tooltip = AnimatedToolTip("", self)
+
+        #self.animated_tip = AnimatedToolTip("Turn On/Off collision braking", self)
+        self.ui.alertAssistWidget.installEventFilter(self)
+        self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
     
-    def handleSettingsNav(self, active_btn, target_page):
+    def eventFilter(self, watched, event):
+        if event.type() == QEvent.ToolTip:
+            if isinstance(watched, QWidget):
+                tooltip_text = watched.toolTip()
+                self.tooltip.setText(tooltip_text)
+
+                # Show beside the widget
+                pos = watched.mapToGlobal(watched.rect().topRight())
+                self.tooltip.show_tooltip(pos)
+                return True  # prevent default tooltip from showing
+
+        elif event.type() == QEvent.Leave:
+            self.tooltip.hide_tooltip()
+
+        return super().eventFilter(watched, event)
+    
+    def handleSettingsNav(self, active_btn, target_page, infoIndex: int):
         for btn in [self.ui.openCVSettingsBtn, self.ui.vehicleTuningBtn]:
             btn.setStyleSheet("QPushButton{background-color: #1e1e21;}")
 
@@ -177,6 +203,9 @@ class MainWindow(QMainWindow):
 
             # Switch page
             self.ui.settingsStackedWidget.setCurrentWidget(target_page)
+
+            # Switch to info page (1) is no page
+            self.ui.settingsInfoStackedWidget.setCurrentIndex(infoIndex)
         
     def handleLeftMenuNav(self, active_btn, target_page):
         for btn in [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn]:
@@ -402,9 +431,13 @@ if __name__ == '__main__':
     #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
+    def launch_main():
+        window = MainWindow()
+        window.setWindowTitle("Drive Core Client Ver 1.2")
+        window.show()
 
-    window = MainWindow()
-    window.show()
-    window.setWindowTitle("Drive Core Client Ver 1.2")
+    loading = LoadingScreen(on_finished_callback=launch_main)
+    loading.show()
+
 
     sys.exit(app.exec())

@@ -24,7 +24,8 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QWidget)
 import resource
 from appFunctions import PageWithKeyEvents
-from appUiElements import (GitHubInfoPanel, SystemLogViewer, CalibrationWidget)
+from appUiElements import (GitHubInfoPanel, SystemLogViewer, CalibrationWidget,
+    DescriptionWidget)
 
 import os
 
@@ -1403,13 +1404,31 @@ class Ui_MainWindow(object):
 
         QMetaObject.connectSlotsByName(MainWindow)
 
-        # * IMPORTANT: add SystemLogViewer widget to a new page
+        #* IMPORTANT: add SystemLogViewer widget to a new page
         self.systemLogPage = SystemLogViewer()
         self.stackedWidget.addWidget(self.systemLogPage)
 
-        # * IMPORTANT: add CalibrationWidget widget to a new settingsStackedWidget page
+        #* IMPORTANT: add CalibrationWidget widget to a new settingsStackedWidget page
         self.VehicleTuningSettingsPage = CalibrationWidget()
         self.settingsStackedWidget.addWidget(self.VehicleTuningSettingsPage)
+
+        #* IMPORTANT: add pages for settingsInfoStackedWidget
+        # ------ OpenCV ------
+        self.settingsInfoOpenCvWidget = DescriptionWidget("D-14/Client-Side/client-app/markdown-descriptions/openCvSettingsTab.md")
+        self.settingsInfoStackedWidget.addWidget(self.settingsInfoOpenCvWidget)
+        self.settingsInfoStackedWidget.setCurrentWidget(self.settingsInfoOpenCvWidget)
+        
+        self.settingsInfoStackedWidget.setStyleSheet("""
+            QWidget{
+                background-color: #74e1ef;
+                border-radius: 15px;
+            }
+        """)
+
+        # ------ Vehicle Calibration ------
+        self.settingsInfoVehicleCalibrationWidget = DescriptionWidget("D-14/Client-Side/client-app/markdown-descriptions/vehicleTuningSettingsTab.md")
+        self.settingsInfoStackedWidget.addWidget(self.settingsInfoVehicleCalibrationWidget)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
