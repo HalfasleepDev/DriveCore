@@ -27,6 +27,7 @@ from MainWindow import Ui_MainWindow
 PORT = 4444 #TODO: move to settings
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
+os.environ["QT_SCALE_FACTOR"] = "0.95"
 
 # TODO: Add error popups
 
@@ -34,7 +35,7 @@ class VideoThread(QThread):
     frame_received = Signal(QImage)  # Signal to send new frame to UI
 
     def __init__(self, stream_url):
-        super().__init__()
+        super().__init__() 
         self.stream_url = stream_url
         self.running = True  # Control flag for stopping thread
 
@@ -101,7 +102,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        '''###########################################Network Setup###########################################'''
+        ''' ====== Network Setup ======'''
         self.ui.inputIp.editingFinished.connect(self.setIp)
         self.ui.inputIp.editingFinished.connect(self.add_ip)
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
@@ -112,28 +113,20 @@ class MainWindow(QMainWindow):
         self.load_recent_ips()
         self.ui.ipComboBtn.clicked.connect(self.setIpCombo)
         
-        '''###########################################Logic For Left Menu Buttons###########################################'''
+        ''' ====== Logic For Left Menu Buttons ====== '''
         self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
-        self.ui.homeBtn.clicked.connect(lambda: self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}"))
-        self.ui.homeBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.homePage))
-        self.ui.homeBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.homeBtn.clicked.connect(lambda: self.ui.settingsBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.homeBtn.clicked.connect(lambda: self.stop_thread_safely())
-
-        self.ui.settingsBtn.clicked.connect(lambda: self.ui.settingsBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}"))
-        self.ui.settingsBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.settingsPage))
-        self.ui.settingsBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.settingsBtn.clicked.connect(lambda: self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.settingsBtn.clicked.connect(lambda: self.stop_thread_safely())
-
-        self.ui.driveBtn.clicked.connect(lambda: self.ui.driveBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}"))
-        self.ui.driveBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.drivePage))
-        self.ui.driveBtn.clicked.connect(lambda: self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-        self.ui.driveBtn.clicked.connect(lambda: self.ui.settingsBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}"))
-
+        self.ui.homeBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.homeBtn, self.ui.homePage))
+        self.ui.settingsBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.settingsBtn, self.ui.settingsPage))
+        self.ui.driveBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.driveBtn, self.ui.drivePage))
         self.ui.driveBtn.clicked.connect(lambda: self.iniDrivePage())
-        #self.filter = KeyPressFilter()
-        '''###########################################Settings Page###########################################'''
+        self.ui.logBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.logBtn, self.ui.systemLogPage))
+
+        ''' ====== Settings Page ====== '''
+        # ------ Top Nav Buttons ------ 
+        self.ui.openCVSettingsBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.openCVSettingsBtn, self.ui.OpenCVSettingsPage))
+        self.ui.vehicleTuningBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.vehicleTuningBtn, self.ui.VehicleTuningSettingsPage))
+        
+        # ------ OpenCV ------
         # OpenCV Setting Buttons
         self.ui.ObjectVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(1))
         self.ui.FloorVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(2))
@@ -157,10 +150,13 @@ class MainWindow(QMainWindow):
         self.ui.HRowSlider.setValue(35)
         self.ui.SRowSlider.setValue(40)
         self.ui.VRowSlider.setValue(50)
+
+        # ------ Vehicle Tuning ------
+
         
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
-        '''###########################################OpenCV Variables & Functions'''
+        ''' ====== OpenCV Variables & Functions ====== '''
         #self.init_kalman_filter()
         self.timer = QTimer()
         
@@ -171,8 +167,26 @@ class MainWindow(QMainWindow):
         self.last_floor_contour = None
 
         self.alert_line_y = 680  # e.g. bottom quarter of 480p frame
-        
+    
+    def handleSettingsNav(self, active_btn, target_page):
+        for btn in [self.ui.openCVSettingsBtn, self.ui.vehicleTuningBtn]:
+            btn.setStyleSheet("QPushButton{background-color: #1e1e21;}")
 
+            # Highlight active button
+            active_btn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+
+            # Switch page
+            self.ui.settingsStackedWidget.setCurrentWidget(target_page)
+        
+    def handleLeftMenuNav(self, active_btn, target_page):
+        for btn in [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn]:
+            btn.setStyleSheet("QPushButton{background-color: #f1f3f3;}")
+
+            # Highlight active button
+            active_btn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+
+            # Switch page
+            self.ui.stackedWidget.setCurrentWidget(target_page)
 
     def stop_thread_safely(self):
         if self.THREAD_RUNNING:
@@ -312,35 +326,42 @@ class MainWindow(QMainWindow):
 
     def changeKeyInfo(self, command):
         if command == "UP":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
+            print('t')
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "DOWN":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "LEFT":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnRightBtn.setStyleSheet("v{color: #f1f3f3;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "RIGHT":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnRightBtn.setStyleSheet("v{color: #7a63ff;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "NEUTRAL":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #7a63ff;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "BRAKE":
-            self.ui.wKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}")
-            self.ui.aKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;")
-            self.ui.sKeyLabel.setStyleSheet("QLabel{color: #FFA500;}")
-            self.ui.dKeyLabel.setStyleSheet("QLabel{color: #f1f3f3;}") 
+            self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
+            self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
 
     def send_command(self, command):
         """Send command to Raspberry Pi"""
@@ -377,10 +398,13 @@ class MainWindow(QMainWindow):
         
 
 if __name__ == '__main__':
+    #QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
     app = QApplication(sys.argv)
 
     window = MainWindow()
     window.show()
-    window.setWindowTitle("Drive Core Client Ver 1.1")
+    window.setWindowTitle("Drive Core Client Ver 1.2")
 
     sys.exit(app.exec())

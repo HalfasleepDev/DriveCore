@@ -17,7 +17,7 @@ class GitHubInfoPanel(QWidget):
         self.repo_url = repo_url
         self.repo_owner, self.repo_name = self._parse_repo_url(repo_url)
 
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(400) 
         self.setStyleSheet("""
             QWidget {
                 background-color: #74e1ef;  /* light cyan */

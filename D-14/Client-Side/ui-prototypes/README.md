@@ -197,3 +197,21 @@
 
 
 </details>
+
+<details>
+
+<summary>Settings Description</summary>
+
+#### Features
+- A settings section that describes the current settings page.
+- Text is in markdown format
+
+#### How will this be applied?
+- It will be a new settings page section on the right.
+
+![Settings Description Vis](ver-1-2/settingsDescriptionGuiVis.png)
+
+[Settings Description Code](ver-1-2/settingsDescriptionGuiVis.py)
+
+
+</details>

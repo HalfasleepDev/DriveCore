@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'MainWindowMWeDpd.ui'
+## Form generated from reading UI file 'MainWindowPergbN.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.3
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
+
+# TODO: UPDATE THE STYLESHEET AND QT DESIGNER ELEMENTS!
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -22,6 +24,11 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QWidget)
 import resource
 from appFunctions import PageWithKeyEvents
+from appUiElements import (GitHubInfoPanel, SystemLogViewer, CalibrationWidget)
+
+import os
+
+os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -36,6 +43,18 @@ class Ui_MainWindow(object):
 "}\n"
 "Line#keysettingsHeaderLine{\n"
 "	color: #1e1e21;\n"
+"}\n"
+"QPushButton#openCVSettingsBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#vehicleTuningBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
 "}\n"
 "\n"
 "/*OpenCV Settings*/\n"
@@ -65,7 +84,8 @@ class Ui_MainWindow(object):
 "}\n"
 "/*FloorVisBtn*/\n"
 "QPushButton#FloorVisBtn{\n"
-"	background-color: #1e1e21;\n"
+"	background-col"
+                        "or: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 5px;\n"
 "	color: #f1f3f3;\n"
@@ -77,8 +97,7 @@ class Ui_MainWindow(object):
 "	color: #f1f3f3;\n"
 "}\n"
 "/*KalmanCenterVisBtn*/\n"
-"QPushButton#KalmanCe"
-                        "nterVisBtn{\n"
+"QPushButton#KalmanCenterVisBtn{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 5px;\n"
@@ -108,7 +127,8 @@ class Ui_MainWindow(object):
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 5px;\n"
-"	color: #f1f3f3;\n"
+""
+                        "	color: #f1f3f3;\n"
 "}\n"
 "QPushButton#FloorSampleVisBtn:pressed{\n"
 "	background-color: #7a63ff;\n"
@@ -120,8 +140,7 @@ class Ui_MainWindow(object):
 "QPushButton#PathVisBtn{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
-"	bor"
-                        "der-radius: 5px;\n"
+"	border-radius: 5px;\n"
 "	color: #f1f3f3;\n"
 "}\n"
 "QPushButton#PathVisBtn:pressed{\n"
@@ -153,7 +172,8 @@ class Ui_MainWindow(object):
 "}\n"
 "QSlider::add-page:horizontal{\n"
 "	background: #f1f3f3;\n"
-"	border-radius: 2px;\n"
+""
+                        "	border-radius: 2px;\n"
 "}\n"
 "QSlider::sub-page:horizontal{\n"
 "	background: #7a63ff;\n"
@@ -166,11 +186,10 @@ class Ui_MainWindow(object):
 "	border-radius: 5px;\n"
 "	color: #f1f3f3;\n"
 "}\n"
-"QLabel#HRowValueLabel{\n"
-""
-                        "	color: #f1f3f3;\n"
-"}\n"
 "QLabel#HRowLabel{\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QLabel#HRowValueLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
 "QLabel#SRowLabel{\n"
@@ -204,7 +223,8 @@ class Ui_MainWindow(object):
 "    padding: 6px;\n"
 "}\n"
 "QPushButton#emergencyDisconnectBtn:pressed{\n"
-"	background-color: #7a63ff;\n"
+""
+                        "	background-color: #7a63ff;\n"
 "	color: #1e1e21;\n"
 "    border-style: outset;\n"
 "    border-width: 2px;\n"
@@ -215,8 +235,7 @@ class Ui_MainWindow(object):
 "QLabel#emergencyDisconnectLabel{\n"
 "	color: #FF0000;\n"
 "}\n"
-"QWidget#currentPgrmVers"
-                        "ionWidget{\n"
+"QWidget#currentPgrmVersionWidget{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 15px;\n"
@@ -239,41 +258,64 @@ class Ui_MainWindow(object):
 "QWidget#videoStreamWidget{\n"
 "	background-color: #f1f3f3;\n"
 "}\n"
-"QLabel#keyBindingsLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"Line#keyBindingsLine{\n"
-"	color: #1e1e21;\n"
-"}\n"
-"QLabel#wKeyLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#aKeyLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#sKeyLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#dKeyLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#accelerateLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#turnLeftLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#reverseBrakeLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLabel#turnRightLabel{\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QWidget#conne"
-                        "ctionVehicleTypeWidget{\n"
+"QWidget#prndWidget{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
 "	border-radius: 15px;\n"
+"}\n"
+"QWidget#speedometerWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 150px;\n"
+"}\n"
+"QWidget#steerAng"
+                        "leWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 15px;\n"
+"}\n"
+"QWidget#alertAssistWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 15px;\n"
+"}\n"
+"\n"
+"QPushButton#accelerateBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#turnLeftBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#reverseBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#turnRightBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"QPushButton#brakeBtn{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 5px;\n"
+"	color: #f1f3f3;\n"
+"}\n"
+"\n"
+"QWidget#connectionVehicleTypeWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+""
+                        "	border-radius: 15px;\n"
 "}\n"
 "QLabel#vehicleTypeLabel{\n"
 "	color: #f1f3f3;\n"
@@ -286,8 +328,19 @@ class Ui_MainWindow(object):
 "QLabel#currentVehicleLabel{\n"
 "	color: #f1f3f3;\n"
 "}\n"
+"QWidget#vehicleAlertLogWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 15px;\n"
+"}\n"
 "\n"
+"/*=======Center home widget=======*/\n"
 "\n"
+"QWidget#connectionLogWidget{\n"
+"	background-color: #1e1e21;\n"
+"	border: 1px #1e1e21;\n"
+"	border-radius: 15px;\n"
+"}\n"
 "\n"
 "/*=======Left home widget=======*/\n"
 "QGroupBox#ipInputBox{\n"
@@ -297,6 +350,7 @@ class Ui_MainWindow(object):
 "	margin-top: 6px;\n"
 "}\n"
 "QGroupBox::title#ipInputBox{\n"
+"   font-size: 15px;\n"
 "	subcontrol-origin: margin;\n"
 "	left: 10px;\n"
 "	bottom: -10px;\n"
@@ -304,9 +358,13 @@ class Ui_MainWindow(object):
 "	color: #f1f3f3;\n"
 "}\n"
 "QLineEdit#inputIp{\n"
+"	font-family: 'Adwaita Sans';\n"
+"   font-size: 14px;\n"
 "	background: #f1f3f3;\n"
 "	color: #1e1e21;\n"
 "	border: none;\n"
+""
+                        "	padding-left: 5px;\n"
 "	border-radius: 5px;\n"
 "}\n"
 "QGroupBox#recentIpBox{\n"
@@ -316,16 +374,20 @@ class Ui_MainWindow(object):
 "	margin-top: 6px;\n"
 "}\n"
 "QGroupBox::title#recentIpBox{\n"
+"	font-family: 'Adwaita Sans';\n"
+"   font-size: 15px;\n"
 "	subcontrol-origin: margin;\n"
-""
-                        "	left: 10px;\n"
+"	left: 10px;\n"
 "	bottom: -10px;\n"
 "	padding: 0 5px;\n"
 "	color: #f1f3f3;\n"
 "}\n"
 "QComboBox#recentIpCombo{\n"
+"	font-family: 'Adwaita Sans';\n"
+"   font-size: 14px;\n"
 "	background: #f1f3f3;\n"
 "	color: #1e1e21;\n"
+"	padding-left: 5px;\n"
 "	border: none;\n"
 "	border-radius: 5px;\n"
 "}\n"
@@ -350,7 +412,8 @@ class Ui_MainWindow(object):
 "QWidget#projectInfoWidget {\n"
 "	background-color: #74e1ef;\n"
 "	border: 1px #74e1ef;\n"
-"	border-radius: 15px;\n"
+"	border-radius: 15px;"
+                        "\n"
 "}\n"
 "QLabel#aboutTitle {\n"
 "	color: #1e1e21;\n"
@@ -370,10 +433,7 @@ class Ui_MainWindow(object):
 "/*=======Left menu=======*/\n"
 "QWidget#leftMenu {\n"
 "	background-color: #1e1e21;\n"
-""
-                        "}\n"
-"\n"
-"\n"
+"}\n"
 "\n"
 "/*=======Left menu buttons=======*/\n"
 "QPushButton#homeBtn {\n"
@@ -394,6 +454,15 @@ class Ui_MainWindow(object):
 "}\n"
 "QPushButton#settingsBtn {\n"
 "	background-color: #f1f3f3;\n"
+"    border-style: outset;\n"
+"    border-width: 2px;\n"
+"    border-radius: 30px;\n"
+"    border-color: #f1f3f3;\n"
+"    padding: 6px;\n"
+"}\n"
+"QPushButton#logBtn {\n"
+"	background-col"
+                        "or: #f1f3f3;\n"
 "    border-style: outset;\n"
 "    border-width: 2px;\n"
 "    border-radius: 30px;\n"
@@ -466,6 +535,24 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.driveBtn)
 
+        self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_9)
+
+        self.logBtn = QPushButton(self.widget_2)
+        self.logBtn.setObjectName(u"logBtn")
+        sizePolicy.setHeightForWidth(self.logBtn.sizePolicy().hasHeightForWidth())
+        self.logBtn.setSizePolicy(sizePolicy)
+        self.logBtn.setMinimumSize(QSize(80, 80))
+        icon5 = QIcon()
+        icon5.addFile(u"D-14/Client-Side/client-app/icons/solar--documents-minimalistic-bold-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.logBtn.setIcon(icon5)
+        self.logBtn.setIconSize(QSize(60, 60))
+        self.logBtn.setCheckable(True)
+        self.logBtn.setChecked(False)
+
+        self.verticalLayout_2.addWidget(self.logBtn)
+
 
         self.verticalLayout.addWidget(self.widget_2, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
 
@@ -505,7 +592,7 @@ class Ui_MainWindow(object):
         self.homePage = QWidget()
         self.homePage.setObjectName(u"homePage")
         self.horizontalLayout_2 = QHBoxLayout(self.homePage)
-        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setSpacing(3) # 0
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.leftHomeWidget = QWidget(self.homePage)
@@ -520,10 +607,11 @@ class Ui_MainWindow(object):
 
         self.ipInputBox = QGroupBox(self.leftHomeWidget)
         self.ipInputBox.setObjectName(u"ipInputBox")
-        self.ipInputBox.setMinimumSize(QSize(0, 90))
-        self.ipInputBox.setMaximumSize(QSize(350, 16777215)) #400
+        self.ipInputBox.setMinimumSize(QSize(400, 90)) # 0
+        self.ipInputBox.setMaximumSize(QSize(400, 16777215)) # 350
         font = QFont()
-        font.setPointSize(11)
+        font.setPointSize(15) # 11
+        #font.setFamily('Adwaita Sans')
         font.setBold(False)
         self.ipInputBox.setFont(font)
         self.horizontalLayout_3 = QHBoxLayout(self.ipInputBox)
@@ -545,8 +633,8 @@ class Ui_MainWindow(object):
 
         self.recentIpBox = QGroupBox(self.leftHomeWidget)
         self.recentIpBox.setObjectName(u"recentIpBox")
-        self.recentIpBox.setMinimumSize(QSize(0, 90))
-        self.recentIpBox.setMaximumSize(QSize(350, 16777215)) #400
+        self.recentIpBox.setMinimumSize(QSize(400, 90)) # 0
+        self.recentIpBox.setMaximumSize(QSize(400, 16777215)) # 350
         self.recentIpBox.setFont(font)
         self.horizontalLayout_4 = QHBoxLayout(self.recentIpBox)
         self.horizontalLayout_4.setSpacing(15)
@@ -575,6 +663,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.ipComboBtn, 0, Qt.AlignmentFlag.AlignBottom)
 
+
         self.verticalLayout_8.addWidget(self.recentIpBox)
 
         self.verticalSpacer_3 = QSpacerItem(20, 155, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -583,6 +672,41 @@ class Ui_MainWindow(object):
 
 
         self.horizontalLayout_2.addWidget(self.leftHomeWidget)
+
+        self.centerHomeWidget = QWidget(self.homePage)
+        self.centerHomeWidget.setObjectName(u"centerHomeWidget")
+        self.centerHomeWidget.setMinimumSize(QSize(0, 0))
+        self.centerHomeWidget.setMaximumSize(QSize(16777215, 16777215))
+        self.verticalLayout_20 = QVBoxLayout(self.centerHomeWidget)
+        self.verticalLayout_20.setSpacing(20)
+        self.verticalLayout_20.setObjectName(u"verticalLayout_20")
+        self.verticalLayout_20.setContentsMargins(0, 0, 20, 0)
+        self.verticalSpacer_12 = QSpacerItem(20, 301, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        self.verticalLayout_20.addItem(self.verticalSpacer_12)
+
+        self.connectionLogWidget = QWidget(self.centerHomeWidget)
+        self.connectionLogWidget.setObjectName(u"connectionLogWidget")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.connectionLogWidget.sizePolicy().hasHeightForWidth())
+        self.connectionLogWidget.setSizePolicy(sizePolicy1)
+        self.connectionLogWidget.setMinimumSize(QSize(400, 450))
+        self.connectionLogWidget.setMaximumSize(QSize(400, 620))
+
+        self.verticalLayout_20.addWidget(self.connectionLogWidget)
+
+        self.verticalSpacer_11 = QSpacerItem(20, 300, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        self.verticalLayout_20.addItem(self.verticalSpacer_11)
+
+
+        self.horizontalLayout_2.addWidget(self.centerHomeWidget, 0, Qt.AlignmentFlag.AlignLeft)
+
+        self.horizontalSpacer_4 = QSpacerItem(10000, 20, QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_4)
 
         self.rightHomeWidget = QWidget(self.homePage)
         self.rightHomeWidget.setObjectName(u"rightHomeWidget")
@@ -602,18 +726,25 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(320, 240))
         self.label_2.setMaximumSize(QSize(320, 240))
-        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-1.png"))
+        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-2.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout_9.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignHCenter)
 
         self.projectInfoWidget = QWidget(self.widget_6)
+
         self.projectInfoWidget.setObjectName(u"projectInfoWidget")
         self.projectInfoWidget.setMinimumSize(QSize(350, 400))
         self.verticalLayout_10 = QVBoxLayout(self.projectInfoWidget)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.verticalLayout_10.setContentsMargins(-1, 20, -1, 30)
-        self.projectTitle = QLabel(self.projectInfoWidget)
+        self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
+
+        # * IMPORTANT: GitHubInfoPanel new widget
+        self.projectInfoWidgetCustom = GitHubInfoPanel("https://github.com/HalfasleepDev/DriveCore")
+        self.verticalLayout_10.addWidget(self.projectInfoWidgetCustom)
+
+        # !REMOVE IN QT DESIGNER
+        '''self.projectTitle = QLabel(self.projectInfoWidget)
         self.projectTitle.setObjectName(u"projectTitle")
         self.projectTitle.setMaximumSize(QSize(300, 30))
         font1 = QFont()
@@ -631,14 +762,16 @@ class Ui_MainWindow(object):
 
         self.githubLink = QLabel(self.projectInfoWidget)
         self.githubLink.setObjectName(u"githubLink")
-        self.githubLink.setMinimumSize(QSize(0, 0))
+        self.githubLink.setMinimumSize(QSize(0, 200))
         self.githubLink.setMaximumSize(QSize(16777215, 40))
+        self.githubLink.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.githubLink.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.githubLink.setWordWrap(True)
         self.githubLink.setMargin(10)
         self.githubLink.setOpenExternalLinks(True)
         self.githubLink.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse|Qt.TextInteractionFlag.TextSelectableByMouse)
 
-        self.verticalLayout_10.addWidget(self.githubLink)
+        self.verticalLayout_10.addWidget(self.githubLink, 0, Qt.AlignmentFlag.AlignTop)
 
         self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -668,7 +801,11 @@ class Ui_MainWindow(object):
         self.description.setWordWrap(True)
         self.description.setMargin(10)
 
-        self.verticalLayout_10.addWidget(self.description)
+        self.verticalLayout_10.addWidget(self.description)'''
+        font1 = QFont()
+        font1.setPointSize(15)
+        font2 = QFont()
+        font2.setPointSize(11)
 
 
         self.verticalLayout_9.addWidget(self.projectInfoWidget, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -690,13 +827,35 @@ class Ui_MainWindow(object):
         self.verticalLayout_15 = QVBoxLayout(self.settingsLeftWidget)
         self.verticalLayout_15.setSpacing(10)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.settingsHeaderLabel = QLabel(self.settingsLeftWidget)
+        self.widget = QWidget(self.settingsLeftWidget)
+        self.widget.setObjectName(u"widget")
+        self.horizontalLayout_17 = QHBoxLayout(self.widget)
+        self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
+        self.horizontalLayout_17.setContentsMargins(0, 0, 0, 0)
+        self.settingsHeaderLabel = QLabel(self.widget)
         self.settingsHeaderLabel.setObjectName(u"settingsHeaderLabel")
         font3 = QFont()
         font3.setPointSize(24)
         self.settingsHeaderLabel.setFont(font3)
 
-        self.verticalLayout_15.addWidget(self.settingsHeaderLabel)
+        self.horizontalLayout_17.addWidget(self.settingsHeaderLabel)
+
+        self.openCVSettingsBtn = QPushButton(self.widget)
+        self.openCVSettingsBtn.setObjectName(u"openCVSettingsBtn")
+        self.openCVSettingsBtn.setMinimumSize(QSize(25, 0))
+        self.openCVSettingsBtn.setMaximumSize(QSize(16777215, 25))
+
+        self.horizontalLayout_17.addWidget(self.openCVSettingsBtn)
+
+        self.vehicleTuningBtn = QPushButton(self.widget)
+        self.vehicleTuningBtn.setObjectName(u"vehicleTuningBtn")
+        self.vehicleTuningBtn.setMinimumSize(QSize(0, 25))
+        self.vehicleTuningBtn.setMaximumSize(QSize(16777215, 25))
+
+        self.horizontalLayout_17.addWidget(self.vehicleTuningBtn)
+
+
+        self.verticalLayout_15.addWidget(self.widget)
 
         self.settingsHeaderLine = QFrame(self.settingsLeftWidget)
         self.settingsHeaderLine.setObjectName(u"settingsHeaderLine")
@@ -705,14 +864,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_15.addWidget(self.settingsHeaderLine)
 
-        self.OpenCVSettingsWidget = QWidget(self.settingsLeftWidget)
-        self.OpenCVSettingsWidget.setObjectName(u"OpenCVSettingsWidget")
-        self.OpenCVSettingsWidget.setMinimumSize(QSize(0, 500))
-        self.verticalLayout_18 = QVBoxLayout(self.OpenCVSettingsWidget)
+        self.settingsStackedWidget = QStackedWidget(self.settingsLeftWidget)
+        self.settingsStackedWidget.setObjectName(u"settingsStackedWidget")
+        self.settingsStackedWidget.setMinimumSize(QSize(0, 500))
+        self.OpenCVSettingsPage = QWidget()
+        self.OpenCVSettingsPage.setObjectName(u"OpenCVSettingsPage")
+        self.verticalLayout_18 = QVBoxLayout(self.OpenCVSettingsPage)
         self.verticalLayout_18.setSpacing(6)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(9, 0, 9, 0)
-        self.OpenCVHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.OpenCVHeaderLabel = QLabel(self.OpenCVSettingsPage)
         self.OpenCVHeaderLabel.setObjectName(u"OpenCVHeaderLabel")
         self.OpenCVHeaderLabel.setMinimumSize(QSize(0, 30))
         self.OpenCVHeaderLabel.setMaximumSize(QSize(16777215, 35))
@@ -720,20 +881,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.OpenCVHeaderLabel)
 
-        self.OpenCVHeaderLine = QFrame(self.OpenCVSettingsWidget)
+        self.OpenCVHeaderLine = QFrame(self.OpenCVSettingsPage)
         self.OpenCVHeaderLine.setObjectName(u"OpenCVHeaderLine")
         self.OpenCVHeaderLine.setFrameShape(QFrame.Shape.HLine)
         self.OpenCVHeaderLine.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.verticalLayout_18.addWidget(self.OpenCVHeaderLine)
 
-        self.DebugCVHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.DebugCVHeaderLabel = QLabel(self.OpenCVSettingsPage)
         self.DebugCVHeaderLabel.setObjectName(u"DebugCVHeaderLabel")
         self.DebugCVHeaderLabel.setMaximumSize(QSize(16777215, 22))
 
         self.verticalLayout_18.addWidget(self.DebugCVHeaderLabel)
 
-        self.DebugCVWidget_1 = QWidget(self.OpenCVSettingsWidget)
+        self.DebugCVWidget_1 = QWidget(self.OpenCVSettingsPage)
         self.DebugCVWidget_1.setObjectName(u"DebugCVWidget_1")
         self.DebugCVWidget_1.setMaximumSize(QSize(16777215, 50))
         self.horizontalLayout_10 = QHBoxLayout(self.DebugCVWidget_1)
@@ -760,7 +921,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.DebugCVWidget_1)
 
-        self.DebugCVWidget_2 = QWidget(self.OpenCVSettingsWidget)
+        self.DebugCVWidget_2 = QWidget(self.OpenCVSettingsPage)
         self.DebugCVWidget_2.setObjectName(u"DebugCVWidget_2")
         self.DebugCVWidget_2.setMaximumSize(QSize(16777215, 50))
         self.horizontalLayout_11 = QHBoxLayout(self.DebugCVWidget_2)
@@ -787,13 +948,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.DebugCVWidget_2)
 
-        self.HSVSettingsHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.HSVSettingsHeaderLabel = QLabel(self.OpenCVSettingsPage)
         self.HSVSettingsHeaderLabel.setObjectName(u"HSVSettingsHeaderLabel")
         self.HSVSettingsHeaderLabel.setMaximumSize(QSize(16777215, 22))
 
         self.verticalLayout_18.addWidget(self.HSVSettingsHeaderLabel)
 
-        self.HSVSliderWidget = QWidget(self.OpenCVSettingsWidget)
+        self.HSVSliderWidget = QWidget(self.OpenCVSettingsPage)
         self.HSVSliderWidget.setObjectName(u"HSVSliderWidget")
         self.HSVSliderWidget.setMaximumSize(QSize(16777215, 130))
         self.verticalLayout_19 = QVBoxLayout(self.HSVSliderWidget)
@@ -908,13 +1069,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.HSVSliderWidget)
 
-        self.CollisionAssistHeaderLabel = QLabel(self.OpenCVSettingsWidget)
+        self.CollisionAssistHeaderLabel = QLabel(self.OpenCVSettingsPage)
         self.CollisionAssistHeaderLabel.setObjectName(u"CollisionAssistHeaderLabel")
         self.CollisionAssistHeaderLabel.setMaximumSize(QSize(16777215, 22))
 
         self.verticalLayout_18.addWidget(self.CollisionAssistHeaderLabel)
 
-        self.CollisionAssistWidget = QWidget(self.OpenCVSettingsWidget)
+        self.CollisionAssistWidget = QWidget(self.OpenCVSettingsPage)
         self.CollisionAssistWidget.setObjectName(u"CollisionAssistWidget")
         self.CollisionAssistWidget.setMaximumSize(QSize(16777215, 50))
         self.horizontalLayout_15 = QHBoxLayout(self.CollisionAssistWidget)
@@ -929,8 +1090,9 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.CollisionAssistWidget)
 
+        self.settingsStackedWidget.addWidget(self.OpenCVSettingsPage)
 
-        self.verticalLayout_15.addWidget(self.OpenCVSettingsWidget)
+        self.verticalLayout_15.addWidget(self.settingsStackedWidget)
 
         self.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -959,7 +1121,19 @@ class Ui_MainWindow(object):
         self.settingsRightWidget.setObjectName(u"settingsRightWidget")
         self.verticalLayout_16 = QVBoxLayout(self.settingsRightWidget)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
-        self.verticalSpacer_10 = QSpacerItem(20, 1010, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.settingsInfoStackedWidget = QStackedWidget(self.settingsRightWidget)
+        self.settingsInfoStackedWidget.setObjectName(u"settingsInfoStackedWidget")
+        self.settingsInfoStackedWidget.setMinimumSize(QSize(0, 800))
+        self.openCVSettingsInfoPage = QWidget()
+        self.openCVSettingsInfoPage.setObjectName(u"openCVSettingsInfoPage")
+        self.settingsInfoStackedWidget.addWidget(self.openCVSettingsInfoPage)
+        self.vehicleTuningInfoPage = QWidget()
+        self.vehicleTuningInfoPage.setObjectName(u"vehicleTuningInfoPage")
+        self.settingsInfoStackedWidget.addWidget(self.vehicleTuningInfoPage)
+
+        self.verticalLayout_16.addWidget(self.settingsInfoStackedWidget)
+
+        self.verticalSpacer_10 = QSpacerItem(20, 100, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
         self.verticalLayout_16.addItem(self.verticalSpacer_10)
 
@@ -1002,11 +1176,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.videoStreamWidget = QWidget(self.drivePage)
         self.videoStreamWidget.setObjectName(u"videoStreamWidget")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.videoStreamWidget.sizePolicy().hasHeightForWidth())
-        self.videoStreamWidget.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.videoStreamWidget.sizePolicy().hasHeightForWidth())
+        self.videoStreamWidget.setSizePolicy(sizePolicy2)
         self.videoStreamWidget.setMinimumSize(QSize(1280, 720))
         self.videoStreamWidget.setMaximumSize(QSize(1920, 1080))
         self.videoStreamWidget.setSizeIncrement(QSize(0, 0))
@@ -1019,8 +1193,8 @@ class Ui_MainWindow(object):
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.videoStreamLabel = QLabel(self.videoStreamWidget)
         self.videoStreamLabel.setObjectName(u"videoStreamLabel")
-        sizePolicy1.setHeightForWidth(self.videoStreamLabel.sizePolicy().hasHeightForWidth())
-        self.videoStreamLabel.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.videoStreamLabel.sizePolicy().hasHeightForWidth())
+        self.videoStreamLabel.setSizePolicy(sizePolicy2)
         self.videoStreamLabel.setMinimumSize(QSize(1280, 720))
         self.videoStreamLabel.setMaximumSize(QSize(1920, 1080))
         self.videoStreamLabel.setSizeIncrement(QSize(0, 0))
@@ -1041,107 +1215,115 @@ class Ui_MainWindow(object):
         self.vehicleControlPanelWidget.setMaximumSize(QSize(16777215, 350))
         self.horizontalLayout_6 = QHBoxLayout(self.vehicleControlPanelWidget)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.activeKeyBindingsWidget = QWidget(self.vehicleControlPanelWidget)
-        self.activeKeyBindingsWidget.setObjectName(u"activeKeyBindingsWidget")
-        self.verticalLayout_6 = QVBoxLayout(self.activeKeyBindingsWidget)
+        self.horizontalLayout_6.setContentsMargins(0, -1, -1, 0)
+        self.vehicleGaugeClusterWidget = QWidget(self.vehicleControlPanelWidget)
+        self.vehicleGaugeClusterWidget.setObjectName(u"vehicleGaugeClusterWidget")
+        self.vehicleGaugeClusterWidget.setMinimumSize(QSize(800, 0))
+        self.vehicleGaugeClusterWidget.setMaximumSize(QSize(1000, 16777215))
+        self.verticalLayout_6 = QVBoxLayout(self.vehicleGaugeClusterWidget)
+        self.verticalLayout_6.setSpacing(0)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.keyBindingsLabel = QLabel(self.activeKeyBindingsWidget)
-        self.keyBindingsLabel.setObjectName(u"keyBindingsLabel")
-        self.keyBindingsLabel.setMinimumSize(QSize(0, 40))
-        self.keyBindingsLabel.setMaximumSize(QSize(16777215, 40))
-        self.keyBindingsLabel.setFont(font3)
+        self.verticalLayout_6.setContentsMargins(0, 0, -1, 0)
+        self.clusterWidget = QWidget(self.vehicleGaugeClusterWidget)
+        self.clusterWidget.setObjectName(u"clusterWidget")
+        self.clusterWidget.setMinimumSize(QSize(0, 300))
+        self.clusterWidget.setMaximumSize(QSize(16777215, 300))
+        self.horizontalLayout_16 = QHBoxLayout(self.clusterWidget)
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.horizontalLayout_16.setContentsMargins(0, 0, 0, 0)
+        self.prndWidget = QWidget(self.clusterWidget)
+        self.prndWidget.setObjectName(u"prndWidget")
+        self.prndWidget.setMinimumSize(QSize(75, 300))
+        self.prndWidget.setMaximumSize(QSize(75, 300))
 
-        self.verticalLayout_6.addWidget(self.keyBindingsLabel)
+        self.horizontalLayout_16.addWidget(self.prndWidget)
 
-        self.keyBindingsLine = QFrame(self.activeKeyBindingsWidget)
-        self.keyBindingsLine.setObjectName(u"keyBindingsLine")
-        self.keyBindingsLine.setFrameShape(QFrame.Shape.HLine)
-        self.keyBindingsLine.setFrameShadow(QFrame.Shadow.Sunken)
+        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.verticalLayout_6.addWidget(self.keyBindingsLine)
+        self.horizontalLayout_16.addItem(self.horizontalSpacer_6)
 
-        self.keyBindListWidget = QWidget(self.activeKeyBindingsWidget)
-        self.keyBindListWidget.setObjectName(u"keyBindListWidget")
-        self.horizontalLayout_7 = QHBoxLayout(self.keyBindListWidget)
+        self.speedometerWidget = QWidget(self.clusterWidget)
+        self.speedometerWidget.setObjectName(u"speedometerWidget")
+        self.speedometerWidget.setMinimumSize(QSize(300, 300))
+        self.speedometerWidget.setMaximumSize(QSize(300, 300))
+
+        self.horizontalLayout_16.addWidget(self.speedometerWidget)
+
+        self.horizontalSpacer_7 = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_16.addItem(self.horizontalSpacer_7)
+
+        self.steerAngleWidget = QWidget(self.clusterWidget)
+        self.steerAngleWidget.setObjectName(u"steerAngleWidget")
+        self.steerAngleWidget.setMinimumSize(QSize(300, 300))
+        self.steerAngleWidget.setMaximumSize(QSize(300, 300))
+
+        self.horizontalLayout_16.addWidget(self.steerAngleWidget)
+
+
+        self.verticalLayout_6.addWidget(self.clusterWidget)
+
+        self.vehicleKeyInfoWidget = QWidget(self.vehicleGaugeClusterWidget)
+        self.vehicleKeyInfoWidget.setObjectName(u"vehicleKeyInfoWidget")
+        self.vehicleKeyInfoWidget.setMinimumSize(QSize(0, 30))
+        self.vehicleKeyInfoWidget.setMaximumSize(QSize(800, 40))
+        self.horizontalLayout_7 = QHBoxLayout(self.vehicleKeyInfoWidget)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.horizontalLayout_7.setContentsMargins(-1, -1, -1, 0)
-        self.keyActiveWidget = QWidget(self.keyBindListWidget)
-        self.keyActiveWidget.setObjectName(u"keyActiveWidget")
-        self.keyActiveWidget.setMinimumSize(QSize(60, 0))
-        self.keyActiveWidget.setMaximumSize(QSize(60, 16777215))
-        self.verticalLayout_11 = QVBoxLayout(self.keyActiveWidget)
-        self.verticalLayout_11.setSpacing(0)
-        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
-        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
-        self.wKeyLabel = QLabel(self.keyActiveWidget)
-        self.wKeyLabel.setObjectName(u"wKeyLabel")
-        self.wKeyLabel.setFont(font1)
-        self.wKeyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.horizontalLayout_7.setContentsMargins(-1, 0, -1, 0)
+        self.accelerateBtn = QPushButton(self.vehicleKeyInfoWidget)
+        self.accelerateBtn.setObjectName(u"accelerateBtn")
+        self.accelerateBtn.setMinimumSize(QSize(0, 25))
+        self.accelerateBtn.setMaximumSize(QSize(16777215, 25))
 
-        self.verticalLayout_11.addWidget(self.wKeyLabel)
+        self.horizontalLayout_7.addWidget(self.accelerateBtn)
 
-        self.aKeyLabel = QLabel(self.keyActiveWidget)
-        self.aKeyLabel.setObjectName(u"aKeyLabel")
-        self.aKeyLabel.setFont(font1)
-        self.aKeyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.turnLeftBtn = QPushButton(self.vehicleKeyInfoWidget)
+        self.turnLeftBtn.setObjectName(u"turnLeftBtn")
+        self.turnLeftBtn.setMinimumSize(QSize(0, 25))
+        self.turnLeftBtn.setMaximumSize(QSize(16777215, 25))
 
-        self.verticalLayout_11.addWidget(self.aKeyLabel)
+        self.horizontalLayout_7.addWidget(self.turnLeftBtn)
 
-        self.sKeyLabel = QLabel(self.keyActiveWidget)
-        self.sKeyLabel.setObjectName(u"sKeyLabel")
-        self.sKeyLabel.setFont(font1)
-        self.sKeyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.reverseBtn = QPushButton(self.vehicleKeyInfoWidget)
+        self.reverseBtn.setObjectName(u"reverseBtn")
+        self.reverseBtn.setMinimumSize(QSize(0, 25))
+        self.reverseBtn.setMaximumSize(QSize(16777215, 25))
 
-        self.verticalLayout_11.addWidget(self.sKeyLabel)
+        self.horizontalLayout_7.addWidget(self.reverseBtn)
 
-        self.dKeyLabel = QLabel(self.keyActiveWidget)
-        self.dKeyLabel.setObjectName(u"dKeyLabel")
-        self.dKeyLabel.setFont(font1)
-        self.dKeyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.turnRightBtn = QPushButton(self.vehicleKeyInfoWidget)
+        self.turnRightBtn.setObjectName(u"turnRightBtn")
+        self.turnRightBtn.setMinimumSize(QSize(0, 25))
+        self.turnRightBtn.setMaximumSize(QSize(16777215, 25))
 
-        self.verticalLayout_11.addWidget(self.dKeyLabel)
+        self.horizontalLayout_7.addWidget(self.turnRightBtn)
 
+        self.brakeBtn = QPushButton(self.vehicleKeyInfoWidget)
+        self.brakeBtn.setObjectName(u"brakeBtn")
+        self.brakeBtn.setMinimumSize(QSize(0, 25))
+        self.brakeBtn.setMaximumSize(QSize(16777215, 25))
 
-        self.horizontalLayout_7.addWidget(self.keyActiveWidget)
-
-        self.keyInfoWitget = QWidget(self.keyBindListWidget)
-        self.keyInfoWitget.setObjectName(u"keyInfoWitget")
-        self.verticalLayout_12 = QVBoxLayout(self.keyInfoWitget)
-        self.verticalLayout_12.setSpacing(0)
-        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
-        self.accelerateLabel = QLabel(self.keyInfoWitget)
-        self.accelerateLabel.setObjectName(u"accelerateLabel")
-        self.accelerateLabel.setFont(font1)
-
-        self.verticalLayout_12.addWidget(self.accelerateLabel)
-
-        self.turnLeftLabel = QLabel(self.keyInfoWitget)
-        self.turnLeftLabel.setObjectName(u"turnLeftLabel")
-        self.turnLeftLabel.setFont(font1)
-
-        self.verticalLayout_12.addWidget(self.turnLeftLabel)
-
-        self.reverseBrakeLabel = QLabel(self.keyInfoWitget)
-        self.reverseBrakeLabel.setObjectName(u"reverseBrakeLabel")
-        self.reverseBrakeLabel.setFont(font1)
-
-        self.verticalLayout_12.addWidget(self.reverseBrakeLabel)
-
-        self.turnRightLabel = QLabel(self.keyInfoWitget)
-        self.turnRightLabel.setObjectName(u"turnRightLabel")
-        self.turnRightLabel.setFont(font1)
-
-        self.verticalLayout_12.addWidget(self.turnRightLabel)
+        self.horizontalLayout_7.addWidget(self.brakeBtn)
 
 
-        self.horizontalLayout_7.addWidget(self.keyInfoWitget)
+        self.verticalLayout_6.addWidget(self.vehicleKeyInfoWidget, 0, Qt.AlignmentFlag.AlignBottom)
 
 
-        self.verticalLayout_6.addWidget(self.keyBindListWidget)
+        self.horizontalLayout_6.addWidget(self.vehicleGaugeClusterWidget)
 
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_6.addWidget(self.activeKeyBindingsWidget, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_8)
+
+        self.alertAssistWidget = QWidget(self.vehicleControlPanelWidget)
+        self.alertAssistWidget.setObjectName(u"alertAssistWidget")
+        self.alertAssistWidget.setMinimumSize(QSize(180, 300))
+
+        self.horizontalLayout_6.addWidget(self.alertAssistWidget)
+
+        self.horizontalSpacer_5 = QSpacerItem(180, 20, QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_5)
 
         self.vehicleStatusWidget = QWidget(self.vehicleControlPanelWidget)
         self.vehicleStatusWidget.setObjectName(u"vehicleStatusWidget")
@@ -1149,6 +1331,7 @@ class Ui_MainWindow(object):
         self.vehicleStatusWidget.setMaximumSize(QSize(450, 16777215))
         self.verticalLayout_14 = QVBoxLayout(self.vehicleStatusWidget)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setContentsMargins(-1, -1, -1, 0)
         self.connectionVehicleTypeWidget = QWidget(self.vehicleStatusWidget)
         self.connectionVehicleTypeWidget.setObjectName(u"connectionVehicleTypeWidget")
         self.connectionVehicleTypeWidget.setMinimumSize(QSize(0, 50))
@@ -1192,6 +1375,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_14.addItem(self.verticalSpacer_7)
 
+        self.vehicleAlertLogWidget = QWidget(self.vehicleStatusWidget)
+        self.vehicleAlertLogWidget.setObjectName(u"vehicleAlertLogWidget")
+        self.vehicleAlertLogWidget.setMinimumSize(QSize(0, 250))
+
+        self.verticalLayout_14.addWidget(self.vehicleAlertLogWidget)
+
 
         self.horizontalLayout_6.addWidget(self.vehicleStatusWidget, 0, Qt.AlignmentFlag.AlignRight)
 
@@ -1213,6 +1402,14 @@ class Ui_MainWindow(object):
 
 
         QMetaObject.connectSlotsByName(MainWindow)
+
+        # * IMPORTANT: add SystemLogViewer widget to a new page
+        self.systemLogPage = SystemLogViewer()
+        self.stackedWidget.addWidget(self.systemLogPage)
+
+        # * IMPORTANT: add CalibrationWidget widget to a new settingsStackedWidget page
+        self.VehicleTuningSettingsPage = CalibrationWidget()
+        self.settingsStackedWidget.addWidget(self.VehicleTuningSettingsPage)
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -1222,6 +1419,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.homeBtn.setText("")
         self.driveBtn.setText("")
+        self.logBtn.setText("")
         self.settingsBtn.setText("")
 #if QT_CONFIG(tooltip)
         self.mainPage.setToolTip("")
@@ -1239,18 +1437,20 @@ class Ui_MainWindow(object):
         '''
         self.ipComboBtn.setText("")
         self.label_2.setText("")
-        self.projectTitle.setText(QCoreApplication.translate("MainWindow", u"Follow the project on GitHub", None))
-        self.githubLink.setText(QCoreApplication.translate("MainWindow", u"https://github.com/HalfasleepDev/DriveCore", None))
-        self.aboutTitle.setText(QCoreApplication.translate("MainWindow", u"About", None))
-        self.description.setText(QCoreApplication.translate("MainWindow", u"DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.", None))
+        #self.projectTitle.setText(QCoreApplication.translate("MainWindow", u"About", None))
+        #self.githubLink.setText(QCoreApplication.translate("MainWindow", u"DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.", None))
+        #self.aboutTitle.setText(QCoreApplication.translate("MainWindow", u"Releases", None))
+        #self.description.setText(QCoreApplication.translate("MainWindow", u"Release here:", None))
         self.settingsHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.openCVSettingsBtn.setText(QCoreApplication.translate("MainWindow", u"Open CV", None))
+        self.vehicleTuningBtn.setText(QCoreApplication.translate("MainWindow", u"Vehicle Tuning", None))
         self.OpenCVHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"OpenCV", None))
         self.DebugCVHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Debug Options:", None))
         self.ObjectVisBtn.setText(QCoreApplication.translate("MainWindow", u"Object Vis: OFF", None))
         self.FloorVisBtn.setText(QCoreApplication.translate("MainWindow", u"Floor Vis: OFF", None))
         self.KalmanCenterVisBtn.setText(QCoreApplication.translate("MainWindow", u"Kalman Center Vis: OFF", None))
         self.AmbientVisBtn.setText(QCoreApplication.translate("MainWindow", u"Ambient Vis: OFF", None))
-        self.FloorSampleVisBtn.setText(QCoreApplication.translate("MainWindow", u"Floor Sample Vis: OFF", None))
+        self.FloorSampleVisBtn.setText(QCoreApplication.translate("MainWindow", u"FloorSample Vis: OFF", None))
         self.PathVisBtn.setText(QCoreApplication.translate("MainWindow", u"Path Vis: OFF", None))
         self.HSVSettingsHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Min HSV Sensitivity Margins:", None))
         self.HRowLabel.setText(QCoreApplication.translate("MainWindow", u"H Margin", None))
@@ -1264,17 +1464,13 @@ class Ui_MainWindow(object):
         self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
         self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
         self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
-        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.1 (05-07-2025)", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.2 (20-04-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
-        self.keyBindingsLabel.setText(QCoreApplication.translate("MainWindow", u"Key Bindings", None))
-        self.wKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[W]", None))
-        self.aKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[A]", None))
-        self.sKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[S]", None))
-        self.dKeyLabel.setText(QCoreApplication.translate("MainWindow", u"[D]", None))
-        self.accelerateLabel.setText(QCoreApplication.translate("MainWindow", u":     Accelerate", None))
-        self.turnLeftLabel.setText(QCoreApplication.translate("MainWindow", u":     Turn Left", None))
-        self.reverseBrakeLabel.setText(QCoreApplication.translate("MainWindow", u":    Reverse/Brake", None))
-        self.turnRightLabel.setText(QCoreApplication.translate("MainWindow", u":    Turn Right", None))
+        self.accelerateBtn.setText(QCoreApplication.translate("MainWindow", u"Accelerate : [W]", None))
+        self.turnLeftBtn.setText(QCoreApplication.translate("MainWindow", u"Turn Left : [A]", None))
+        self.reverseBtn.setText(QCoreApplication.translate("MainWindow", u"Reverse : [S]", None))
+        self.turnRightBtn.setText(QCoreApplication.translate("MainWindow", u"Turn Right : [D]", None))
+        self.brakeBtn.setText(QCoreApplication.translate("MainWindow", u"Brake : [SPACE]", None))
         self.currentVehicleLabel.setText(QCoreApplication.translate("MainWindow", u"Current vehicle connected to:", None))
         self.vehicleTypeLabel.setText(QCoreApplication.translate("MainWindow", u"Unknown", None))
     # retranslateUi
