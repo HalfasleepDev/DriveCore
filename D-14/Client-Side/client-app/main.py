@@ -19,7 +19,7 @@ import time
 
 from appFunctions import toggleDebugCV, showError
 
-from appUiAnimations import AnimatedToolTip, LoadingScreen
+from appUiAnimations import AnimatedToolTip, LoadingScreen, install_hover_animation
 
 from openCVFunctions import FrameProcessor
 
@@ -103,6 +103,16 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        ''' ====== Animated Button Setup ======'''
+        animButtons = [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn, self.ui.openCVSettingsBtn,
+            self.ui.vehicleTuningBtn, self.ui.ObjectVisBtn, self.ui.FloorVisBtn, self.ui.KalmanCenterVisBtn, 
+            self.ui.AmbientVisBtn, self.ui.FloorSampleVisBtn, self.ui.PathVisBtn, self.ui.CollisionAssistBtn,
+            self.ui.emergencyDisconnectBtn, self.ui.ipComboBtn
+            ]
+        
+        for btn in animButtons:
+            install_hover_animation(btn)
 
         ''' ====== Network Setup ======'''
         self.ui.inputIp.editingFinished.connect(self.setIp)
@@ -429,17 +439,18 @@ if __name__ == '__main__':
     #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
-    #!ENABLE LTR
-    '''def launch_main():
+    #!ENABLE FOR RELEASE
+    def launch_main():
         window = MainWindow()
         window.setWindowTitle("Drive Core Client Ver 1.2")
-        window.show()'''
+        window.show()
 
-    #loading = LoadingScreen(on_finished_callback=launch_main)
-    #loading.show()
+    loading = LoadingScreen(on_finished_callback=launch_main)
+    loading.show()
 
-    window = MainWindow()
-    window.setWindowTitle("Drive Core Client Ver 1.2")
-    window.show()
+    #!ENABLE FOR TESTING ONLY
+    #window = MainWindow()
+    #window.setWindowTitle("Drive Core Client Ver 1.2")
+    #window.show()
 
     sys.exit(app.exec())

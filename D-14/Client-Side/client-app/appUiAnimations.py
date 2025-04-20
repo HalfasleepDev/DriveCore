@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QLabel, QWidget, QGraphicsOpacityEffect, QVBoxLayout, QHBoxLayout
-from PySide6.QtCore import QTimer, QPropertyAnimation, Qt, QEasingCurve, QRectF, QThread, QConicalGradient
-from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen
+from PySide6.QtWidgets import QLabel, QWidget, QGraphicsOpacityEffect, QVBoxLayout, QHBoxLayout, QPushButton, QGraphicsColorizeEffect
+from PySide6.QtCore import QTimer, QPropertyAnimation, Qt, QEasingCurve, QRectF, QThread, QEvent
+from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen, QConicalGradient
 
 import math
 
@@ -177,4 +177,46 @@ class LoadingScreen(QWidget):
         self.close()
         if self.on_finished:
             self.on_finished()
+
+def install_hover_animation(button: QPushButton):
+    """Attach animated hover effect to a QPushButton."""
+    effect = QGraphicsColorizeEffect(button)
+    effect.setColor(QColor("#7a63ff"))
+    effect.setStrength(0.0)
+    button.setGraphicsEffect(effect)
+
+    # Create animation objects
+    anim_in = QPropertyAnimation(effect, b"strength", button)
+    anim_in.setDuration(200)
+    anim_in.setEndValue(0.5)
+    anim_in.setEasingCurve(QEasingCurve.OutQuad)
+
+    anim_out = QPropertyAnimation(effect, b"strength", button)
+    anim_out.setDuration(200)
+    anim_out.setEndValue(0.0)
+    anim_out.setEasingCurve(QEasingCurve.InQuad)
+
+    # Store in button so it's not garbage collected
+    button._hover_anim_in = anim_in
+    button._hover_anim_out = anim_out
+
+    def on_enter(event):
+        anim_out.stop()
+        anim_in.start()
+        return False
+
+    def on_leave(event):
+        anim_in.stop()
+        anim_out.start()
+        return False
+
+    def event_filter(obj, event):
+        if event.type() == QEvent.Enter:
+            return on_enter(event)
+        elif event.type() == QEvent.Leave:
+            return on_leave(event)
+        return False
+
+    button.installEventFilter(button)
+    button.eventFilter = event_filter  # Monkey-patch filter into button instance
 
