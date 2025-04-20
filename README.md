@@ -29,15 +29,17 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 
 ---
 
-# Current Version: 1.1 for D-14
+# Current Version: 1.2 - *"Control Tuning & UI Foundations"* for D-14
+
+![Ver 1.2 Demo](D-14/Diagrams-Concepts/Ver-1-2/DemoV1-2.gif)
 
 - [D-14 Client and Host Section](D-14/README.md)
 
 <details>
 
-<summary>OpenCV Overlay</summary>
+<summary>Important Notes</summary>
 
-![Settings Page Ver 1.1](D-14/Diagrams-Concepts/Ver-1-1/CvOverlayV1-1.png)
+- Many UI elements are functional, but they require backend functionality **(Ver 1.3)**
 
 </details>
 

@@ -1,10 +1,13 @@
 # WPL D-14 
 ![Modified WPL D-14 Host](D-14-Mod.jpg)
 
-## Currently running Ver 1.1
+## Currently running Ver 1.2 - *"Control Tuning & UI Foundations"*
 
 ---
 
+![Ver 1.2 Demo](Diagrams-Concepts/Ver-1-2/DemoV1-2.gif)
+
+---
 ## Features:
 ### Host:
 - Can move forward, backward, and any combination with left or right
@@ -20,13 +23,14 @@
 - Inputs using `W` `A` `S` `D`
 - On exit, the host "should" stop running
 - OpenCV HUD & settings
+- UI Foundations for upcomming Ver 1.3
 
-### UI Demo (Ver 1.1):
+### UI Demo (Ver 1.2):
 <details>
 
 <summary>Home Page</summary>
 
-![Home Page Ver 1.1](Diagrams-Concepts/Ver-1-1/HomePageV1-1.png)
+![Home Page Ver 1.2](Diagrams-Concepts/Ver-1-2/HomePageV1-2.gif)
 
 </details>
 
@@ -34,7 +38,15 @@
 
 <summary>Drive Page</summary>
 
-![Drive Page Ver 1.1](Diagrams-Concepts/Ver-1-1/DrivePageV1-1.png)
+![Drive Page Ver 1.2](Diagrams-Concepts/Ver-1-2/DrivePageV1-2.gif)
+
+</details>
+
+<details>
+
+<summary>Log Page</summary>
+
+![Log Page Ver 1.2](Diagrams-Concepts/Ver-1-2/LogPageV1-2.gif)
 
 </details>
 
@@ -42,7 +54,7 @@
 
 <summary>Settings Page</summary>
 
-![Settings Page Ver 1.1](Diagrams-Concepts/Ver-1-1/SettingsPageV1-1.png)
+![Settings Page Ver 1.2](Diagrams-Concepts/Ver-1-2/SettingsPageV1-2.gif)
 
 </details>
 
@@ -50,7 +62,7 @@
 
 <summary>OpenCV Overlay</summary>
 
-![OpenCV Overlay Ver 1.1](Diagrams-Concepts/Ver-1-1/CvOverlayV1-1.png)
+![OpenCV Overlay Ver 1.1](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
 
 </details>
 
@@ -166,6 +178,74 @@
 
 </details>
 
+<details>
+
+<summary>Ver 1.2</summary>
+
+#### Ver 1.2 - "Control Tuning & UI Foundations"
+
+##### Host:
+- No new changes.
+
+##### Client
+- Added multiple new UI Elements demonstrated in [ui-prototypes Ver 1.2](Client-Side/ui-prototypes/README.md).
+    - `Project Info Widget`
+    - `General Logs Widget`
+    - `Speedometer Widget`
+    - `Steer Angle Widget`
+    - `PRND Selector Widget`
+    - `DriveAssist Alert Widget`
+    - `System Log Page`
+    - `Vehicle Calibration Widget`
+    - `Settings Description Widget`
+- Added a new custom boot screen animation
+- General UI Fixes and Tweaks for consistancy. 
+
+##### UI Demo (Ver 1.2):
+<details>
+
+<summary>Home Page</summary>
+
+![Home Page Ver 1.2](Diagrams-Concepts/Ver-1-2/HomePageV1-2.gif)
+
+</details>
+
+<details>
+
+<summary>Drive Page</summary>
+
+![Drive Page Ver 1.2](Diagrams-Concepts/Ver-1-2/DrivePageV1-2.gif)
+
+</details>
+
+<details>
+
+<summary>Log Page</summary>
+
+![Log Page Ver 1.2](Diagrams-Concepts/Ver-1-2/LogPageV1-2.gif)
+
+</details>
+
+<details>
+
+<summary>Settings Page</summary>
+
+![Settings Page Ver 1.2](Diagrams-Concepts/Ver-1-2/SettingsPageV1-2.gif)
+
+</details>
+
+<details>
+
+<summary>OpenCV Overlay</summary>
+
+![OpenCV Overlay Ver 1.1](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
+
+</details>
+
+---
+
+</details>
+
 ---
 
 ## Hardware requirements:
@@ -257,6 +337,11 @@
 - [x] Path detection (opencv) **(Ver 1.1)**
 - [x] Reduced input lag **(Ver 1.1)**
 - [x] Error popups for critical issues **(Ver 1.1)**
+- [x] Framework for steering and max throttle tuning on the `settings` page **(Ver 1.2)**
+- [X] UI design consistency **(Ver 1.2)**
+- [x] Add UI element foundations for *Ver 1.3* **(Ver 1.2)**
+- [x] Upgrade `settings` page **(Ver 1.2)**
+- [x] Created the front-end for the `log` page **(Ver 1.2)**
 
 </details>
 
