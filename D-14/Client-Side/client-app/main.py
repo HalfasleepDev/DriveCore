@@ -31,7 +31,7 @@ PORT = 4444 #TODO: move to settings
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
 
-# TODO: Add error popups
+# TODO: Style error popups
 
 class VideoThread(QThread):
     frame_received = Signal(QImage)  # Signal to send new frame to UI
@@ -371,7 +371,7 @@ class MainWindow(QMainWindow):
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "DOWN":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
-            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
