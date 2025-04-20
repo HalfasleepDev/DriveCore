@@ -62,7 +62,7 @@
 
 <summary>OpenCV Overlay</summary>
 
-![OpenCV Overlay Ver 1.1](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
+![OpenCV Overlay Ver 1.2](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
 
 </details>
 
@@ -238,7 +238,7 @@
 
 <summary>OpenCV Overlay</summary>
 
-![OpenCV Overlay Ver 1.1](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
+![OpenCV Overlay Ver 1.2](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
 
 </details>
 
@@ -269,20 +269,6 @@
 ---
 
 ## Version Roadmap **(Upcomming)**:
-<details>
-
-<summary>Version 1.2</summary>
-
-### Version 1.2 - "Control Tuning & UI Foundations"
-- [x] Framework for steering and max throttle tuning on the `settings` page
-- [X] UI design consistency
-- [x] Add UI element foundations for **Ver 1.3** *(All UI protoyping for Ver 1.2 is done)*
-- [x] Upgrade `settings` page
-
-- [UI Preview](Diagrams-Concepts/DriveCore-Ver-1-2.pdf)
-
-</details>
-
 <details>
 
 <summary>Version 1.3</summary>
@@ -342,6 +328,17 @@
 - [x] Add UI element foundations for *Ver 1.3* **(Ver 1.2)**
 - [x] Upgrade `settings` page **(Ver 1.2)**
 - [x] Created the front-end for the `log` page **(Ver 1.2)**
+
+</details>
+
+---
+
+<details>
+
+<summary>UI Concepts</summary>
+
+- [UI Preview V 1.0](Diagrams-Concepts/DriveCore-Ver-1-1.pdf)
+- [UI Preview V1.2](Diagrams-Concepts/DriveCore-Ver-1-2.pdf)
 
 </details>
 
