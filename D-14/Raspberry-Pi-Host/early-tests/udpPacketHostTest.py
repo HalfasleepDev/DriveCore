@@ -5,7 +5,7 @@ HOST = "0.0.0.0"
 PORT = 4444
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((HOST, PORT))
+sock.bind((HOST, PORT)) 
 
 print(f"Server listening on {HOST}:{PORT}")
 
