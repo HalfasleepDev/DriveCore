@@ -1,11 +1,11 @@
-from picamera2 import Picamera2
 import socket
-import struct
-import time
-import threading
 import json
+import struct
+import threading
+import time
 import io
-from PIL import Image
+from picamera2 import Picamera2
+from PIL import Image               # pillow
 
 from udpProtocolHost import (broadcast_packet)
 
@@ -39,6 +39,44 @@ def broadcast_ip():
         sock.sendto(message.encode(), ('<broadcast>', BROADCAST_PORT))
         time.sleep(1)
 
+# === HANDLE HANDSHAKE LOGIC ===
+def handle_handshake(sock, addr, payload):
+    global client_ip
+    client_ip = addr[0]
+
+    if payload.get("type") == "credentials":
+        print(f"🔐 Received credentials from {addr}")
+        sock.sendto(json.dumps({"type": "auth_status", "status": "ok"}).encode(), addr)
+
+    elif payload.get("type") == "version_request":
+        sock.sendto(json.dumps({"type": "version_info", "host_version": "1.0.2"}).encode(), addr)
+        time.sleep(0.1)
+        sock.sendto(json.dumps({"type": "request_client_version"}).encode(), addr)
+
+    elif payload.get("type") == "client_version":
+        print(f"📦 Client version: {payload['version']}")
+
+    elif payload.get("type") == "setup_request":
+        print(f"⚙️ Received setup from {addr}: {payload}")
+        sock.sendto(json.dumps({"type": "setup_confirmed", "ready": True}).encode(), addr)
+        handshake_complete.set()
+
+# === HANDLE POST-HANDSHAKE COMMANDS ===
+def handle_control(sock, addr, payload):
+    if payload.get("type") == "command":
+        command = payload["command"]
+        print(f"🚗 Command received: {command}")
+
+        # TODO: Add actual ESC/servo logic here
+
+        ack = {
+            "type": "command_ack",
+            "command": command,
+            "timestamp": payload.get("timestamp"),
+            "status": "executed"
+        }
+        sock.sendto(json.dumps(ack).encode(), addr)
+
 # === COMMAND RECEIVER ===
 def command_listener():
     global client_ip
@@ -48,39 +86,16 @@ def command_listener():
 
     while True:
         data, addr = sock.recvfrom(2048)
-        client_ip = addr[0]
-        payload = json.loads(data.decode())
+        try:
+            payload = json.loads(data.decode())
+        except json.JSONDecodeError:
+            print(f"Invalid JSON from {addr}")
+            continue
 
-        # ============ HANDSHAKE PHASE ============
         if not handshake_complete.is_set():
-            if payload.get("type") == "credentials":
-                print(f"Received credentials from {client_ip}")
-                sock.sendto(json.dumps({"type": "auth_status", "status": "ok"}).encode(), addr)
-
-            elif payload.get("type") == "version_request":
-                sock.sendto(json.dumps({"type": "version_info", "host_version": "1.0.2"}).encode(), addr)
-                time.sleep(0.2)
-                sock.sendto(json.dumps({"type": "request_client_version"}).encode(), addr)
-
-            elif payload.get("type") == "client_version":
-                print(f"Client version: {payload['version']}")
-
-            elif payload.get("type") == "setup_request":
-                print("Setup info received:", payload)
-                sock.sendto(json.dumps({"type": "setup_confirmed", "ready": True}).encode(), addr)
-                handshake_complete.set()
-
-        # ============ POST-HANDSHAKE CONTROL ============
-        elif payload.get("type") == "command":
-            print(f"Command received: {payload['command']} from {addr}")
-            # Handle control here (ESC, servo, etc.)
-            response = {
-                "type": "command_ack",
-                "command": payload['command'],
-                "timestamp": payload['timestamp'],
-                "status": "executed"
-            }
-            sock.sendto(json.dumps(response).encode(), addr)
+            handle_handshake(sock, addr, payload)
+        else:
+            handle_control(sock, addr, payload)
 
 # === VIDEO STREAMING ===
 def video_stream():

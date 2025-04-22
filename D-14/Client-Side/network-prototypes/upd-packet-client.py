@@ -23,7 +23,8 @@ def discover_host():
     global server_ip, video_port, control_port
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', BROADCAST_PORT))
+    sock.bind(('', BROADCAST_PORT)) #'<broadcast>'
+
     while True:
         data, addr = sock.recvfrom(1024)
         try:
@@ -34,8 +35,9 @@ def discover_host():
                 control_port = payload.get("control_port")
                 print(f"Discovered host at {server_ip}")
                 break
-        except:
-            continue
+        except ConnectionRefusedError:
+            print("[Broadcast] ConnectionRefusedError")
+
     sock.close()
 
 def perform_handshake():
@@ -45,29 +47,31 @@ def perform_handshake():
     def send(payload):
         sock.sendto(json.dumps(payload).encode(), (server_ip, control_port))
 
-    send({"type": "credentials", "username": "greg", "password": "secure123"})
-    time.sleep(0.2)
-    send({"type": "version_request"})
-    time.sleep(0.2)
-    send({"type": "client_version", "version": "1.0.0"})
-    time.sleep(0.2)
-    send({
-        "type": "setup_request",
-        "vehicle_model": "RCX-7",
-        "control_scheme": "WASD",
-        "num_cameras": 1,
-        "num_sensors": 2,
-        "sensor_types": ["lidar", "imu"],
-        "local_processing": True,
-        "https_cam_addr": "http://192.168.0.5/cam"
-    })
+    pending_action = "send_credentials"
 
-    handshake_done.set()
-    sock.close()
+    while not handshake_done.is_set():
+
+        if pending_action == "send_credentials":
+            send()
+        
+        # === Inbound messages ===
+        try:
+            data, _ = sock.recvfrom(2048)
+            payload = json.loads(data.decode())
+            pending_action = handle_server_response(payload)
+
+        except socket.timeout:
+            print("Waiting for server...")
+            continue
+
+def handle_server_response(payload):
+    pass
 
 def send_command(cmd: str):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(1.0)
+
+    # Replace with protocol
     packet = {
         "type": "command",
         "command": cmd,
