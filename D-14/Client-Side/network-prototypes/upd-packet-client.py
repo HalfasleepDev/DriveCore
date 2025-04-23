@@ -10,6 +10,19 @@ import json
 import time
 import threading
 
+from udpProtocolClient import (credential_packet, version_request_packet, 
+                               setup_request_packet, send_tune_data_packet)
+
+#TODO:
+'''
+- [x] Create a command file
+- [x] brodcast
+- [X] HandShake
+- [ ] Commands
+- [ ] Video
+'''
+
+# ------ Network Settings ------
 BROADCAST_PORT = 9999
 CHUNK_SIZE = 1024
 BUFFER_SIZE = 65536
@@ -19,11 +32,33 @@ video_port = None
 control_port = None
 handshake_done = threading.Event()
 
+# ------ Temp Variables ------
+# --- Credentials --- 
+username = "test"
+password = "123"
+# --- Version ---
+client_ver = "1.3"
+supported_ver = ["1.3"]
+# --- PWM Tune Settings ---
+MIN_DUTY_SERVO = 900   # Leftmost position in µs
+MAX_DUTY_SERVO = 2100  # Rightmost position in µs 
+NEUTRAL_SERVO = 1500   # Center position in µs
+
+MIN_DUTY_ESC = 1310    # Minimum throttle
+MAX_DUTY_ESC = 1750    # Maximum throttle
+NEUTRAL_DUTY_ESC = 1500  # Neutral position
+BRAKE_ESC = 1470     # Should trigger the brake in the esc
+# --- Vehicle Setup ---
+control_scheme = str
+vehicle_model = str
+
+# ====== Discover Broadcast ======
 def discover_host():
     global server_ip, video_port, control_port
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', BROADCAST_PORT)) #'<broadcast>'
+    print("[Broadcast]: Listening for broadcast...")
 
     while True:
         data, addr = sock.recvfrom(1024)
@@ -40,7 +75,11 @@ def discover_host():
 
     sock.close()
 
+# ------ Preform Handshake ------
 def perform_handshake():
+    global handshake_status
+    handshake_status = True
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(1.0)
 
@@ -49,10 +88,47 @@ def perform_handshake():
 
     pending_action = "send_credentials"
 
-    while not handshake_done.is_set():
+    while (not handshake_done.is_set()) & handshake_status:
 
         if pending_action == "send_credentials":
-            send()
+            send(credential_packet(username, password))
+            pending_action = None
+        
+        elif pending_action == "auth_failed":
+            # Add error message
+            handshake_status = False
+            pending_action = None
+        
+        elif pending_action == "version_request":
+            send(version_request_packet(client_ver))
+            pending_action = None
+        
+        elif pending_action == "version_request_failed":
+            # Add error message
+            handshake_status = False
+            pending_action = None
+
+        elif pending_action == "send_client_version_failed":
+            # Add error message
+            handshake_status = False
+            pending_action = None
+        
+        elif pending_action == "setup_request":
+            send(setup_request_packet)
+            pending_action = None
+
+        elif pending_action == "send_tune_data":
+            send(send_tune_data_packet("handshake", ))
+            pending_action = None
+
+        elif pending_action == "handshake_complete":
+            # Add status message
+            pending_action = None
+
+        '''elif pending_action == "":
+            pending_action = None'''
+        
+        # TODO: add other actions
         
         # === Inbound messages ===
         try:
@@ -65,6 +141,7 @@ def perform_handshake():
             continue
 
 def handle_server_response(payload):
+    # TODO: process server responces, should return a string
     pass
 
 def send_command(cmd: str):

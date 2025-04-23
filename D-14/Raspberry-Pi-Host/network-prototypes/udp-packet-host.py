@@ -13,7 +13,7 @@ from udpProtocolHost import (broadcast_packet)
 '''
 - [x] Create a command file
 - [x] brodcast
-- [ ] HandShake
+- [X] HandShake
 - [ ] Commands
 - [ ] Video
 '''
