@@ -39,7 +39,7 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SE
         }
 
 # ------ Keyboard Commands ------
-def keyboard_command_packet(cmd: str, intensity: float):
+def keyboard_command_packet(cmd: str, intensity):
     return {
         "type": "keyboard_command",
         "command": cmd,

@@ -276,7 +276,7 @@
 ### Version 1.3 – “Control System & Communication Layer”
 - [ ] Drive model *(HOST)*
 - [x] Client-Host communication & verification
-- [ ] Acceleration curves *(CLIENT)*
+- [x] Acceleration curves *(CLIENT)*
 - [ ] Vehicle status info *(CLIENT)*
 - [ ] Application packaging
 - [ ] Client-Host logging
