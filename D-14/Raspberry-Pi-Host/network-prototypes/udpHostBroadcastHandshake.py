@@ -5,7 +5,6 @@ import threading
 
 from udpProtocolHost import (broadcast_packet, auth_status_packet, version_info_packet,
                              setup_info_packet, handshake_complete_packet)
-updProtocolHost
 # === CONFIG ===
 BROADCAST_PORT = 9999
 CONTROL_PORT = 4444

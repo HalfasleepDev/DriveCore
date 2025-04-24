@@ -39,3 +39,22 @@ def handshake_complete_packet(COMPLETE: bool):
         "type": "handshake_complete",
         "status": COMPLETE
     }
+
+# ------ Keyboard Command ACK ------
+
+def keyboard_command_ack_packet(cmd: str, current_esc_pw, current_servo_pw):
+    return {
+        "type": "command_ack",
+        "command": cmd,
+        "esc_pw": current_esc_pw,
+        "servo_pw": current_servo_pw,
+        "timestamp": current_time()
+    }
+
+# ------ Frame ------
+
+def frame_ack_packet(n_chunks):
+    return {
+        "chunks": n_chunks,
+        "timestamp": current_time()
+    }

@@ -38,4 +38,11 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SE
             # Add more ltr
         }
 
-# ====== Response packets ======
+# ------ Keyboard Commands ------
+def keyboard_command_packet(cmd: str, intensity: float):
+    return {
+        "type": "keyboard_command",
+        "command": cmd,
+        "intensity": intensity,
+        "timestamp": current_time()
+    }

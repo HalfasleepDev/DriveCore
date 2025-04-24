@@ -9,17 +9,19 @@ import numpy as np
 import json
 import time
 import threading
+from queue import Queue  
 
 from udpProtocolClient import (credential_packet, version_request_packet, 
-                               setup_request_packet, send_tune_data_packet)
+                               setup_request_packet, send_tune_data_packet,
+                               current_time, keyboard_command_packet)
 
 #TODO:
 '''
 - [x] Create a command file
 - [x] brodcast
 - [X] HandShake
-- [ ] Commands
-- [ ] Video
+- [x] Commands
+- [x] Video
 '''
 
 # ------ Network Settings ------
@@ -52,6 +54,10 @@ BRAKE_ESC = 1470     # Should trigger the brake in the esc
 control_scheme = str
 vehicle_model = str
 
+# ------- Control setup ------
+command_queue = Queue()
+MAX_RETRIES = 3
+
 # ====== Discover Broadcast ======
 def discover_host():
     global server_ip, video_port, control_port
@@ -68,7 +74,7 @@ def discover_host():
                 server_ip = addr[0]
                 video_port = payload.get("video_port")
                 control_port = payload.get("control_port")
-                print(f"Discovered host at {server_ip}")
+                print(f"[Broadcast]: Found host: {server_ip}, Video: {video_port}, Control: {control_port}")
                 break
         except ConnectionRefusedError:
             print("[Broadcast] ConnectionRefusedError")
@@ -77,11 +83,10 @@ def discover_host():
 
 # ------ Preform Handshake ------
 def perform_handshake():
-    global handshake_status
     handshake_status = True
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(1.0)
+    sock.settimeout(2.0)
 
     def send(payload):
         sock.sendto(json.dumps(payload).encode(), (server_ip, control_port))
@@ -93,9 +98,10 @@ def perform_handshake():
         if pending_action == "send_credentials":
             send(credential_packet(username, password))
             pending_action = None
-        
+
         elif pending_action == "auth_failed":
-            # Add error message
+            #! Error message
+            print("[Handshake][Error]: authentication failed")
             handshake_status = False
             pending_action = None
         
@@ -104,26 +110,35 @@ def perform_handshake():
             pending_action = None
         
         elif pending_action == "version_request_failed":
-            # Add error message
+            #! Error message
+            print("[Handshake][Error]: Incompatable Host Ver")
             handshake_status = False
             pending_action = None
 
         elif pending_action == "send_client_version_failed":
-            # Add error message
+            #! Error message
+            print("[Handshake][Error]: Incompatable Client Ver")
             handshake_status = False
             pending_action = None
         
         elif pending_action == "setup_request":
-            send(setup_request_packet)
+            send(setup_request_packet())
             pending_action = None
 
         elif pending_action == "send_tune_data":
-            send(send_tune_data_packet("handshake", ))
+            send(send_tune_data_packet("handshake", MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SERVO, 
+                                       MIN_DUTY_ESC, MAX_DUTY_ESC, NEUTRAL_DUTY_ESC, BRAKE_ESC))
             pending_action = None
 
         elif pending_action == "handshake_complete":
-            # Add status message
+            #* Done message
+            print("[Handshake]: handshake is complete")
+            print(f"[Status]: Successfully connected to {vehicle_model}")
+            print(f"[Status]: Using {control_scheme} control scheme")
             pending_action = None
+            handshake_status = False
+            handshake_done.set()
+            
 
         '''elif pending_action == "":
             pending_action = None'''
@@ -139,29 +154,63 @@ def perform_handshake():
         except socket.timeout:
             print("Waiting for server...")
             continue
+    sock.close()
 
 def handle_server_response(payload):
-    # TODO: process server responces, should return a string
-    pass
+    global vehicle_model, control_scheme
+    # ------ Authentication ------
+    if payload.get("type") == "auth_status":
+        if payload.get("status"):
+            #* Done message
+            print("[Handshake]: Authentication succsessful")
+            return "version_request"                                #* <--- pass
+        else:
+            return "auth_failed"
+    
+    # ------ Check Version Compatability ------
+    elif payload.get("type") == "version_info":
+        if payload.get("client_compatablity"):
+            # grab host ver here
+            #* Done message
+            print("[Handshake]: Client is compatable")
+            if payload.get("host-version") in supported_ver:
+                #* Done message
+                print("[Handshake]: Host is compatable")
+                return "setup_request"                              #* <--- pass
+            else:
+                return "version_request_failed"
+        else:
+            return "send_client_version_failed"
+    # ------ Gather Vehicle Setup Info ------
+    elif payload.get("type") == "setup_info":
+        vehicle_model = payload.get("vehicle_model")
+        control_scheme = payload.get("control_scheme")
+        #* Done message
+        print("[Handshake]: Gathered vehicle setup info")
+        return "send_tune_data"                                     #* <--- pass
+    
+    elif payload.get("type") == "handshake_complete":
+        if payload.get("status"):
+            return "handshake_complete"                             #* <--- pass
+        
+    elif payload.get("type") == "":
+        return
 
 def send_command(cmd: str):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(1.0)
 
-    # Replace with protocol
-    packet = {
-        "type": "command",
-        "command": cmd,
-        "assist": None,
-        "timestamp": int(time.time() * 1000)
-    }
+    packet = keyboard_command_packet(cmd)
+    sock.sendto(json.dumps(packet).encode(), (server_ip, control_port))
+
     try:
-        sock.sendto(json.dumps(packet).encode(), (server_ip, control_port))
         data, _ = sock.recvfrom(1024)
         ack = json.loads(data.decode())
-        print(f"✅ Command ACK: {ack}")
+        now = current_time()
+        delay = now - ack["timestamp"]
+        print(f"ACK: {ack['command']} | RTT: {delay}ms")
     except socket.timeout:
-        print("⚠️ No ACK for command:", cmd)
+        print("No ACK for command:", cmd)
     sock.close()
 
 class DriveCoreUI(QWidget):
@@ -180,6 +229,12 @@ class DriveCoreUI(QWidget):
         self.current_chunks = 0
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
+
+        self.last_frame_time = time.time()
+        self.frame_counter = 0
+        self.fps = 0
+        self.last_video_latency_ms = 0
+        self.last_frame_timestamp = 0
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.receive_video)
@@ -209,18 +264,40 @@ class DriveCoreUI(QWidget):
         try:
             while True:
                 data, _ = self.sock.recvfrom(BUFFER_SIZE)
-                if len(data) == 4:
-                    self.total_chunks = struct.unpack("!I", data)[0]
+
+                # === HEADER PACKET (contains JSON: chunks + timestamp) ===
+                try:
+                    header = json.loads(data.decode())
+                    self.total_chunks = header["chunks"]
+                    self.last_frame_timestamp = header["timestamp"]
                     self.frame_chunks = []
                     self.current_chunks = 0
-                else:
-                    self.frame_chunks.append(data)
-                    self.current_chunks += 1
-                    if self.current_chunks == self.total_chunks:
-                        frame_data = b''.join(self.frame_chunks)
-                        self.display_frame(frame_data)
-                        self.frame_chunks = []
-                        self.current_chunks = 0
+                    continue  # Don't count header as chunk
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    pass  # Not a JSON header → it's a frame chunk
+
+                # === FRAME CHUNKS ===
+                self.frame_chunks.append(data)
+                self.current_chunks += 1
+
+                 # === Drop frame if excessive chunks ===
+                if self.current_chunks > self.total_chunks:
+                    print("⚠️ Dropping overdue frame")
+                    self.frame_chunks.clear()
+                    self.current_chunks = 0
+
+                # === Display full frame ===
+                if self.current_chunks == self.total_chunks:
+                    frame_data = b''.join(self.frame_chunks)
+
+                    now = int(time.time() * 1000)
+                    self.last_video_latency_ms = now - self.last_frame_timestamp
+
+                    self.display_frame(frame_data)
+
+                    self.frame_chunks = []
+                    self.current_chunks = 0
+
         except BlockingIOError:
             pass
 
@@ -228,6 +305,21 @@ class DriveCoreUI(QWidget):
         nparr = np.frombuffer(data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is not None:
+            # === FPS calculation ===
+            self.frame_counter += 1
+            now = time.time()
+            elapsed = now - self.last_frame_time
+            if elapsed >= 1.0:
+                self.fps = self.frame_counter / elapsed
+                self.frame_counter = 0
+                self.last_frame_time = now
+
+            # === Overlay text ===
+            overlay = f"FPS: {self.fps:.1f} | Latency: {self.last_video_latency_ms} ms"
+            cv2.putText(img, overlay, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.8, (0, 255, 0), 2, cv2.LINE_AA)
+
+            # === Show frame ===
             h, w, ch = img.shape
             bytes_per_line = ch * w
             qt_image = QImage(img.data, w, h, bytes_per_line, QImage.Format_BGR888)
