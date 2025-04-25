@@ -215,3 +215,30 @@
 
 
 </details>
+
+---
+## GUI (v1.3)
+---
+### Home Page
+<details>
+
+<summary>Username Password Field</summary>
+
+#### Features
+- To connect to a host it now requires a username and password.
+
+#### How will this be applied?
+- It will replace the ip input fields.
+
+![Username Password Field](ver-1-3/loginConnectGuiVis.png)
+
+[Username Password Field](ver-1-3/loginConnectGuiVis.py)
+
+
+</details>
+
+### Drive Page
+
+### Log Page
+
+### Settings page

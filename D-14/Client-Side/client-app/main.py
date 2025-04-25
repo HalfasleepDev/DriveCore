@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
         for btn in animButtons:
             install_hover_animation(btn)
 
-        ''' ====== Network Setup ======'''
+        ''' ====== Network Setup ======'''#! Depreciated for Ver1.3
         self.ui.inputIp.editingFinished.connect(self.setIp)
         self.ui.inputIp.editingFinished.connect(self.add_ip)
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
@@ -250,6 +250,7 @@ class MainWindow(QMainWindow):
             case 7:
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
 
+    #! Depreciated for Ver1.3
     def add_ip(self):
         """ Adds the entered IP to the combo box and saves it. """
         ip = self.ui.inputIp.text().strip()
@@ -262,6 +263,7 @@ class MainWindow(QMainWindow):
         # Clear input field
         self.ui.inputIp.clear()
 
+    #! Depreciated for Ver1.3
     def load_recent_ips(self):
         """ Loads recent IP addresses from a file. """
         filename = "D-14/Client-Side/client-app/recent_ips.txt"
@@ -270,6 +272,7 @@ class MainWindow(QMainWindow):
                 return [line.strip() for line in file.readlines()]
         return []
     
+    #! Depreciated for Ver1.3
     def save_recent_ips(self):
         """ Saves recent IP addresses to a file. """
         with open("D-14/Client-Side/client-app/recent_ips.txt", "w") as file:
@@ -282,6 +285,7 @@ class MainWindow(QMainWindow):
             self.send_command("DISCONNECT")
             VEHICLE_CONNECTION = False
 
+    #! Depreciated for Ver1.3
     def is_ip_address(self, s):
         try:
             ipaddress.ip_address(s)  # Try converting the string to an IP address
@@ -290,6 +294,7 @@ class MainWindow(QMainWindow):
             showError(self, "CONNECTION ERROR", "Not a valid IP address")
             return False  # Not a valid IP address
     
+    #! Depreciated for Ver1.3
     def setIp(self):
         
         if self.is_ip_address(self.ui.inputIp.text()):
@@ -315,7 +320,8 @@ class MainWindow(QMainWindow):
 
         else:
             self.ui.ipInputBox.setStyleSheet("QGroupBox::title{color: #FF0000;}")
-    
+            
+    #! Depreciated for Ver1.3
     def setIpCombo(self):
         if self.is_ip_address(self.ui.recentIpCombo.currentText()):
             self.IP_ADDR = self.ui.recentIpCombo.currentText()
@@ -400,6 +406,7 @@ class MainWindow(QMainWindow):
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
 
+    #! Depreciated for Ver1.3
     def send_command(self, command):
         """Send command to Raspberry Pi"""
         try:
@@ -412,7 +419,7 @@ class MainWindow(QMainWindow):
             showError(self, "CONNECTION FALIURE", f"{e}")
             self.VEHICLE_CONNECTION = False
 
-    
+    #! Depreciated for Ver1.3
     def update_frame(self, q_img):
         """Update QLabel with new frame."""
         self.ui.videoStreamLabel.setPixmap(QPixmap.fromImage(q_img))
@@ -422,6 +429,7 @@ class MainWindow(QMainWindow):
         else:
             self.alert_triggered_Prev = False
 
+    #! Depreciated for Ver1.3
     def closeEvent(self, event):
         """Release resources when closing the window."""
         if self.VEHICLE_CONNECTION:

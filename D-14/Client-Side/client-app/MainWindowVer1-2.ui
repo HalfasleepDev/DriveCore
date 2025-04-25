@@ -307,6 +307,7 @@ QWidget#vehicleAlertLogWidget{
 }
 
 /*=======Center home widget=======*/
+
 QWidget#connectionLogWidget{
 	background-color: #1e1e21;
 	border: 1px #1e1e21;
@@ -314,10 +315,60 @@ QWidget#connectionLogWidget{
 }
 
 /*=======Left home widget=======*/
-QWidget#loginWidget{
-	background-color: #7a63ff;
+QGroupBox#ipInputBox{
+	border: 1px #f1f3f3;
 	border-radius: 15px;
+	background-color: #7a63ff;
+	margin-top: 6px;
 }
+QGroupBox::title#ipInputBox{
+	subcontrol-origin: margin;
+	left: 10px;
+	bottom: -10px;
+	padding: 0 5px;
+	color: #f1f3f3;
+}
+QLineEdit#inputIp{
+	background: #f1f3f3;
+	color: #1e1e21;
+	border: none;
+	border-radius: 5px;
+}
+QGroupBox#recentIpBox{
+	border: 1px #f1f3f3;
+	border-radius: 15px;
+	background-color: #7a63ff;
+	margin-top: 6px;
+}
+QGroupBox::title#recentIpBox{
+	subcontrol-origin: margin;
+	left: 10px;
+	bottom: -10px;
+	padding: 0 5px;
+	color: #f1f3f3;
+}
+QComboBox#recentIpCombo{
+	background: #f1f3f3;
+	color: #1e1e21;
+	border: none;
+	border-radius: 5px;
+}
+QComboBox::drop-down#recentIpCombo{
+	border: none;
+}
+QComboBox::down-arrow#recentIpCombo{
+	border: 1px #7a63ff;
+	border-style: dotted;
+}
+QPushButton#ipComboBtn{
+	background-color: #f1f3f3;
+	border-radius: 5px;
+}
+QPushButton#ipComboBtn:pressed{
+	background-color: #74e1ef;
+}
+
+
 
 /*=======Right home widget=======*/
 QWidget#projectInfoWidget {
@@ -675,19 +726,182 @@ QWidget#drivePage{
                </spacer>
               </item>
               <item>
-               <widget class="QWidget" name="loginWidget" native="true">
+               <widget class="QGroupBox" name="ipInputBox">
                 <property name="minimumSize">
                  <size>
                   <width>400</width>
-                  <height>400</height>
+                  <height>90</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>400</width>
-                  <height>400</height>
+                  <height>16777215</height>
                  </size>
                 </property>
+                <property name="font">
+                 <font>
+                  <pointsize>15</pointsize>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="title">
+                 <string>Enter an ip address to connect</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <property name="spacing">
+                  <number>15</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>15</number>
+                 </property>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="QLineEdit" name="inputIp">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="placeholderText">
+                    <string>Enter an ip address...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>158</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="recentIpBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>90</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>15</pointsize>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="title">
+                 <string>Connect to a recent ip address</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="spacing">
+                  <number>15</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>15</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>15</number>
+                 </property>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="QComboBox" name="recentIpCombo">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>ip-addr test-1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>ip-addr test-2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>ip-addr test-3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>ip-addr test-4</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>ip-addr test-5</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
+                  <widget class="QPushButton" name="ipComboBtn">
+                   <property name="minimumSize">
+                    <size>
+                     <width>35</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>35</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>:/icons/3c1ab251/solar--link-bold.svg</normaloff>:/icons/3c1ab251/solar--link-bold.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item>
