@@ -2,6 +2,26 @@ from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QStack
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtCore import Qt, Signal, QTimer
 import time
+import os
+import json
+
+#from MainWindow import Ui_MainWindow
+
+DEFAULT_SETTINGS = {
+    "min_duty_servo": 900,
+    "max_duty_servo": 2100,
+    "neutral_duty_servo": 1500,
+    "min_duty_esc": 1310,
+    "max_duty_esc": 1750,
+    "neutral_duty_esc": 1500,
+    "brake_esc": 1470,
+    "ramp_up": 0.05,
+    "ramp_down": 0.05,
+    "username": "",
+    "password": "",
+    "acceleration_curve": "linear",
+    "broadcast_port": 9999
+}
 
 '''Keypress Page Class'''
 class PageWithKeyEvents(QWidget):
@@ -106,5 +126,16 @@ def showError(self, title: str, message: str):
     msg_box.setText(message)
     msg_box.exec()
 
-#def logToSystem()
+def load_settings(SETTINGS_FILE):
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, "r") as f:
+            try:
+                loaded = json.load(f)
+                return {**DEFAULT_SETTINGS, **loaded}
+            except json.JSONDecodeError:
+                print("⚠️ Invalid settings file. Loading defaults.")
+    return DEFAULT_SETTINGS.copy()
 
+def save_settings(new_settings, SETTINGS_FILE):
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump(new_settings, f, indent=4)

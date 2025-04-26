@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'MainWindowPergbN.ui'
+## Form generated from reading UI file 'MainWindowfkCUmi.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.0
 ##
@@ -28,7 +28,7 @@ from appFunctions import PageWithKeyEvents
 
 from appUiElements import (GitHubInfoPanel, SystemLogViewer, CalibrationWidget,
     DescriptionWidget, LogConsoleWidget, DriveAssistWidget, PRNDWidget,
-    SpeedometerWidget, SteeringPathWidget)
+    SpeedometerWidget, SteeringPathWidget, CarConnectWidget)
 
 import os
 
@@ -340,7 +340,6 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "/*=======Center home widget=======*/\n"
-"\n"
 "QWidget#connectionLogWidget{\n"
 "	background-color: #1e1e21;\n"
 "	border: 1px #1e1e21;\n"
@@ -348,70 +347,10 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "/*=======Left home widget=======*/\n"
-"QGroupBox#ipInputBox{\n"
-"	border: 1px #f1f3f3;\n"
-"	border-radius: 15px;\n"
+"QWidget#loginWidget{\n"
 "	background-color: #7a63ff;\n"
-"	margin-top: 6px;\n"
-"}\n"
-"QGroupBox::title#ipInputBox{\n"
-"   font-size: 15px;\n"
-"	subcontrol-origin: margin;\n"
-"	left: 10px;\n"
-"	bottom: -10px;\n"
-"	padding: 0 5px;\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QLineEdit#inputIp{\n"
-"	font-family: 'Adwaita Sans';\n"
-"   font-size: 14px;\n"
-"	background: #f1f3f3;\n"
-"	color: #1e1e21;\n"
-"	border: none;\n"
-""
-                        "	padding-left: 5px;\n"
-"	border-radius: 5px;\n"
-"}\n"
-"QGroupBox#recentIpBox{\n"
-"	border: 1px #f1f3f3;\n"
 "	border-radius: 15px;\n"
-"	background-color: #7a63ff;\n"
-"	margin-top: 6px;\n"
 "}\n"
-"QGroupBox::title#recentIpBox{\n"
-"	font-family: 'Adwaita Sans';\n"
-"   font-size: 15px;\n"
-"	subcontrol-origin: margin;\n"
-"	left: 10px;\n"
-"	bottom: -10px;\n"
-"	padding: 0 5px;\n"
-"	color: #f1f3f3;\n"
-"}\n"
-"QComboBox#recentIpCombo{\n"
-"	font-family: 'Adwaita Sans';\n"
-"   font-size: 14px;\n"
-"	background: #f1f3f3;\n"
-"	color: #1e1e21;\n"
-"	padding-left: 5px;\n"
-"	border: none;\n"
-"	border-radius: 5px;\n"
-"}\n"
-"QComboBox::drop-down#recentIpCombo{\n"
-"	border: none;\n"
-"}\n"
-"QComboBox::down-arrow#recentIpCombo{\n"
-"	border: 1px #7a63ff;\n"
-"	border-style: dotted;\n"
-"}\n"
-"QPushButton#ipComboBtn{\n"
-"	background-color: #f1f3f3;\n"
-"	border-radius: 5px;\n"
-"}\n"
-"QPushButton#ipComboBtn:pressed{\n"
-"	background-color: #74e1ef;\n"
-"}\n"
-"\n"
-"\n"
 "\n"
 "/*=======Right home widget=======*/\n"
 "QWidget#projectInfoWidget {\n"
@@ -610,66 +549,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addItem(self.verticalSpacer_5)
 
-        self.ipInputBox = QGroupBox(self.leftHomeWidget)
-        self.ipInputBox.setObjectName(u"ipInputBox")
-        self.ipInputBox.setMinimumSize(QSize(400, 90)) # 0
-        self.ipInputBox.setMaximumSize(QSize(400, 16777215)) # 350
-        font = QFont()
-        font.setPointSize(15) # 11
-        #font.setFamily('Adwaita Sans')
-        font.setBold(False)
-        self.ipInputBox.setFont(font)
-        self.horizontalLayout_3 = QHBoxLayout(self.ipInputBox)
-        self.horizontalLayout_3.setSpacing(15)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(15, 15, 15, 15)
-        self.inputIp = QLineEdit(self.ipInputBox)
-        self.inputIp.setObjectName(u"inputIp")
-        self.inputIp.setMinimumSize(QSize(0, 35))
+        self.loginWidget = QWidget(self.leftHomeWidget)
+        self.loginWidget.setObjectName(u"loginWidget")
+        self.loginWidget.setMinimumSize(QSize(400, 400))
+        self.loginWidget.setMaximumSize(QSize(400, 400))
 
-        self.horizontalLayout_3.addWidget(self.inputIp, 0, Qt.AlignmentFlag.AlignBottom)
-
-
-        self.verticalLayout_8.addWidget(self.ipInputBox)
-
-        self.verticalSpacer_4 = QSpacerItem(20, 158, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_8.addItem(self.verticalSpacer_4)
-
-        self.recentIpBox = QGroupBox(self.leftHomeWidget)
-        self.recentIpBox.setObjectName(u"recentIpBox")
-        self.recentIpBox.setMinimumSize(QSize(400, 90)) # 0
-        self.recentIpBox.setMaximumSize(QSize(400, 16777215)) # 350
-        self.recentIpBox.setFont(font)
-        self.horizontalLayout_4 = QHBoxLayout(self.recentIpBox)
-        self.horizontalLayout_4.setSpacing(15)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalLayout_4.setContentsMargins(15, 15, 15, 15)
-        self.recentIpCombo = QComboBox(self.recentIpBox)
-        '''self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")
-        self.recentIpCombo.addItem("")'''
-        self.recentIpCombo.setObjectName(u"recentIpCombo")
-        self.recentIpCombo.setMinimumSize(QSize(0, 35))
-
-        self.horizontalLayout_4.addWidget(self.recentIpCombo, 0, Qt.AlignmentFlag.AlignBottom)
-
-        self.ipComboBtn = QPushButton(self.recentIpBox)
-        self.ipComboBtn.setObjectName(u"ipComboBtn")
-        self.ipComboBtn.setMinimumSize(QSize(35, 35))
-        self.ipComboBtn.setMaximumSize(QSize(35, 35))
-        icon4 = QIcon()
-        icon4.addFile(u"D-14/Client-Side/client-app/icons/solar--link-bold-duotone.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.ipComboBtn.setIcon(icon4)
-        self.ipComboBtn.setIconSize(QSize(30, 30))
-
-        self.horizontalLayout_4.addWidget(self.ipComboBtn, 0, Qt.AlignmentFlag.AlignBottom)
-
-
-        self.verticalLayout_8.addWidget(self.recentIpBox)
+        self.verticalLayout_8.addWidget(self.loginWidget)
 
         self.verticalSpacer_3 = QSpacerItem(20, 155, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -1460,11 +1345,17 @@ class Ui_MainWindow(object):
         self.horizontalLayout_SW.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_SW.addWidget(self.vehicleSpeedometerWidget, 0, Qt.AlignmentFlag.AlignCenter)
 
-        #* IMPROTANT: add SteeringPathWidget to steerAngleWidget
+        #* IMPORTANT: add SteeringPathWidget to steerAngleWidget
         self.steerPathWidget = SteeringPathWidget()
         self.horizontalLayout_SAW = QHBoxLayout(self.steerAngleWidget)
         self.horizontalLayout_SAW.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_SAW.addWidget(self.steerPathWidget, 0, Qt.AlignmentFlag.AlignCenter)
+
+        #* IMPORTANT: add CarConnectWidget to loginWidget
+        self.carConnectLoginWidget = CarConnectWidget()
+        self.horizontalLayout_LW = QHBoxLayout(self.loginWidget)
+        self.horizontalLayout_LW.setContentsMargins(5, 0, 5, 0)
+        self.horizontalLayout_LW.addWidget(self.carConnectLoginWidget, 0, Qt.AlignmentFlag.AlignCenter)
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -1479,10 +1370,10 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.mainPage.setToolTip("")
 #endif // QT_CONFIG(tooltip)
-        self.ipInputBox.setTitle(QCoreApplication.translate("MainWindow", u"Enter an ip address to connect", None))
-        self.inputIp.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter an ip address...", None))
-        self.recentIpBox.setTitle(QCoreApplication.translate("MainWindow", u"Connect to a recent ip address", None))
-        self.recentIpCombo.setItemText(0, "")
+        #self.ipInputBox.setTitle(QCoreApplication.translate("MainWindow", u"Enter an ip address to connect", None))
+        #self.inputIp.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter an ip address...", None))
+        #self.recentIpBox.setTitle(QCoreApplication.translate("MainWindow", u"Connect to a recent ip address", None))
+        #self.recentIpCombo.setItemText(0, "")
         '''
         self.recentIpCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ip-addr test-1", None))
         self.recentIpCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"ip-addr test-2", None))
@@ -1490,7 +1381,7 @@ class Ui_MainWindow(object):
         self.recentIpCombo.setItemText(4, QCoreApplication.translate("MainWindow", u"ip-addr test-4", None))
         self.recentIpCombo.setItemText(5, QCoreApplication.translate("MainWindow", u"ip-addr test-5", None))
         '''
-        self.ipComboBtn.setText("")
+        #self.ipComboBtn.setText("")
         self.label_2.setText("")
         #self.projectTitle.setText(QCoreApplication.translate("MainWindow", u"About", None))
         #self.githubLink.setText(QCoreApplication.translate("MainWindow", u"DriveCore is a modular and scalable platform designed for controlling RC vehicles with the potential for AI-powered autonomy. Built using Python, OpenCV, and a Raspberry Pi, DriveCore serves as the foundation for both manual and automated vehicle operation, integrating computer vision, sensor fusion, and remote control capabilities.", None))
@@ -1519,7 +1410,7 @@ class Ui_MainWindow(object):
         self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
         self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
         self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
-        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.2 (20-04-2025)", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.3 (01-05-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
         self.accelerateBtn.setText(QCoreApplication.translate("MainWindow", u"Accelerate : [W]", None))
         self.turnLeftBtn.setText(QCoreApplication.translate("MainWindow", u"Turn Left : [A]", None))

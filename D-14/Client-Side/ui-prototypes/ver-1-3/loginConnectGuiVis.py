@@ -132,7 +132,7 @@ class CarConnectWidget(QWidget):
         elif username != "test" or password != "123":
             self.show_error("Invalid credentials. Please try again.")
         else:
-            self.save_credentials(username, password)
+            #self.save_credentials(username, password)
             print(f"[INFO] Connecting to car as '{username}'...")
             self.error_label.hide()
 

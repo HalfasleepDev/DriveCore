@@ -16,8 +16,12 @@ import numpy as np
 import ipaddress
 import socket
 import time
+import json
+import threading
 
-from appFunctions import toggleDebugCV, showError
+from appFunctions import toggleDebugCV, showError, load_settings, save_settings
+
+from appClientNetwork import NetworkManager
 
 from appUiAnimations import AnimatedToolTip, LoadingScreen, install_hover_animation
 
@@ -77,12 +81,24 @@ class VideoThread(QThread):
 
 
 class MainWindow(QMainWindow):
+    # Load Settings
+    SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
+    #client_ver = "1.3"
+    #supported_ver = ["1.3"]
+
     # Network Variables
-    IP_ADDR = ""
-    STREAM_URL = ""
+    #server_ip = None
+    #video_port = None
+    #control_port = None
+    #handshake_done = threading.Event()
+
 
     # Vehicle Status
     VEHICLE_CONNECTION = False
+
+    # Vehicle Info
+    #control_scheme = str
+    #vehicle_model = str
 
     # Thread Status
     THREAD_RUNNING = False
@@ -103,27 +119,49 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        ''' ====== App Details ======'''
+        # Current Client App Version
+        self.client_ver = "1.3"
+        # Supported Host Versions
+        self.supported_ver = ["1.3"]
+
+        # Load Settings From Json
+        self.settings = load_settings(self.SETTINGS_FILE)
+
+        ''' ====== Host Details ======'''
+        self.vehicle_model = str
+        self.control_scheme = str
 
         ''' ====== Animated Button Setup ======'''
         animButtons = [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn, self.ui.openCVSettingsBtn,
             self.ui.vehicleTuningBtn, self.ui.ObjectVisBtn, self.ui.FloorVisBtn, self.ui.KalmanCenterVisBtn, 
             self.ui.AmbientVisBtn, self.ui.FloorSampleVisBtn, self.ui.PathVisBtn, self.ui.CollisionAssistBtn,
-            self.ui.emergencyDisconnectBtn, self.ui.ipComboBtn
+            self.ui.emergencyDisconnectBtn
             ]
         
         for btn in animButtons:
             install_hover_animation(btn)
 
-        ''' ====== Network Setup ======'''#! Depreciated for Ver1.3
-        self.ui.inputIp.editingFinished.connect(self.setIp)
-        self.ui.inputIp.editingFinished.connect(self.add_ip)
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
+        ''' ====== Network Setup ======'''
+        self.handshake_done = threading.Event()
 
-        self.recent_ips = self.load_recent_ips()
-        self.ui.recentIpCombo.addItems(self.recent_ips)
+        self.network = NetworkManager(self)
+        #! Depreciated for Ver1.3
+        #self.ui.inputIp.editingFinished.connect(self.setIp)
+        #self.ui.inputIp.editingFinished.connect(self.add_ip)
+        #self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
 
-        self.load_recent_ips()
-        self.ui.ipComboBtn.clicked.connect(self.setIpCombo)
+        #self.recent_ips = self.load_recent_ips()
+        #self.ui.recentIpCombo.addItems(self.recent_ips)
+
+        #self.load_recent_ips()
+        #self.ui.ipComboBtn.clicked.connect(self.setIpCombo)
+
+        ''' ====== Home Page ======'''
+        # Load Credentials On Startup
+        self.load_credentials()
+
+        self.ui.carConnectLoginWidget.connect_btn.clicked.connect(self.attempt_connection)
         
         ''' ====== Logic For Left Menu Buttons ====== '''
         self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
@@ -250,7 +288,38 @@ class MainWindow(QMainWindow):
             case 7:
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
 
+    def logToSystem(self, message: str, type: str):
+        self.ui.systemLogPage.log(message, type)
+        match type:
+            case "BROADCAST":
+                self.ui.networkConnectionLogWidget.add_log(f"[{type}] {message}")
+            case "HANDSHAKE":
+                self.ui.networkConnectionLogWidget.add_log(f"[{type}] {message}")
+            case "INFO":
+                self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
+            case "WARN":
+                self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
+
+    def load_credentials(self):
+        self.ui.carConnectLoginWidget.username_input.setText(self.settings["username"])
+        self.ui.carConnectLoginWidget.password_input.setText(self.settings["password"])
+
+    def attempt_connection(self):
+        username = self.ui.carConnectLoginWidget.username_input.text().strip()
+        password = self.ui.carConnectLoginWidget.password_input.text().strip()
+
+        if not username or not password:
+            self.ui.carConnectLoginWidget.show_error("Please enter both username and password.")
+        else:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            self.network.discover_host()
+            #time.sleep(1)
+            self.network.preform_handshake(username, password)
+            QApplication.restoreOverrideCursor()
+        
     #! Depreciated for Ver1.3
+
+    '''
     def add_ip(self):
         """ Adds the entered IP to the combo box and saves it. """
         ip = self.ui.inputIp.text().strip()
@@ -345,7 +414,7 @@ class MainWindow(QMainWindow):
             QApplication.restoreOverrideCursor()
                 
         else:
-            self.ui.recentIpBox.setStyleSheet("QGroupBox::title{color: #FF0000;}")
+            self.ui.recentIpBox.setStyleSheet("QGroupBox::title{color: #FF0000;}")'''
         
 
     def iniDrivePage(self):
@@ -450,7 +519,7 @@ if __name__ == '__main__':
     #!ENABLE FOR RELEASE
     def launch_main():
         window = MainWindow()
-        window.setWindowTitle("Drive Core Client Ver 1.2")
+        window.setWindowTitle(f"Drive Core Client Ver {window.client_ver}")
         window.show()
 
     loading = LoadingScreen(on_finished_callback=launch_main)

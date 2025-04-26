@@ -9,5 +9,7 @@
     "ramp_up": 0.05,
     "ramp_down": 0.05,
     "username": "",
-    "password": ""
+    "password": "",
+    "acceleration_curve": "linear",
+    "broadcast_port": 9999
 }
