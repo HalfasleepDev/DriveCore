@@ -1299,6 +1299,8 @@ class Ui_MainWindow(object):
 
         #* IMPORTANT: add CalibrationWidget widget to a new settingsStackedWidget page
         self.VehicleTuningSettingsPage = CalibrationWidget()
+        self.VehicleTuningSettingsPage.setMaximumHeight(1000)
+        self.VehicleTuningSettingsPage.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.settingsStackedWidget.addWidget(self.VehicleTuningSettingsPage)
 
         #* IMPORTANT: add pages for settingsInfoStackedWidget

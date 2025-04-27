@@ -52,5 +52,16 @@ def keyboard_command_packet(cmd: str, intensity):
     }
 
 # ------ Drive Assist Commands ------
-def drive_assist_command_packet():
-    pass
+def drive_assist_command_packet(cmd: str, intensity):
+    return {
+        "type": "drive_assist_command",
+        "command": cmd,
+        "intensity": intensity,
+        "timestamp": current_time()
+    }
+
+# ------ Shutdown Command ------
+def shutdown_host_packet():
+    return {
+        "type": "shutdown_systems"
+    }

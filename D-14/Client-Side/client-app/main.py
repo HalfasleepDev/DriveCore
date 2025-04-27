@@ -1,6 +1,6 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect, QTimer,
-    QSize, QTime, QUrl, QThread, Signal, QEvent, Qt)
+    QSize, QTime, QUrl, QThread, Signal, QEvent, Qt, QThreadPool,QRunnable, Slot)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
     QGroupBox, QHBoxLayout, QLabel, QLayout,
     QLineEdit, QMainWindow, QPushButton, QSizePolicy,
     QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+
 import os
 import sys
 import cv2
@@ -34,9 +35,143 @@ PORT = 4444 #TODO: move to settings
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
-
+""" 
+This Codebase sucks and I hate sockets
+Time wasted here since 26-04-2025: 16Hrs
+"""
 # TODO: Style error popups
+class Worker(QRunnable):
+    """Worker thread.
 
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+
+    :param callback: The function callback to run on this worker thread.
+                     Supplied args and kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
+    """
+
+    def __init__(self, fn, *args, **kwargs):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+    @Slot()
+    def run(self):
+        """Initialise the runner function with passed args, kwargs."""
+        self.fn(*self.args, **self.kwargs)
+
+class VideoThread(QThread):
+    frame_received = Signal(QImage)
+
+    def __init__(self, server_ip, video_port):
+        super().__init__()
+        self.server_ip = server_ip
+        self.video_port = video_port
+        self.running = True
+        self.processor = None  # Optional processor
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setblocking(False)
+        self.sock.bind(('', self.video_port))
+
+        self.total_chunks = 0
+        self.current_chunks = 0
+        self.frame_chunks = []
+        self.last_frame_timestamp = 0
+
+        self.last_frame_time = time.time()
+        self.frame_counter = 0
+        self.fps = 0
+        self.last_video_latency_ms = 0
+        self.last_frame_timestamp = 0
+
+    def set_processor(self, processor):
+        self.processor = processor
+
+    def run(self):
+        BUFFER_SIZE = 65536
+
+        while self.running:
+            try:
+                data, _ = self.sock.recvfrom(BUFFER_SIZE)
+
+                # Header packet (first packet = JSON info)
+                try:
+                    header = json.loads(data.decode())
+                    self.total_chunks = header["chunks"]
+                    self.last_frame_timestamp = header["timestamp"]
+                    self.frame_chunks = []
+                    self.current_chunks = 0
+                    continue
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    pass
+
+                # Accumulate frame chunks
+                self.frame_chunks.append(data)
+                self.current_chunks += 1
+
+                # === Drop frame if excessive chunks ===
+                if self.current_chunks > self.total_chunks:
+                    self.frame_chunks.clear()
+                    self.current_chunks = 0
+                    continue
+
+                # Frame complete
+                if self.current_chunks == self.total_chunks:
+                    frame_data = b''.join(self.frame_chunks)
+
+                    # Decode JPEG
+                    now = int(time.time() * 1000)
+                    self.last_video_latency_ms = now - self.last_frame_timestamp
+
+                    ###! self.display_frame(frame_data)
+                    nparr = np.frombuffer(frame_data, np.uint8)
+                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+                    if frame is not None:
+                        # === FPS calculation ===
+                        self.frame_counter += 1
+                        now = time.time()
+                        elapsed = now - self.last_frame_time
+                        if elapsed >= 1.0:
+                            self.fps = self.frame_counter / elapsed
+                            self.frame_counter = 0
+                            self.last_frame_time = now
+
+                        # === Overlay text ===
+                        overlay = f"FPS: {self.fps:.1f} | Latency: {self.last_video_latency_ms} ms"
+                        cv2.putText(frame, overlay, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                                    0.5, (0, 255, 0), 1, cv2.LINE_AA) 
+                           
+                        #AI or floor detection
+                        if self.processor:
+                            frame = self.processor.detect_floor_region(frame)
+
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                        h, w, ch = frame.shape
+                        bytes_per_line = ch * w
+                        q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+
+                        self.frame_received.emit(q_img)
+                    ###! end
+
+                    # Reset for next frame
+                    self.frame_chunks = []
+                    self.current_chunks = 0
+
+            except BlockingIOError:
+                pass  # No data received; socket is non-blocking
+
+    def stop(self):
+        self.running = False
+        self.wait()
+        self.sock.close()
+
+'''
 class VideoThread(QThread):
     frame_received = Signal(QImage)  # Signal to send new frame to UI
 
@@ -78,8 +213,7 @@ class VideoThread(QThread):
     def stop(self):
         self.running = False
         self.wait()  # Ensure the thread is properly closed
-
-
+'''
 class MainWindow(QMainWindow):
     # Load Settings
     SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
@@ -114,11 +248,18 @@ class MainWindow(QMainWindow):
     alert_triggered = False
     alert_triggered_Prev = False
 
+    logSignal = Signal(str, str)
+    displayVehicleMovementSignal = Signal(str, int, int)
 
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.threadpool = QThreadPool()
+
+        thread_count = self.threadpool.maxThreadCount()
+        print(f"Multithreading with maximum {thread_count} threads")
+
         ''' ====== App Details ======'''
         # Current Client App Version
         self.client_ver = "1.3"
@@ -131,6 +272,8 @@ class MainWindow(QMainWindow):
         ''' ====== Host Details ======'''
         self.vehicle_model = str
         self.control_scheme = str
+
+        self.curveType = str
 
         ''' ====== Animated Button Setup ======'''
         animButtons = [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn, self.ui.openCVSettingsBtn,
@@ -146,6 +289,13 @@ class MainWindow(QMainWindow):
         self.handshake_done = threading.Event()
 
         self.network = NetworkManager(self)
+
+        # TODO: if network doesnt update use these 
+        '''
+        self.server_ip = None
+        self.video_port = None
+        '''
+        
         #! Depreciated for Ver1.3
         #self.ui.inputIp.editingFinished.connect(self.setIp)
         #self.ui.inputIp.editingFinished.connect(self.add_ip)
@@ -162,6 +312,9 @@ class MainWindow(QMainWindow):
         self.load_credentials()
 
         self.ui.carConnectLoginWidget.connect_btn.clicked.connect(self.attempt_connection)
+        self.logSignal.connect(self.logToSystem)
+        #self.discoverHostSignal.connect(self.network.discover_host)
+        #self.performHandshakeSignal.connect(self.network.perform_handshake)
         
         ''' ====== Logic For Left Menu Buttons ====== '''
         self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
@@ -203,7 +356,13 @@ class MainWindow(QMainWindow):
         self.ui.VRowSlider.setValue(50)
 
         # ------ Vehicle Tuning ------
+        self.ui.VehicleTuningSettingsPage.previewServoSignal.connect()
 
+        self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(lambda: self.curveType)
+
+        self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(lambda: self.tuneVehicle)
+        self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(lambda: self.tuneVehicle)
+        self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
         # ------ Emergency Dissconnect ------
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
@@ -223,6 +382,7 @@ class MainWindow(QMainWindow):
         self.tooltip = AnimatedToolTip("", self)
         self.ui.alertAssistWidget.installEventFilter(self)
         self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
+        self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
     
     def eventFilter(self, watched, event):
         if event.type() == QEvent.ToolTip:
@@ -252,6 +412,14 @@ class MainWindow(QMainWindow):
 
             # Switch to info page (1) is no page
             self.ui.settingsInfoStackedWidget.setCurrentIndex(infoIndex)
+            if infoIndex == 3:
+                self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
+                self.ui.verticalSpacer_8 = QSpacerItem(20, 100, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+                self.ui.verticalLayout_15.insertItem(3, self.ui.verticalSpacer_8)
+            else:
+                self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
+                self.ui.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+                self.ui.verticalLayout_15.insertItem(3, self.ui.verticalSpacer_8)
         
     def handleLeftMenuNav(self, active_btn, target_page):
         for btn in [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn]:
@@ -287,6 +455,9 @@ class MainWindow(QMainWindow):
                 self.PATH_VIS_ENABLED = toggleDebugCV(self.ui.PathVisBtn, self.PATH_VIS_ENABLED, "Path Vis: ")
             case 7:
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
+            case 8:
+                self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
+                self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
 
     def logToSystem(self, message: str, type: str):
         self.ui.systemLogPage.log(message, type)
@@ -312,10 +483,21 @@ class MainWindow(QMainWindow):
             self.ui.carConnectLoginWidget.show_error("Please enter both username and password.")
         else:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            self.network.discover_host()
-            #time.sleep(1)
-            self.network.preform_handshake(username, password)
+            print(username)
+            print(password)
+
+            self.threadpool.start(Worker(self.network.discover_host))
+            self.threadpool.waitForDone()
+            self.network.discovery_done_signal.connect(lambda: self.threadpool.start(Worker(lambda: self.network.perform_handshake(username, password))))
+
+            self.network.handshake_done_signal.connect(lambda: print(f"Okay {self.network.server_ip}"))
+            self.threadpool.waitForDone()
+            #print("This is the server ip:")
             QApplication.restoreOverrideCursor()
+            if self.VEHICLE_CONNECTION:
+                self.settings["username"] = username
+                self.settings["password"] = password
+                save_settings(self.settings, self.SETTINGS_FILE)
         
     #! Depreciated for Ver1.3
 
@@ -421,7 +603,7 @@ class MainWindow(QMainWindow):
         #print('yay')
         #print(self.STREAM_URL)
         if self.VEHICLE_CONNECTION:
-            self.thread = VideoThread(self.STREAM_URL)
+            self.thread = VideoThread(self.network.server_ip, self.network.video_port)
             self.processor = FrameProcessor(self, self.thread)
             self.processor.initKalmanFilter()
             self.thread.set_processor(self.processor)
@@ -431,7 +613,7 @@ class MainWindow(QMainWindow):
             #self.ui.drivePage.installEventFilter(self.filter)
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
-            self.ui.drivePage.commandSignal.connect(self.send_command)
+            self.ui.drivePage.commandSignal.connect(self.send_command) # <---- TODO: change to network manager
             
         else:
             self.ui.videoStreamLabel.setStyleSheet("QLabel{color: #1e1e21;}")
@@ -475,6 +657,56 @@ class MainWindow(QMainWindow):
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
 
+    def updateVehicleMovement(self, mode: str, esc_pw=None, servo_pw=None):
+        #self.ui.vehicleSpeedometerWidget.min_us = self.settings["min_duty_esc"]
+        #self.ui.vehicleSpeedometerWidget.max_us = self.settings["max_duty_esc"]
+        #self.ui.vehicleSpeedometerWidget.neutral_us = self.settings["neutral_duty_esc"]
+
+        match mode:
+            case "SET":
+                # Update Settings to get current
+                self.settings = load_settings(self.SETTINGS_FILE)
+                # Speedometer
+                self.ui.vehicleSpeedometerWidget.min_us = self.settings["min_duty_esc"]
+                self.ui.vehicleSpeedometerWidget.max_us = self.settings["max_duty_esc"]
+                self.ui.vehicleSpeedometerWidget.neutral_us = self.settings["neutral_duty_esc"]
+                #self.ui.vehicleSpeedometerWidget.vehicleConnect = True
+                # Steer angle
+                self.ui.steerPathWidget.min_us = self.settings["min_duty_servo"]
+                self.ui.steerPathWidget.max_us = self.settings["max_duty_servo"]
+                self.ui.steerPathWidget.center_us = self.settings["neutral_duty_servo"]
+                # PRND
+                self.ui.PRNDWidget.set_gear("N")
+            
+            case "UPDATE":
+                # Speedometer
+                self.ui.vehicleSpeedometerWidget.target_us = esc_pw # <--- ESC US
+                # Steer angle
+                self.ui.steerPathWidget.set_steering_us(servo_pw)
+                # PRND
+                if esc_pw > self.ui.vehicleSpeedometerWidget.neutral_us:
+                    self.ui.PRNDWidget.set_gear("D")
+                elif esc_pw == self.ui.vehicleSpeedometerWidget.neutral_us:
+                    self.ui.PRNDWidget.set_gear("N")
+                elif esc_pw < self.ui.vehicleSpeedometerWidget.neutral_us:
+                    if esc_pw == self.settings["brake_esc"]:
+                        self.ui.PRNDWidget.set_gear("P")
+                    else:
+                        self.ui.PRNDWidget.set_gear("R")
+
+    def tuneVehicle(self, mode: str, min: int, mid: int, max: int):
+        match mode:
+            case "SERVO":
+                # SAVE
+                # IF VEHICLE CONNECTED
+                    # APPLY
+                pass
+            case "ESC":
+                # SAVE
+                # IF VEHICLE CONNECTED
+                    # APPLY
+                pass
+    
     #! Depreciated for Ver1.3
     def send_command(self, command):
         """Send command to Raspberry Pi"""

@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import webbrowser
 import math
 import json
+import numpy as np
+import matplotlib.pyplot as plt
+from io import BytesIO
 
 from datetime import datetime
 from PySide6.QtWidgets import (
@@ -11,12 +14,12 @@ from PySide6.QtWidgets import (
     QScrollArea, QFrame, QHBoxLayout,QTextEdit,QFileDialog, 
     QTabWidget, QSplitter, QSizePolicy, QLineEdit,QGroupBox,
     QDoubleSpinBox, QFormLayout, QSlider, QSpinBox, QSpacerItem,
-    QTextBrowser)
+    QTextBrowser, QLayout)
 
-from PySide6.QtCore import Qt, QTimer, QDateTime, QSize, QRectF
+from PySide6.QtCore import Qt, QTimer, QDateTime, QSize, QRectF, Signal
 
 from PySide6.QtGui import (QFont, QTextCursor, QPainter, QColor,
-    QConicalGradient, QPen, QPainterPath, QIcon)
+    QConicalGradient, QPen, QPainterPath, QIcon, QPixmap, QImage)
 
 import os
 
@@ -29,6 +32,12 @@ os.environ["QT_SCALE_FACTOR"] = "0.95"
 - Everything is held together with duct tape
 - Ver 1.3 is needed for Client to Host communication
 '''
+""" TODO:
+- [ ] Speedometer linking
+- [ ] Steering linking
+- [ ] Drive Assist linking
+- [ ] Fix CarConnectWidget styling
+"""
 
 class GitHubInfoPanel(QWidget):
     """
@@ -575,10 +584,78 @@ class CalibrationWidget(QWidget):
     Main widget for calibrating servo and ESC settings.
     Also includes port configuration and curve placeholders.
     """
+    # Send PWM to servo
+    previewServoSignal = Signal(int)
+    # Send acceleration curve type
+    accelCurveSignal = Signal(str)
+    # Update tune settings for servo
+    servoTuneSignal = Signal(str, int, int, int) #* MODE, MIN, MID, MAX
+    # Update tune settings for esc
+    escTuneSignal = Signal(str, int, int, int)   #* MODE, MIN, MID, MAX
+    # Update broadcast port
+    updateBroadcastPortSignal = Signal(int)
+
     def __init__(self):
         super().__init__()
+        # === Top-level Layout ===
+        outer_layout = QVBoxLayout(self)
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+        outer_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinAndMaxSize)
+
+        # === Scroll Area ===
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        outer_layout.addWidget(scroll_area)
+
+        # === Scrollable Container Widget ===
+        container = QWidget()
+        container.setAutoFillBackground(True)
+        palette = container.palette()
+        palette.setColor(container.backgroundRole(), QColor("#0c0c0d"))
+        container.setPalette(palette)
 
         self.setStyleSheet("""
+            QScrollBar:vertical {
+                background: #0c0c0d;
+                border: 2px solid #1e1e21;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: #7a63ff;
+                min-height: 10px;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #f1f3f3;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: #0c0c0d;
+            }
+            
+            QScrollBar:horizontal {
+                background: #0c0c0d;
+                border: 2px solid #1e1e21;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:horizontal {
+                background: #7a63ff;
+                min-height: 10px;
+                border-radius: 2px;
+            }
+            QScrollBar::handle:horizontal:hover {
+                background: #f1f3f3;
+            }
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+                height: 0;
+            }
+            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+                background: #0c0c0d;
+            }
             QSpinBox {
                 font-family: 'Adwaita Sans';
                 font-size: 15px;
@@ -713,8 +790,17 @@ class CalibrationWidget(QWidget):
             }
             
         """)
+        
+        
+        #container.setStyleSheet("background-color: #1e1e21;")
+        self.scroll_content_layout = QVBoxLayout(container)
+        
 
-        main_layout = QVBoxLayout(self)
+        self.build_ui()
+        scroll_area.setWidget(container)
+
+    def build_ui(self):
+        #main_layout = QVBoxLayout(self)
         self.headerTitle = QLabel("Vehicle Tuning")
         self.headerTitle.setObjectName("headerTitle")
         self.headerTitle.setMinimumSize(QSize(0, 30))
@@ -722,12 +808,12 @@ class CalibrationWidget(QWidget):
         font1 = QFont()
         font1.setPointSize(15)
         self.headerTitle.setFont(font1)
-        main_layout.addWidget(self.headerTitle)
+        self.scroll_content_layout.addWidget(self.headerTitle)
 
         self.headerLine = QFrame()
         self.headerLine.setFrameShape(QFrame.Shape.HLine)
         self.headerLine.setFrameShadow(QFrame.Shadow.Sunken)
-        main_layout.addWidget(self.headerLine, 0 , Qt.AlignmentFlag.AlignVCenter)
+        self.scroll_content_layout.addWidget(self.headerLine, 0 , Qt.AlignmentFlag.AlignVCenter)
 
         # === Servo Calibration ===
         servo_group = QGroupBox("Servo Calibration (µs):")
@@ -758,10 +844,10 @@ class CalibrationWidget(QWidget):
         servo_layout.addWidget(servo_test_btn)
 
         servo_group.setLayout(servo_layout)
-        main_layout.addWidget(servo_group, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.scroll_content_layout.addWidget(servo_group, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.verticalSpacer1 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        main_layout.addItem(self.verticalSpacer1)
+        self.scroll_content_layout.addItem(self.verticalSpacer1)
 
         # === ESC Calibration ===
         esc_group = QGroupBox("ESC Calibration (µs):")
@@ -789,10 +875,10 @@ class CalibrationWidget(QWidget):
         esc_form.addRow(esc_test_btn)
 
         esc_group.setLayout(esc_form)
-        main_layout.addWidget(esc_group, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.scroll_content_layout.addWidget(esc_group, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.verticalSpacer2 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        main_layout.addItem(self.verticalSpacer2)
+        self.scroll_content_layout.addItem(self.verticalSpacer2)
 
         # === Network Port Settings ===
         port_group = QGroupBox("Network Port Configuration:")
@@ -828,24 +914,102 @@ class CalibrationWidget(QWidget):
         port_layout.addRow(apply_btn)
 
         port_group.setLayout(port_layout)
-        main_layout.addWidget(port_group, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.scroll_content_layout.addWidget(port_group, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.verticalSpacer3 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        main_layout.addItem(self.verticalSpacer3)
+        self.scroll_content_layout.addItem(self.verticalSpacer3)
 
         # === Future Curve Configuration ===
         curve_group = QGroupBox("Acceleration / Deceleration Curves:")
         curve_layout = QVBoxLayout()
-        curve_note = QLabel("Curve shaping will allow smooth acceleration profiles (coming soon).")
+
+        curve_note = QLabel("Choose a curve shaping profile for throttle and brake behavior.")
         curve_note.setWordWrap(True)
         curve_layout.addWidget(curve_note)
+
+        # Curve toggle buttons
+        self.curve_buttons = {}
+        curves = ["Linear", "Quadratic", "Cubic", "Exponential", "Sigmoid"]
+        for curve_name in curves:
+            btn = QPushButton(curve_name)
+            btn.setCheckable(True)
+            btn.setMinimumHeight(30)
+            btn.clicked.connect(self.handle_curve_selection)
+            curve_layout.addWidget(btn)
+            self.curve_buttons[curve_name] = btn
+
+        # === Add Curve Preview Area ===
+        self.curve_preview = QLabel()
+        self.curve_preview.setFixedHeight(150)
+        self.curve_preview.setAlignment(Qt.AlignCenter)
+        self.curve_preview.setStyleSheet("background-color: #1e1e21; border: 1px solid #7a63ff; border-radius: 8px;")
+        curve_layout.addWidget(self.curve_preview)
+
         curve_group.setLayout(curve_layout)
+        self.scroll_content_layout.addWidget(curve_group, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        main_layout.addWidget(curve_group, 0, Qt.AlignmentFlag.AlignVCenter)
+        
+        self.scroll_content_layout.setSpacing(6)
+        self.scroll_content_layout.setContentsMargins(9, 0, 9, 0)
+        self.scroll_content_layout.addStretch()
 
-        main_layout.addStretch()
-        main_layout.setSpacing(6)
-        main_layout.setContentsMargins(9, 0, 9, 0)
+    def handle_curve_selection(self):
+        """Handles selection logic for acceleration curve profiles."""
+        sender = self.sender()
+        selected_curve = None
+
+        for name, btn in self.curve_buttons.items():
+            if btn == sender:
+                btn.setChecked(True)
+                btn.setStyleSheet("background-color: #7a63ff; color: #f1f3f3; border-radius: 5px;")
+                selected_curve = name
+                # TODO: Emit signal
+                print(f"[CURVE] Selected: {name}")
+                self.accelCurveSignal.emit(name)
+            else:
+                btn.setChecked(False)
+                btn.setStyleSheet("background-color: #f1f3f3; color: #0c0c0d; border-radius: 5px;")
+                btn.setStyleSheet("QPushButton:hover {background-color: #7a63ff;color: #f1f3f3;}")
+
+        if selected_curve:
+            self.update_curve_plot(selected_curve)
+    
+    def update_curve_plot(self, curve_type):
+        """Updates the preview graph based on selected curve."""
+        x = np.linspace(0, 1, 100)
+
+        if curve_type == "Linear":
+            y = x
+        elif curve_type == "Quadratic":
+            y = x ** 2
+        elif curve_type == "Cubic":
+            y = x ** 3
+        elif curve_type == "Exponential":
+            y = np.power(2, x) - 1
+            y /= y.max()  # normalize
+        elif curve_type == "Sigmoid":
+            y = 1 / (1 + np.exp(-10 * (x - 0.5)))
+        else:
+            y = x
+
+        fig, ax = plt.subplots(figsize=(2.5, 1.5), dpi=100)
+        ax.plot(x, y, color="#7a63ff", linewidth=2)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.axis('off')  # Hide axes
+        fig.tight_layout(pad=0)
+
+        # Save figure to buffer
+        buf = BytesIO()
+        fig.savefig(buf, format="png", transparent=True)
+        buf.seek(0)
+
+        # Load buffer into QLabel
+        image = QImage.fromData(buf.getvalue())
+        pixmap = QPixmap.fromImage(image)
+        self.curve_preview.setPixmap(pixmap)
+
+        plt.close(fig)
 
     # === Preview callbacks ===
     def preview_servo(self, value):
@@ -856,6 +1020,7 @@ class CalibrationWidget(QWidget):
         """
         print(f"[Preview] Sending servo test µs: {value}")
         # TODO: Send live µs to servo
+        self.previewServoSignal.emit(value)
 
     def test_servo(self):
         """
@@ -865,6 +1030,7 @@ class CalibrationWidget(QWidget):
         print(f"Min: {self.servo_min.value()} µs")
         print(f"Mid: {self.servo_mid_tuner.get_mid_value()} µs")
         print(f"Max: {self.servo_max.value()} µs")
+        self.servoTuneSignal.emit("SERVO", self.servo_min.value(), self.servo_mid_tuner.get_mid_value(), self.servo_max.value())
 
     def test_esc(self):
         """
@@ -874,6 +1040,7 @@ class CalibrationWidget(QWidget):
         print(f"Min: {self.esc_min.value()} µs")
         print(f"Mid: {self.esc_mid.value()} µs")
         print(f"Max: {self.esc_max.value()} µs")
+        self.escTuneSignal.emit("ESC", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
     
     def apply_port_settings(self):
         """
@@ -885,6 +1052,7 @@ class CalibrationWidget(QWidget):
         #self.cam_label.setText(f"Current: {cam}")
         #print(f"[PORT] Comm: {comm} | Webcam: {cam}")
         # TODO: Send updated config to networking system
+        self.updateBroadcastPortSignal.emit(comm)
 
 class DescriptionWidget(QWidget):
     """
@@ -1080,7 +1248,7 @@ class DriveAssistWidget(QWidget):
                 color: #f1f3f3;
             }
         """)
-        self.toggle_button.clicked.connect(self.toggle_assist)
+        #self.toggle_button.clicked.connect(self.toggle_assist)
 
         # === Warning Section ===
         self.warning_label = QLabel("No active warnings")
@@ -1113,8 +1281,10 @@ class DriveAssistWidget(QWidget):
         """
         if self.toggle_button.isChecked():
             self.toggle_button.setText("Drive Assist: ON")
+            return True
         else:
             self.toggle_button.setText("Drive Assist: OFF")
+            return 
         # TODO: Emit signal or call control logic here
 
     def show_warning(self, message: str):

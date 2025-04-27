@@ -24,6 +24,7 @@ DEFAULT_SETTINGS = {
 }
 
 '''Keypress Page Class'''
+# TODO: REFACTOR!!!!
 class PageWithKeyEvents(QWidget):
     """A QWidget that only detects key presses when active in QStackedWidget"""
     commandSignal = Signal(str)
@@ -133,7 +134,7 @@ def load_settings(SETTINGS_FILE):
                 loaded = json.load(f)
                 return {**DEFAULT_SETTINGS, **loaded}
             except json.JSONDecodeError:
-                print("⚠️ Invalid settings file. Loading defaults.")
+                print("Invalid settings file. Loading defaults.")
     return DEFAULT_SETTINGS.copy()
 
 def save_settings(new_settings, SETTINGS_FILE):
