@@ -43,11 +43,12 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SE
 
 # ====== Movement Packets ======
 # ------ Keyboard Commands ------
-def keyboard_command_packet(cmd: str, intensity):
+def keyboard_command_packet(cmd: str, esc_intensity, servo_intensity):
     return {
         "type": "keyboard_command",
         "command": cmd,
-        "intensity": intensity,
+        "esc_intensity": esc_intensity,
+        "servo_intensity": servo_intensity,
         "timestamp": current_time()
     }
 

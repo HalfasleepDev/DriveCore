@@ -4,6 +4,7 @@ import threading
 import time
 
 from PySide6.QtCore import QObject, Signal,QCoreApplication
+from PySide6.QtWidgets import QApplication
 
 from udpProtocols import (credential_packet, version_request_packet, 
                                setup_request_packet, send_tune_data_packet,
@@ -67,9 +68,10 @@ class NetworkManager(QObject):
                     self.video_port = payload.get("video_port")
                     self.control_port = payload.get("control_port")
                     self.app.logSignal.emit(f"Found host: {self.server_ip}, Video: {self.video_port}, Control: {self.control_port}", "BROADCAST")
-                    print("1")
+                    
                     QCoreApplication.processEvents()
                     self.discovery_done_signal.emit()
+                    print("1")
                     break
             except ConnectionRefusedError:
                 #! Error message
@@ -77,8 +79,6 @@ class NetworkManager(QObject):
                 self.app.logSignal.emit("[BROADCAST] ConnectionRefusedError", "ERROR")
                 self.app.ui.showError(self, "CONNECTION ERROR", "ConnectionRefusedError. Could not connect to host.")
             except Exception as e:
-                continue
-            finally:
                 continue
             
         sock.close()
@@ -203,6 +203,7 @@ class NetworkManager(QObject):
                 continue
 
         sock.close()
+        QApplication.restoreOverrideCursor()
         return
 
     # Step 2.5: Handle Server Response From Handshake
@@ -263,10 +264,10 @@ class NetworkManager(QObject):
     # Step 3: Send Different Types of Commands
 
     # Step 4: Send Keyboard Commands
-    def send_keyboard_command(self, cmd: str, intensity):
+    def send_keyboard_command(self, cmd: str, esc_intensity, servo_intensity):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)
-        packet = keyboard_command_packet(cmd, intensity)
+        packet = keyboard_command_packet(cmd, esc_intensity, servo_intensity)
         now = int(time.time() * 1000)                                   # TODO: Maybe replace with 'current_time()'
         sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.control_port))
 
@@ -280,11 +281,12 @@ class NetworkManager(QObject):
                 delay = now - ack["timestamp"]
                 esc_pw = ack["esc_pw"]
                 servo_pw = ack["servo_pw"]
-                #self.app. 
+                # UPDATE UI EELEMRNTS
+                self.app.updateVehicleMovement("UPDATE", esc_pw, servo_pw)
                 self.app.logSignal.emit(f"[ACK] Command: {ack['command']} | ESC: {ack["esc_pw"]} | SERVO: {ack["servo_pw"]} | RTT: {delay}ms", "INFO")
 
                 #print(f"[ACK]: Command: {ack['command']} | ESC: {ack["esc_pw"]} | SERVO: {ack["servo_pw"]} | RTT: {delay}ms")
-            
+            # EMERGENCY STOP FEATURES
             #elif ack.get("type") == ""
 
         except socket.timeout:

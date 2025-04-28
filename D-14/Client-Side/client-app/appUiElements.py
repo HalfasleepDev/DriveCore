@@ -593,7 +593,9 @@ class CalibrationWidget(QWidget):
     # Update tune settings for esc
     escTuneSignal = Signal(str, int, int, int)   #* MODE, MIN, MID, MAX
     # Update broadcast port
-    updateBroadcastPortSignal = Signal(int)
+    updateBroadcastPortSignal = Signal(int)      #* MODE, Value
+    # Update log 
+    logToSystemSignal = Signal(str, str)        #* MSG, TYPE
 
     def __init__(self):
         super().__init__()
@@ -953,6 +955,20 @@ class CalibrationWidget(QWidget):
         self.scroll_content_layout.setContentsMargins(9, 0, 9, 0)
         self.scroll_content_layout.addStretch()
 
+    def set_curve_selection(self, sel:str):
+        selected_curve = None
+        for name, btn in self.curve_buttons.items():
+            if name == sel:
+                btn.setChecked(True)
+                btn.setStyleSheet("background-color: #7a63ff; color: #f1f3f3; border-radius: 5px;")
+                selected_curve = name
+                #TODO:
+                self.logToSystemSignal.emit(f"[CURVE] Selected: {name}", "DEBUG")
+                self.accelCurveSignal.emit(name)
+
+        if selected_curve:
+            self.update_curve_plot(selected_curve)
+
     def handle_curve_selection(self):
         """Handles selection logic for acceleration curve profiles."""
         sender = self.sender()
@@ -964,7 +980,7 @@ class CalibrationWidget(QWidget):
                 btn.setStyleSheet("background-color: #7a63ff; color: #f1f3f3; border-radius: 5px;")
                 selected_curve = name
                 # TODO: Emit signal
-                print(f"[CURVE] Selected: {name}")
+                self.logToSystemSignal.emit(f"[CURVE] Selected: {name}", "DEBUG")
                 self.accelCurveSignal.emit(name)
             else:
                 btn.setChecked(False)
@@ -1052,7 +1068,7 @@ class CalibrationWidget(QWidget):
         #self.cam_label.setText(f"Current: {cam}")
         #print(f"[PORT] Comm: {comm} | Webcam: {cam}")
         # TODO: Send updated config to networking system
-        self.updateBroadcastPortSignal.emit(comm)
+        self.updateBroadcastPortSignal.emit("broadcast_port", comm)
 
 class DescriptionWidget(QWidget):
     """

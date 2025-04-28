@@ -8,8 +8,8 @@
     "brake_esc": 1470,
     "ramp_up": 0.05,
     "ramp_down": 0.05,
-    "username": "",
-    "password": "",
-    "acceleration_curve": "linear",
+    "username": "D-14",
+    "password": "driveCore",
+    "acceleration_curve": "Quadratic",
     "broadcast_port": 9999
 }

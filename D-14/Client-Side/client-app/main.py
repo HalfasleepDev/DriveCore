@@ -257,9 +257,6 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.threadpool = QThreadPool()
 
-        thread_count = self.threadpool.maxThreadCount()
-        print(f"Multithreading with maximum {thread_count} threads")
-
         ''' ====== App Details ======'''
         # Current Client App Version
         self.client_ver = "1.3"
@@ -356,13 +353,18 @@ class MainWindow(QMainWindow):
         self.ui.VRowSlider.setValue(50)
 
         # ------ Vehicle Tuning ------
-        self.ui.VehicleTuningSettingsPage.previewServoSignal.connect()
+        self.ui.VehicleTuningSettingsPage.set_curve_selection(self.settings["acceleration_curve"])
+        #self.ui.VehicleTuningSettingsPage.previewServoSignal.connect()
 
-        self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(lambda: self.curveType)
+        self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(self.setSaveCurveType) #* DONE
 
-        self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(lambda: self.tuneVehicle)
-        self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(lambda: self.tuneVehicle)
-        self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
+        self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
+        self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
+
+        #self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
+
+        self.ui.VehicleTuningSettingsPage.logToSystemSignal.connect(self.logToSystem) #* DONE
+
         # ------ Emergency Dissconnect ------
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
@@ -383,7 +385,11 @@ class MainWindow(QMainWindow):
         self.ui.alertAssistWidget.installEventFilter(self)
         self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
         self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
-    
+
+    def onStartup(self):
+        thread_count = self.threadpool.maxThreadCount()
+        self.logToSystem(f"Multithreading with maximum {thread_count} threads", "DEBUG")
+        
     def eventFilter(self, watched, event):
         if event.type() == QEvent.ToolTip:
             if isinstance(watched, QWidget):
@@ -470,31 +476,40 @@ class MainWindow(QMainWindow):
                 self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
             case "WARN":
                 self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
+        QCoreApplication.processEvents()
 
+    # Set and save the selected curve from the settings page
+    def setSaveCurveType(self, curve: str):
+        self.ui.drivePage.setCurveType = curve
+        self.settings["acceleration_curve"] = curve
+        save_settings(self.settings, self.SETTINGS_FILE)
+
+    # Automatically load the previously used credentials from settings.json
     def load_credentials(self):
         self.ui.carConnectLoginWidget.username_input.setText(self.settings["username"])
         self.ui.carConnectLoginWidget.password_input.setText(self.settings["password"])
 
+    # Attempt a connection to the vehicle
     def attempt_connection(self):
+        # Get username and password from the input fields
         username = self.ui.carConnectLoginWidget.username_input.text().strip()
         password = self.ui.carConnectLoginWidget.password_input.text().strip()
 
+        # Check that username and/or password is not empty
         if not username or not password:
             self.ui.carConnectLoginWidget.show_error("Please enter both username and password.")
         else:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            print(username)
-            print(password)
 
             self.threadpool.start(Worker(self.network.discover_host))
-            self.threadpool.waitForDone()
+            #self.threadpool.waitForDone()
             self.network.discovery_done_signal.connect(lambda: self.threadpool.start(Worker(lambda: self.network.perform_handshake(username, password))))
 
-            self.network.handshake_done_signal.connect(lambda: print(f"Okay {self.network.server_ip}"))
             self.threadpool.waitForDone()
-            #print("This is the server ip:")
             QApplication.restoreOverrideCursor()
+
             if self.VEHICLE_CONNECTION:
+                
                 self.settings["username"] = username
                 self.settings["password"] = password
                 save_settings(self.settings, self.SETTINGS_FILE)
@@ -600,9 +615,9 @@ class MainWindow(QMainWindow):
         
 
     def iniDrivePage(self):
-        #print('yay')
-        #print(self.STREAM_URL)
         if self.VEHICLE_CONNECTION:
+            print(self.network.server_ip)
+            print(self.network.video_port)
             self.thread = VideoThread(self.network.server_ip, self.network.video_port)
             self.processor = FrameProcessor(self, self.thread)
             self.processor.initKalmanFilter()
@@ -610,18 +625,19 @@ class MainWindow(QMainWindow):
             self.thread.frame_received.connect(self.update_frame)
             self.thread.start()
             self.THREAD_RUNNING = True
+            self.updateVehicleMovement("SET")
             #self.ui.drivePage.installEventFilter(self.filter)
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
-            self.ui.drivePage.commandSignal.connect(self.send_command) # <---- TODO: change to network manager
+            self.ui.drivePage.commandSignal.connect(self.network.send_keyboard_command) # <---- TODO: change to network manager
             
         else:
             self.ui.videoStreamLabel.setStyleSheet("QLabel{color: #1e1e21;}")
 
-    def changeKeyInfo(self, command):
+    def changeKeyInfo(self, command, intensity):
         if command == "UP":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
-            print('t')
+            #print('t')
             self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
@@ -636,23 +652,23 @@ class MainWindow(QMainWindow):
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
-            self.ui.turnRightBtn.setStyleSheet("v{color: #f1f3f3;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "RIGHT":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
-            self.ui.turnRightBtn.setStyleSheet("v{color: #7a63ff;}")
+            self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "NEUTRAL":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
-            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
         elif command == "BRAKE":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
-            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;")
+            self.ui.turnLeftBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.reverseBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
@@ -670,7 +686,7 @@ class MainWindow(QMainWindow):
                 self.ui.vehicleSpeedometerWidget.min_us = self.settings["min_duty_esc"]
                 self.ui.vehicleSpeedometerWidget.max_us = self.settings["max_duty_esc"]
                 self.ui.vehicleSpeedometerWidget.neutral_us = self.settings["neutral_duty_esc"]
-                #self.ui.vehicleSpeedometerWidget.vehicleConnect = True
+                self.ui.vehicleSpeedometerWidget.vehicleConnect = True
                 # Steer angle
                 self.ui.steerPathWidget.min_us = self.settings["min_duty_servo"]
                 self.ui.steerPathWidget.max_us = self.settings["max_duty_servo"]
@@ -707,29 +723,33 @@ class MainWindow(QMainWindow):
                     # APPLY
                 pass
     
+    def updateGeneralSettings(self, mode:str, value):
+        self.settings[mode] = value
+        save_settings(self.settings, self.SETTINGS_FILE)
+
+
     #! Depreciated for Ver1.3
     def send_command(self, command):
         """Send command to Raspberry Pi"""
-        try:
-            self.client_socket.send(command.encode())
-            print(command + " sent!")
-        except BrokenPipeError:
-            showError(self, "CONNECTION ERROR", "Lost connection to Raspberry Pi")
-            self.VEHICLE_CONNECTION = False
-        except Exception as e:
-            showError(self, "CONNECTION FALIURE", f"{e}")
-            self.VEHICLE_CONNECTION = False
+        # Check For MODE
+        # IF keyboard
+            # calculate intensity
+            # send command
+        # IF driveassist
+            # send driveAssist Command
+        pass
 
     #! Depreciated for Ver1.3
     def update_frame(self, q_img):
         """Update QLabel with new frame."""
+        #pixmap = QPixmap.fromImage(q_img)
         self.ui.videoStreamLabel.setPixmap(QPixmap.fromImage(q_img))
-        if self.alert_triggered and self.COLLISION_ASSIST_ENABLED and self.alert_triggered_Prev == False:
+        '''if self.alert_triggered and self.COLLISION_ASSIST_ENABLED and self.alert_triggered_Prev == False:
                 self.alert_triggered_Prev = True
                 self.ui.drivePage.send_brake_burst(1,20)
         else:
             self.alert_triggered_Prev = False
-
+'''
     #! Depreciated for Ver1.3
     def closeEvent(self, event):
         """Release resources when closing the window."""
@@ -753,6 +773,7 @@ if __name__ == '__main__':
         window = MainWindow()
         window.setWindowTitle(f"Drive Core Client Ver {window.client_ver}")
         window.show()
+        window.onStartup()
 
     loading = LoadingScreen(on_finished_callback=launch_main)
     loading.show()

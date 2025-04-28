@@ -49,7 +49,7 @@ class DriveCoreHost:
     FREQ_ESC = 100    # ESC frequency (Match your ESC calibration)
 
     # ====== Settings Path ======
-    SETTINGS_FILE = "DriveCore/settings.json"
+    SETTINGS_FILE = "/home/halfdev/DriveCore/settings.json"
 
     def __init__(self):
         # === Settings ===
@@ -98,6 +98,40 @@ class DriveCoreHost:
         else:
             return int(self.neutral_duty_esc - (self.neutral_duty_esc - self.min_duty_esc) * intensity)
 
+    '''
+    def map_steering(self, current_esc_pwm, k_p=1.0):
+        """
+        Calculate steering PWM based on current ESC PWM.
+        
+        Assumes:
+        - Neutral ESC = center point
+        - Max/Min ESC = full motion extremes
+        """
+         # Calculate normalized "ESC error"
+        if current_esc_pwm > self.neutral_duty_esc:
+            # Moving forward
+            max_range = self.max_duty_esc - self.neutral_duty_esc
+            esc_error = (current_esc_pwm - self.neutral_duty_esc) / max_range
+        else:
+            # Moving backward or braking
+            min_range = self.neutral_duty_esc - self.min_duty_esc
+            esc_error = (current_esc_pwm - self.neutral_duty_esc) / min_range
+        # Proportional control
+        correction = -k_p * esc_error
+
+        # Clamp correction
+        correction = max(min(correction, 1.0), -1.0)
+
+        if correction >= 0:
+            # Steer right
+            pwm = self.neutral_servo - (self.neutral_servo - self.min_duty_servo) * correction
+        else:
+            # Steer left
+            pwm = self.neutral_servo + (self.max_duty_servo - self.neutral_servo) * abs(correction)
+
+        return int(pwm)
+    '''
+    
     def map_steering(self, intensity, left=True):
         if left:
             return int(self.neutral_servo + (self.max_duty_servo - self.neutral_servo) * intensity)
@@ -110,7 +144,7 @@ class DriveCoreHost:
         self.handshake_complete.wait()
         threading.Thread(target=self.network.command_listener, daemon=True).start()
         threading.Thread(target=self.network.video_stream(), daemon=True).start()
-
+        
     def shutdown(self):
         self.reset_pwm()
         self.pi.stop()
