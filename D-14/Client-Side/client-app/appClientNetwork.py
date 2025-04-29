@@ -15,10 +15,10 @@ from appFunctions import save_settings, load_settings
 """ TODO:
 - [x] Search for broadcast
 - [x] Handshake
-- [ ] Send keyboard commands
+- [x] Send keyboard commands
 - [ ] Send Drive Assist Commands
 - [ ] Applying tune settings
-- [ ] Recieve video 
+- [x] Recieve video 
 """
 
 #SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
@@ -281,13 +281,17 @@ class NetworkManager(QObject):
                 delay = now - ack["timestamp"]
                 esc_pw = ack["esc_pw"]
                 servo_pw = ack["servo_pw"]
+                # If servo pwm is == to center
+                if servo_pw == self.settings["neutral_duty_servo"]:
+                    # change the intensity of servo to 0.0
+                    self.app.ui.drivePage.servo_intensity = 0.0
+
                 # UPDATE UI EELEMRNTS
                 self.app.updateVehicleMovement("UPDATE", esc_pw, servo_pw)
                 self.app.logSignal.emit(f"[ACK] Command: {ack['command']} | ESC: {ack["esc_pw"]} | SERVO: {ack["servo_pw"]} | RTT: {delay}ms", "INFO")
 
-                #print(f"[ACK]: Command: {ack['command']} | ESC: {ack["esc_pw"]} | SERVO: {ack["servo_pw"]} | RTT: {delay}ms")
             # EMERGENCY STOP FEATURES
-            #elif ack.get("type") == ""
+            #elif ack.get("type") == "":
 
         except socket.timeout:
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "INFO")
@@ -298,9 +302,11 @@ class NetworkManager(QObject):
 
     # Step 5: Send Drive Assist Commands
     def send_drive_assist_command(self, cmd: str):
-        if cmd == "emergency_stop":
+        if cmd == "EMERGENCY_STOP":
             self.send_keyboard_command(cmd, None)
             # Todo: Add more triggers for UI?
+        elif cmd == "CLEAR_EMERGENCY":
+            pass
 
     # Step 6: Applying Tune Data
     def tune_vehicle_command():

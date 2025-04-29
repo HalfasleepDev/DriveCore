@@ -954,6 +954,10 @@ class CalibrationWidget(QWidget):
         self.scroll_content_layout.setSpacing(6)
         self.scroll_content_layout.setContentsMargins(9, 0, 9, 0)
         self.scroll_content_layout.addStretch()
+    
+    # set the esc servo, and port values from settings 
+    def set_default_tune_page(self, esc_min, esc_mid, esc_max, servo_min, servo_mid, servo_max, broad_port):
+        pass
 
     def set_curve_selection(self, sel:str):
         selected_curve = None
@@ -962,7 +966,6 @@ class CalibrationWidget(QWidget):
                 btn.setChecked(True)
                 btn.setStyleSheet("background-color: #7a63ff; color: #f1f3f3; border-radius: 5px;")
                 selected_curve = name
-                #TODO:
                 self.logToSystemSignal.emit(f"[CURVE] Selected: {name}", "DEBUG")
                 self.accelCurveSignal.emit(name)
 
@@ -979,7 +982,6 @@ class CalibrationWidget(QWidget):
                 btn.setChecked(True)
                 btn.setStyleSheet("background-color: #7a63ff; color: #f1f3f3; border-radius: 5px;")
                 selected_curve = name
-                # TODO: Emit signal
                 self.logToSystemSignal.emit(f"[CURVE] Selected: {name}", "DEBUG")
                 self.accelCurveSignal.emit(name)
             else:

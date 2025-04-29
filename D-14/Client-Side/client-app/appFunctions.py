@@ -53,7 +53,7 @@ class PageWithKeyEvents(QWidget):
 
         self.control_timer = QTimer()
         self.control_timer.timeout.connect(self.send_ramping_command)
-        self.control_timer.start(150) # check send speed?
+        self.control_timer.start(100) # check send speed?
     
     def setCurveType(self, val):
         self.curveType = val
