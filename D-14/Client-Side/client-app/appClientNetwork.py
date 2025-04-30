@@ -309,7 +309,13 @@ class NetworkManager(QObject):
             pass
 
     # Step 6: Applying Tune Data
-    def tune_vehicle_command():
-        pass
+    def tune_vehicle_command(self, mode:str, min_duty_servo=0, max_duty_servo=0, neutral_servo=0, 
+                            min_duty_esc=0, max_duty_esc=0, neutral_duty_esc=0, brake_esc=0
+                            ):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        packet = send_tune_data_packet(mode, min_duty_servo, max_duty_servo, neutral_servo, 
+                                        min_duty_esc, max_duty_esc, neutral_duty_esc, brake_esc)
+        sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.control_port))
+        self.settings = load_settings(self.SETTINGS_FILE)
 
     # Step 7: 

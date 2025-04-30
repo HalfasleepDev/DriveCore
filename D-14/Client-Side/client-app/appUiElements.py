@@ -33,10 +33,10 @@ os.environ["QT_SCALE_FACTOR"] = "0.95"
 - Ver 1.3 is needed for Client to Host communication
 '''
 """ TODO:
-- [ ] Speedometer linking
-- [ ] Steering linking
+- [x] Speedometer linking
+- [x] Steering linking
 - [ ] Drive Assist linking
-- [ ] Fix CarConnectWidget styling
+- [x] Fix CarConnectWidget styling
 """
 
 class GitHubInfoPanel(QWidget):
@@ -514,6 +514,9 @@ class ServoCenterTuner(QGroupBox):
     
     @param on_send_callback: Optional callback for live servo updates.
     """
+    # Save Servo midpoint
+    saveServoMidpointSignal = Signal(str, int)
+
     def __init__(self, on_send_callback=None):
         super().__init__("Fine Tune Servo Center")
         self.on_send = on_send_callback
@@ -539,12 +542,14 @@ class ServoCenterTuner(QGroupBox):
         btns.addWidget(self.reset_btn)
 
         self.set_btn.clicked.connect(self._save_mid)
+        # TODO: Use default settings on startup (1500)
         self.reset_btn.clicked.connect(lambda: self._update(1500))
 
         layout.addWidget(self.slider)
         layout.addWidget(self.display)
         layout.addLayout(btns)
 
+        # TODO: Use json settings on startup
         self._saved_mid = 1500
 
     def _slider_moved(self, val):
@@ -570,8 +575,9 @@ class ServoCenterTuner(QGroupBox):
         """
         Saves the current slider value as the servo midpoint.
         """
+        self.saveServoMidpointSignal.emit("save_mid_servo", self.slider.value())
         self._saved_mid = self.slider.value()
-        print(f"[Servo Cal] Midpoint saved as: {self._saved_mid} µs")
+        #print(f"[Servo Cal] Midpoint saved as: {self._saved_mid} µs")
 
     def get_mid_value(self):
         """
@@ -585,7 +591,7 @@ class CalibrationWidget(QWidget):
     Also includes port configuration and curve placeholders.
     """
     # Send PWM to servo
-    previewServoSignal = Signal(int)
+    previewServoSignal = Signal(str, int)
     # Send acceleration curve type
     accelCurveSignal = Signal(str)
     # Update tune settings for servo
@@ -955,7 +961,7 @@ class CalibrationWidget(QWidget):
         self.scroll_content_layout.setContentsMargins(9, 0, 9, 0)
         self.scroll_content_layout.addStretch()
     
-    # set the esc servo, and port values from settings 
+    # TODO: Set the esc servo, and port values from settings 
     def set_default_tune_page(self, esc_min, esc_mid, esc_max, servo_min, servo_mid, servo_max, broad_port):
         pass
 
@@ -1036,9 +1042,7 @@ class CalibrationWidget(QWidget):
 
         @param value: µs value for live servo preview.
         """
-        print(f"[Preview] Sending servo test µs: {value}")
-        # TODO: Send live µs to servo
-        self.previewServoSignal.emit(value)
+        self.previewServoSignal.emit("servo_mid_cal", value)
 
     def test_servo(self):
         """

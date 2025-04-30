@@ -229,6 +229,7 @@ class MainWindow(QMainWindow):
 
     # Vehicle Status
     VEHICLE_CONNECTION = False
+    OPENED_DRIVE_PAGE = False
 
     # Vehicle Info
     #control_scheme = str
@@ -354,12 +355,14 @@ class MainWindow(QMainWindow):
 
         # ------ Vehicle Tuning ------
         self.ui.VehicleTuningSettingsPage.set_curve_selection(self.settings["acceleration_curve"])
-        #self.ui.VehicleTuningSettingsPage.previewServoSignal.connect()
+        self.ui.VehicleTuningSettingsPage.previewServoSignal.connect(self.tuneVehicle)
+
+        self.ui.VehicleTuningSettingsPage.servo_mid_tuner.saveServoMidpointSignal.connect(self.tuneVehicle)
 
         self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(self.setSaveCurveType) #* DONE
 
-        self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
-        self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
+        #self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
+        #self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
 
         #self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
 
@@ -615,7 +618,7 @@ class MainWindow(QMainWindow):
         
 
     def iniDrivePage(self):
-        if self.VEHICLE_CONNECTION:
+        if self.VEHICLE_CONNECTION and not self.OPENED_DRIVE_PAGE:
             print(self.network.server_ip)
             print(self.network.video_port)
             self.thread = VideoThread(self.network.server_ip, self.network.video_port)
@@ -625,6 +628,7 @@ class MainWindow(QMainWindow):
             self.thread.frame_received.connect(self.update_frame)
             self.thread.start()
             self.THREAD_RUNNING = True
+            self.OPENED_DRIVE_PAGE = True
             self.updateVehicleMovement("SET")
             #self.ui.drivePage.installEventFilter(self.filter)
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
@@ -710,8 +714,28 @@ class MainWindow(QMainWindow):
                     else:
                         self.ui.PRNDWidget.set_gear("R")
 
-    def tuneVehicle(self, mode: str, min: int, mid: int, max: int):
+    def tuneVehicle(self, mode: str, min=0, mid=0, max=0):
+        #if self.VEHICLE_CONNECTION:
         match mode:
+            case "servo_mid_cal":
+                if self.VEHICLE_CONNECTION:
+                    self.network.tune_vehicle_command(mode, min)
+                    self.logToSystem(f"[SERVO] Servo tested at {min} µs", "DEBUG")
+                #TEST PRINT
+                #print(min)
+            
+            case "save_mid_servo":
+                if self.VEHICLE_CONNECTION:
+                    self.network.tune_vehicle_command(mode, min)
+                    # TODO: Uncomment if it works
+                    #self.settings["neutral_duty_servo"] = min
+                    #save_settings(self.settings, self.SETTINGS_FILE)
+
+                    self.logToSystem(f"[SERVO] New servo midpoint is set to {min} µs", "DEBUG")
+                    
+                #TEST PRINT
+                #print(f"TEST save servo mid {min}")
+
             case "SERVO":
                 # SAVE
                 # IF VEHICLE CONNECTED
@@ -722,6 +746,7 @@ class MainWindow(QMainWindow):
                 # IF VEHICLE CONNECTED
                     # APPLY
                 pass
+        #self.settings = load_settings(self.SETTINGS_FILE)
     
     def updateGeneralSettings(self, mode:str, value):
         self.settings[mode] = value

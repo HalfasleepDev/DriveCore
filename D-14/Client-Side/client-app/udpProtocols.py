@@ -26,8 +26,8 @@ def setup_request_packet():
     }
 
 # ------ Apply Tune Settings ------ #! <--- Use this for applying tunes in setting page
-def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SERVO, 
-                          MIN_DUTY_ESC, MAX_DUTY_ESC, NEUTRAL_DUTY_ESC, BRAKE_ESC):
+def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO=0, MAX_DUTY_SERVO=0, NEUTRAL_SERVO=0, 
+                          MIN_DUTY_ESC=0, MAX_DUTY_ESC=0, NEUTRAL_DUTY_ESC=0, BRAKE_ESC=0):
     if PHASE == "handshake":
         return {
             "type": "handshake_tune_setup",
@@ -40,6 +40,14 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO, MAX_DUTY_SERVO, NEUTRAL_SE
             "brake_esc": BRAKE_ESC
             # Add more ltr
         }
+    
+    elif PHASE == "servo_mid_cal" or "save_mid_servo":
+        return {
+            "type": "sent_tune",
+            "action": PHASE,
+            "servo": MIN_DUTY_SERVO
+        }
+    
 
 # ====== Movement Packets ======
 # ------ Keyboard Commands ------
