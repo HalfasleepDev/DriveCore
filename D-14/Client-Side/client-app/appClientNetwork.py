@@ -2,6 +2,7 @@ import socket
 import json
 import threading
 import time
+import asyncio
 
 from PySide6.QtCore import QObject, Signal,QCoreApplication
 from PySide6.QtWidgets import QApplication
@@ -176,6 +177,8 @@ class NetworkManager(QObject):
                 pending_action = None
                 handshake_status = False
                 self.app.VEHICLE_CONNECTION = True
+                '''# FOR TUNE SETUP
+                self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True'''
                 QCoreApplication.processEvents()
                 self.handshake_done_signal.emit()
                 #self.app.handshake_done.set()
@@ -293,6 +296,13 @@ class NetworkManager(QObject):
             # EMERGENCY STOP FEATURES
             #elif ack.get("type") == "":
 
+            # TUNNING RESPONSE
+            #elif ack.get("type") == "end_servo_test":
+                # TELL THE TUNNER AND SYSTEM THAT THE VEHICLE IS READY
+
+            #elif ack.get("type") == "end_esc_test":
+                # TELL THE TUNNER AND SYSTEM THAT THE VEHICLE IS READY
+
         except socket.timeout:
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "INFO")
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "ERROR")
@@ -312,10 +322,20 @@ class NetworkManager(QObject):
     def tune_vehicle_command(self, mode:str, min_duty_servo=0, max_duty_servo=0, neutral_servo=0, 
                             min_duty_esc=0, max_duty_esc=0, neutral_duty_esc=0, brake_esc=0
                             ):
+        print("send")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         packet = send_tune_data_packet(mode, min_duty_servo, max_duty_servo, neutral_servo, 
                                         min_duty_esc, max_duty_esc, neutral_duty_esc, brake_esc)
         sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.control_port))
         self.settings = load_settings(self.SETTINGS_FILE)
+
+        async def waitForTest():
+            self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
+            await asyncio.sleep(5)
+            # TODO: LOG WHEN TESTING IS DONE   
+            self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
+
+        if mode == "test_servo":
+            asyncio.run(waitForTest())
 
     # Step 7: 

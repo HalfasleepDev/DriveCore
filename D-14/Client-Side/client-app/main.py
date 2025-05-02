@@ -256,7 +256,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.threadpool = QThreadPool()
+        self.threadpool = QThreadPool.globalInstance()
 
         ''' ====== App Details ======'''
         # Current Client App Version
@@ -311,6 +311,8 @@ class MainWindow(QMainWindow):
 
         self.ui.carConnectLoginWidget.connect_btn.clicked.connect(self.attempt_connection)
         self.logSignal.connect(self.logToSystem)
+
+        self.ui.projectInfoWidgetCustom.logErrorSignal.connect(self.logToSystem)
         #self.discoverHostSignal.connect(self.network.discover_host)
         #self.performHandshakeSignal.connect(self.network.perform_handshake)
         
@@ -318,6 +320,7 @@ class MainWindow(QMainWindow):
         self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
         self.ui.homeBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.homeBtn, self.ui.homePage))
         self.ui.settingsBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.settingsBtn, self.ui.settingsPage))
+        self.ui.settingsBtn.clicked.connect(lambda: self.iniSettingsPage())
         self.ui.driveBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.driveBtn, self.ui.drivePage))
         self.ui.driveBtn.clicked.connect(lambda: self.iniDrivePage())
         self.ui.logBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.logBtn, self.ui.systemLogPage))
@@ -361,8 +364,8 @@ class MainWindow(QMainWindow):
 
         self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(self.setSaveCurveType) #* DONE
 
-        #self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
-        #self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
+        self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
+        self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
 
         #self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
 
@@ -423,7 +426,7 @@ class MainWindow(QMainWindow):
             self.ui.settingsInfoStackedWidget.setCurrentIndex(infoIndex)
             if infoIndex == 3:
                 self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
-                self.ui.verticalSpacer_8 = QSpacerItem(20, 100, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+                self.ui.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
                 self.ui.verticalLayout_15.insertItem(3, self.ui.verticalSpacer_8)
             else:
                 self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
@@ -618,7 +621,7 @@ class MainWindow(QMainWindow):
         
 
     def iniDrivePage(self):
-        if self.VEHICLE_CONNECTION and not self.OPENED_DRIVE_PAGE:
+        if self.VEHICLE_CONNECTION and self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY:
             print(self.network.server_ip)
             print(self.network.video_port)
             self.thread = VideoThread(self.network.server_ip, self.network.video_port)
@@ -626,14 +629,16 @@ class MainWindow(QMainWindow):
             self.processor.initKalmanFilter()
             self.thread.set_processor(self.processor)
             self.thread.frame_received.connect(self.update_frame)
-            self.thread.start()
-            self.THREAD_RUNNING = True
-            self.OPENED_DRIVE_PAGE = True
+
+            if not self.OPENED_DRIVE_PAGE:
+                self.thread.start()
+                self.THREAD_RUNNING = True
+                self.OPENED_DRIVE_PAGE = True
+            
             self.updateVehicleMovement("SET")
-            #self.ui.drivePage.installEventFilter(self.filter)
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
-            self.ui.drivePage.commandSignal.connect(self.network.send_keyboard_command) # <---- TODO: change to network manager
+            self.ui.drivePage.commandSignal.connect(self.network.send_keyboard_command)
             
         else:
             self.ui.videoStreamLabel.setStyleSheet("QLabel{color: #1e1e21;}")
@@ -678,9 +683,6 @@ class MainWindow(QMainWindow):
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
 
     def updateVehicleMovement(self, mode: str, esc_pw=None, servo_pw=None):
-        #self.ui.vehicleSpeedometerWidget.min_us = self.settings["min_duty_esc"]
-        #self.ui.vehicleSpeedometerWidget.max_us = self.settings["max_duty_esc"]
-        #self.ui.vehicleSpeedometerWidget.neutral_us = self.settings["neutral_duty_esc"]
 
         match mode:
             case "SET":
@@ -713,6 +715,10 @@ class MainWindow(QMainWindow):
                         self.ui.PRNDWidget.set_gear("P")
                     else:
                         self.ui.PRNDWidget.set_gear("R")
+    
+    def iniSettingsPage(self):
+        if self.VEHICLE_CONNECTION:
+            self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
 
     def tuneVehicle(self, mode: str, min=0, mid=0, max=0):
         #if self.VEHICLE_CONNECTION:
@@ -734,18 +740,29 @@ class MainWindow(QMainWindow):
                     self.logToSystem(f"[SERVO] New servo midpoint is set to {min} µs", "DEBUG")
                     
                 #TEST PRINT
-                #print(f"TEST save servo mid {min}")
+                print(f"TEST save servo mid {min}")
 
-            case "SERVO":
-                # SAVE
-                # IF VEHICLE CONNECTED
-                    # APPLY
+            case "test_servo":
+                # IF VEHICLE CONNECTED:
+                if self.VEHICLE_CONNECTION:
+                    pass
+                    # SEND TEST COMMAND ---> Send via WAIT and Send command, ACK should re enable the button
+                    
+                print(f"SERVO:\nMin: {min} µs\n Mid: {mid} µs\nMax: {max} µs")
+
+            case "save_servo":
                 pass
-            case "ESC":
-                # SAVE
-                # IF VEHICLE CONNECTED
-                    # APPLY
+            
+            case "test_esc":
+                # IF VEHICLE CONNECTED:
+                if self.VEHICLE_CONNECTION:
+                    pass
+                
+                print(f"SERVO:\nMin: {min} µs\n Mid: {mid} µs\nMax: {max} µs")
+
+            case "save_esc":
                 pass
+
         #self.settings = load_settings(self.SETTINGS_FILE)
     
     def updateGeneralSettings(self, mode:str, value):
@@ -763,8 +780,8 @@ class MainWindow(QMainWindow):
         # IF driveassist
             # send driveAssist Command
         pass
-
-    #! Depreciated for Ver1.3
+    
+    #! FIX DRIVE ASSIST Functions
     def update_frame(self, q_img):
         """Update QLabel with new frame."""
         #pixmap = QPixmap.fromImage(q_img)

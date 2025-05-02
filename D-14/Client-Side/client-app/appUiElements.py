@@ -45,6 +45,8 @@ class GitHubInfoPanel(QWidget):
     
     @param repo_url: URL to the GitHub repository.
     """
+    logErrorSignal = Signal(str, str)
+
     def __init__(self, repo_url="https://github.com/HalfasleepDev/DriveCore"):
         
         super().__init__()
@@ -171,8 +173,9 @@ class GitHubInfoPanel(QWidget):
 
         except Exception as e:
             self.about_scroll.text_label.setText("Failed to load repository info.")
-            self.release_scroll.text_label.setText(str(e))
-            print("GitHubInfoPanel Error:", e)
+            self.release_scroll.text_label.setText("Failed to load release info.")
+            self.logErrorSignal.emit(f"GitHubInfoPanel Error: {e}", "ERROR")
+            #print("GitHubInfoPanel Error:", e)
 
     def fetch_preview_metadata(self, repo_url):
         response = requests.get(repo_url)
@@ -591,7 +594,7 @@ class CalibrationWidget(QWidget):
     Also includes port configuration and curve placeholders.
     """
     # Send PWM to servo
-    previewServoSignal = Signal(str, int)
+    previewServoSignal = Signal(str, int)        #* MODE, servo pwm value
     # Send acceleration curve type
     accelCurveSignal = Signal(str)
     # Update tune settings for servo
@@ -602,6 +605,9 @@ class CalibrationWidget(QWidget):
     updateBroadcastPortSignal = Signal(int)      #* MODE, Value
     # Update log 
     logToSystemSignal = Signal(str, str)        #* MSG, TYPE
+
+    # UNIVERSAL `IS VEHICLE READY`
+    IS_VEHICLE_READY = True
 
     def __init__(self):
         super().__init__()
@@ -851,6 +857,11 @@ class CalibrationWidget(QWidget):
         servo_test_btn.clicked.connect(self.test_servo)
         servo_layout.addWidget(servo_test_btn)
 
+        servo_save_btn = QPushButton("Save Servo Settings")
+        servo_save_btn.setMinimumSize(QSize(0, 25))
+        servo_save_btn.clicked.connect(self.save_servo)
+        servo_layout.addWidget(servo_save_btn)
+
         servo_group.setLayout(servo_layout)
         self.scroll_content_layout.addWidget(servo_group, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -881,6 +892,11 @@ class CalibrationWidget(QWidget):
         esc_test_btn.setMinimumSize(QSize(0, 25))
         esc_test_btn.clicked.connect(self.test_esc)
         esc_form.addRow(esc_test_btn)
+
+        esc_save_btn = QPushButton("Save ESC Settings")
+        esc_save_btn.setMinimumSize(QSize(0, 25))
+        esc_save_btn.clicked.connect(self.save_esc)
+        esc_form.addRow(esc_save_btn)
 
         esc_group.setLayout(esc_form)
         self.scroll_content_layout.addWidget(esc_group, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -1042,28 +1058,52 @@ class CalibrationWidget(QWidget):
 
         @param value: µs value for live servo preview.
         """
+        #if self.IS_VEHICLE_READY:
         self.previewServoSignal.emit("servo_mid_cal", value)
 
     def test_servo(self):
         """
         Prints out the current servo min, mid, and max values for testing.
         """
-        print("[TEST] Servo Calibration:")
+        # If testing servo mode is available:
+        #if self.IS_VEHICLE_READY:
+        
+        self.servoTuneSignal.emit("test_servo", self.servo_min.value(), self.servo_mid_tuner.get_mid_value(), self.servo_max.value())
+    
+    def save_servo(self):
+        """
+        Save the servo command
+        """
+        #if self.IS_VEHICLE_READY:
+        print("[TEST] Saved servo Calibration:")
         print(f"Min: {self.servo_min.value()} µs")
         print(f"Mid: {self.servo_mid_tuner.get_mid_value()} µs")
         print(f"Max: {self.servo_max.value()} µs")
-        self.servoTuneSignal.emit("SERVO", self.servo_min.value(), self.servo_mid_tuner.get_mid_value(), self.servo_max.value())
+        self.servoTuneSignal.emit("save_servo", self.servo_min.value(), self.servo_mid_tuner.get_mid_value(), self.servo_max.value())
 
     def test_esc(self):
         """
         Prints out the current ESC min, mid, and max values for testing.
         """
+        # If testing esc mode is available:
+        #if self.IS_VEHICLE_READY:
         print("[TEST] ESC Calibration:")
         print(f"Min: {self.esc_min.value()} µs")
         print(f"Mid: {self.esc_mid.value()} µs")
         print(f"Max: {self.esc_max.value()} µs")
-        self.escTuneSignal.emit("ESC", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
+        self.escTuneSignal.emit("test_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
     
+    def save_esc(self):
+        '''
+        Save the esc command
+        '''
+        #if self.IS_VEHICLE_READY:
+        print("[TEST] Saved ESC Calibration:")
+        print(f"Min: {self.esc_min.value()} µs")
+        print(f"Mid: {self.esc_mid.value()} µs")
+        print(f"Max: {self.esc_max.value()} µs")
+        self.escTuneSignal.emit("save_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
+
     def apply_port_settings(self):
         """
         Applies the communication and camera port settings from the UI.

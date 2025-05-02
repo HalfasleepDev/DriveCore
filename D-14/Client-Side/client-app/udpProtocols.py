@@ -48,6 +48,11 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO=0, MAX_DUTY_SERVO=0, NEUTRA
             "servo": MIN_DUTY_SERVO
         }
     
+    elif PHASE == "test_servo":
+        return {
+            "type": "sent_tune"
+        }
+    
 
 # ====== Movement Packets ======
 # ------ Keyboard Commands ------
