@@ -28,16 +28,15 @@ from appUiAnimations import AnimatedToolTip, LoadingScreen, install_hover_animat
 
 from openCVFunctions import FrameProcessor
 
-#from appFunctions import PageWithKeyEvents
 from MainWindow import Ui_MainWindow
 
-PORT = 4444 #TODO: move to settings
+#PORT = 4444 #move to settings
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
 """ 
 This Codebase sucks and I hate sockets
-Time wasted here since 26-04-2025: 16Hrs
+Time wasted here since 26-04-2025: 30Hrs
 """
 # TODO: Style error popups
 class Worker(QRunnable):
@@ -148,6 +147,7 @@ class VideoThread(QThread):
                            
                         #AI or floor detection
                         if self.processor:
+                            # IF DriveAssist Enabled
                             frame = self.processor.detect_floor_region(frame)
 
                         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -247,7 +247,10 @@ class MainWindow(QMainWindow):
     PATH_VIS_ENABLED = False
     COLLISION_ASSIST_ENABLED = False
     alert_triggered = False
-    alert_triggered_Prev = False
+    alert_cooldown = False
+
+    # Drive Assist
+    IS_DRIVE_ASSIST_ENABLED = False
 
     logSignal = Signal(str, str)
     displayVehicleMovementSignal = Signal(str, int, int)
@@ -367,7 +370,12 @@ class MainWindow(QMainWindow):
         self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
         self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
 
-        #self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect()
+        self.ui.VehicleTuningSettingsPage.set_default_tune_page(self.settings["min_duty_esc"], self.settings["neutral_duty_esc"], 
+                                                                self.settings["max_duty_esc"], self.settings["brake_esc"], 
+                                                                self.settings["min_duty_servo"], self.settings["neutral_duty_servo"], 
+                                                                self.settings["max_duty_servo"], self.settings["broadcast_port"])
+
+        self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect(self.tuneVehicle)
 
         self.ui.VehicleTuningSettingsPage.logToSystemSignal.connect(self.logToSystem) #* DONE
 
@@ -391,6 +399,12 @@ class MainWindow(QMainWindow):
         self.ui.alertAssistWidget.installEventFilter(self)
         self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
         self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
+
+        # ------ Drive Assist Widget ------
+        self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
+        self.alert_cooldown_timer = QTimer()
+        self.alert_cooldown_timer.setSingleShot(True)
+        self.alert_cooldown_timer.timeout.connect(self.reset_alert_cooldown)
 
     def onStartup(self):
         thread_count = self.threadpool.maxThreadCount()
@@ -452,6 +466,7 @@ class MainWindow(QMainWindow):
                 #print(f"Error stopping thread: {e}")
     
     def toggleSettingOpenCvBtns(self, select):
+        self.IS_DRIVE_ASSIST_ENABLED = True
         match select:
             case 1:
                 self.OBJECT_VIS_ENABLED = toggleDebugCV(self.ui.ObjectVisBtn, self.OBJECT_VIS_ENABLED, "Object Vis: ")
@@ -470,6 +485,7 @@ class MainWindow(QMainWindow):
             case 8:
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
                 self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
+                self.IS_DRIVE_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
 
     def logToSystem(self, message: str, type: str):
         self.ui.systemLogPage.log(message, type)
@@ -720,54 +736,77 @@ class MainWindow(QMainWindow):
         if self.VEHICLE_CONNECTION:
             self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
 
-    def tuneVehicle(self, mode: str, min=0, mid=0, max=0):
-        #if self.VEHICLE_CONNECTION:
-        match mode:
-            case "servo_mid_cal":
-                if self.VEHICLE_CONNECTION:
+    def tuneVehicle(self, mode: str, min=0, mid=0, max=0, brake=0, port=0):
+        if self.VEHICLE_CONNECTION:
+            match mode:
+                case "servo_mid_cal":
                     self.network.tune_vehicle_command(mode, min)
                     self.logToSystem(f"[SERVO] Servo tested at {min} µs", "DEBUG")
-                #TEST PRINT
-                #print(min)
-            
-            case "save_mid_servo":
-                if self.VEHICLE_CONNECTION:
+                    #TEST PRINT
+                    #print(min)
+                
+                case "save_mid_servo":
                     self.network.tune_vehicle_command(mode, min)
                     # TODO: Uncomment if it works
                     #self.settings["neutral_duty_servo"] = min
                     #save_settings(self.settings, self.SETTINGS_FILE)
 
                     self.logToSystem(f"[SERVO] New servo midpoint is set to {min} µs", "DEBUG")
-                    
-                #TEST PRINT
-                print(f"TEST save servo mid {min}")
+                        
+                    #TEST PRINT
+                    #print(f"TEST save servo mid {min}")
 
-            case "test_servo":
-                # IF VEHICLE CONNECTED:
-                if self.VEHICLE_CONNECTION:
-                    pass
+                case "test_servo":
+                    self.network.tune_vehicle_command(mode, min, max, mid)
                     # SEND TEST COMMAND ---> Send via WAIT and Send command, ACK should re enable the button
                     
-                print(f"SERVO:\nMin: {min} µs\n Mid: {mid} µs\nMax: {max} µs")
+                    # TEST PRINT
+                    #print(f"SERVO:\nMin: {min} µs\nMid: {mid} µs\nMax: {max} µs")
 
-            case "save_servo":
-                pass
-            
-            case "test_esc":
-                # IF VEHICLE CONNECTED:
-                if self.VEHICLE_CONNECTION:
-                    pass
+                case "save_servo":
+                    # TODO: Uncomment if it works
+                    #self.network.tune_vehicle_command(mode, min, max, mid)
+                    #self.settings["neutral_duty_servo"] = mid
+                    #self.settings["max_duty_servo"] = max
+                    #self.settings["min_duty_servo"] = min
+                    #save_settings(self.settings, self.SETTINGS_FILE)
+
+                    self.logToSystem(f"[SERVO] New servo is set to {min}µs, {mid}µs, {max}µs", "DEBUG") 
+
+
                 
-                print(f"SERVO:\nMin: {min} µs\n Mid: {mid} µs\nMax: {max} µs")
+                case "test_esc":
+                    self.network.tune_vehicle_command(mode, 0,0,0, min, mid, max, brake)
+                        
+                    # TEST PRINT
+                    #print(f"ESC:\nMin: {min} µs\nMid: {mid} µs\nMax: {max} µs\nBRAKE {brake} µs")
 
-            case "save_esc":
-                pass
+                case "save_esc":
+                    # TODO: Uncomment if it works
+                    #self.network.tune_vehicle_command(mode, 0,0,0, min, mid, max, brake)
+                    #self.settings["min_duty_esc"] = min
+                    #self.settings["max_duty_esc"] = max
+                    #self.settings["neutral_duty_esc"] = mid
+                    #self.settings["brake_esc"] = brake
+                    #save_settings(self.settings, self.SETTINGS_FILE)
+
+                    self.logToSystem(f"[ESC] New esc is set to {min}µs, {mid}µs, {max}µs, {brake}µs", "DEBUG")
+
+        elif mode == "update_port":
+            # TODO: Uncomment if it works
+            #self.settings["broadcast_port"] = port
+            #save_settings(self.settings, self.SETTINGS_FILE)
+                    
+            self.logToSystem(f"[NETWORK] Updated broadcast port on client to {port}", "DEBUG")
 
         #self.settings = load_settings(self.SETTINGS_FILE)
     
     def updateGeneralSettings(self, mode:str, value):
         self.settings[mode] = value
         save_settings(self.settings, self.SETTINGS_FILE)
+
+    def enableDriveAssist(self):
+        pass
 
 
     #! Depreciated for Ver1.3
@@ -786,12 +825,19 @@ class MainWindow(QMainWindow):
         """Update QLabel with new frame."""
         #pixmap = QPixmap.fromImage(q_img)
         self.ui.videoStreamLabel.setPixmap(QPixmap.fromImage(q_img))
-        '''if self.alert_triggered and self.COLLISION_ASSIST_ENABLED and self.alert_triggered_Prev == False:
-                self.alert_triggered_Prev = True
-                self.ui.drivePage.send_brake_burst(1,20)
-        else:
-            self.alert_triggered_Prev = False
-'''
+        
+        if self.alert_triggered and not self.alert_cooldown:
+            self.network.send_drive_assist_command("EMERGENCY_STOP")
+            self.ui.driveAssistWidget.show_warning("OBJECT DETECTED")
+            self.alert_cooldown = True
+            self.alert_cooldown_timer.start(3000) # 3 seconds
+            self.logToSystem("Object detected! Applying command: EMERGENCY_STOP", "WARN")
+        
+    def reset_alert_cooldown(self):
+        self.alert_cooldown = False
+        self.ui.driveAssistWidget.clear_warning()
+        self.logToSystem("Object Alert has been reset on client", "WARN")
+
     #! Depreciated for Ver1.3
     def closeEvent(self, event):
         """Release resources when closing the window."""

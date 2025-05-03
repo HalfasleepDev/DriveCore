@@ -1331,7 +1331,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_VALW.addWidget(self.vehicleSystemAlertLogWidget)
 
         #* IMPORTANT: add DriveAssistWidget to alertAssistWidget
-        self.driveAssistWidget = DriveAssistWidget()
+        self.driveAssistWidget = DriveAssistWidget() 
         self.horizontalLayout_AAW = QHBoxLayout(self.alertAssistWidget)
         self.horizontalLayout_AAW.addWidget(self.driveAssistWidget)
 

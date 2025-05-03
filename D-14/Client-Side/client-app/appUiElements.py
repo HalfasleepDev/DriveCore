@@ -21,6 +21,8 @@ from PySide6.QtCore import Qt, QTimer, QDateTime, QSize, QRectF, Signal
 from PySide6.QtGui import (QFont, QTextCursor, QPainter, QColor,
     QConicalGradient, QPen, QPainterPath, QIcon, QPixmap, QImage)
 
+from appFunctions import DEFAULT_SETTINGS
+
 import os
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -524,13 +526,18 @@ class ServoCenterTuner(QGroupBox):
         super().__init__("Fine Tune Servo Center")
         self.on_send = on_send_callback
 
+        self.midVal = 1500
+        self.defaultMidVal = 1500
+        self.minVal = 900
+        self.maxVal = 2100
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
         self.slider = QSlider(Qt.Horizontal)
-        self.slider.setRange(900, 2100)
-        self.slider.setValue(1500)
-        self.slider.setSingleStep(1)
+        self.slider.setRange(self.minVal, self.maxVal)
+        self.slider.setValue(self.midVal)
+        self.slider.setSingleStep(10)
         self.slider.valueChanged.connect(self._slider_moved)
 
         self.display = QLabel("Current µs: 1500")
@@ -546,7 +553,7 @@ class ServoCenterTuner(QGroupBox):
 
         self.set_btn.clicked.connect(self._save_mid)
         # TODO: Use default settings on startup (1500)
-        self.reset_btn.clicked.connect(lambda: self._update(1500))
+        self.reset_btn.clicked.connect(lambda: self._update(self.defaultMidVal))
 
         layout.addWidget(self.slider)
         layout.addWidget(self.display)
@@ -600,14 +607,14 @@ class CalibrationWidget(QWidget):
     # Update tune settings for servo
     servoTuneSignal = Signal(str, int, int, int) #* MODE, MIN, MID, MAX
     # Update tune settings for esc
-    escTuneSignal = Signal(str, int, int, int)   #* MODE, MIN, MID, MAX
+    escTuneSignal = Signal(str, int, int, int, int)   #* MODE, MIN, MID, MAX, BRAKE
     # Update broadcast port
-    updateBroadcastPortSignal = Signal(int)      #* MODE, Value
+    updateBroadcastPortSignal = Signal(str, int, int, int, int, int)      #* MODE, SKIP, SKIP, SKIP, SKIP, BROADCAST_PORT
     # Update log 
     logToSystemSignal = Signal(str, str)        #* MSG, TYPE
 
     # UNIVERSAL `IS VEHICLE READY`
-    IS_VEHICLE_READY = True
+    IS_VEHICLE_READY = True 
 
     def __init__(self):
         super().__init__()
@@ -884,9 +891,15 @@ class CalibrationWidget(QWidget):
         self.esc_max.setRange(500, 2500)
         self.esc_max.setValue(1750)
 
+        # ADD BRAKE
+        self.esc_brake = QDoubleSpinBox()
+        self.esc_brake.setRange(500, 2500)
+        self.esc_brake.setValue(1470)
+
         esc_form.addRow("Min:", self.esc_min)
         esc_form.addRow("Mid:", self.esc_mid)
         esc_form.addRow("Max:", self.esc_max)
+        esc_form.addRow("Brake:", self.esc_brake)
 
         esc_test_btn = QPushButton("Test ESC")
         esc_test_btn.setMinimumSize(QSize(0, 25))
@@ -915,7 +928,7 @@ class CalibrationWidget(QWidget):
 
         self.comm_port = QSpinBox()
         self.comm_port.setRange(1024, 65535)
-        self.comm_port.setValue(4444)  # Default or current communication port
+        self.comm_port.setValue(4444)
 
         self.cam_port = QSpinBox()
         self.cam_port.setRange(1024, 65535)
@@ -977,9 +990,21 @@ class CalibrationWidget(QWidget):
         self.scroll_content_layout.setContentsMargins(9, 0, 9, 0)
         self.scroll_content_layout.addStretch()
     
-    # TODO: Set the esc servo, and port values from settings 
-    def set_default_tune_page(self, esc_min, esc_mid, esc_max, servo_min, servo_mid, servo_max, broad_port):
-        pass
+    def set_default_tune_page(self, esc_min, esc_mid, esc_max, esc_brake, servo_min, servo_mid, servo_max, broad_port):
+        # SERVO
+        self.servo_mid_tuner.defaultMidVal = DEFAULT_SETTINGS["neutral_duty_servo"]
+        self.servo_mid_tuner.midVal = servo_mid
+        self.servo_max.setValue(servo_max)
+        self.servo_min.setValue(servo_min)
+
+        # ESC
+        self.esc_min.setValue(esc_min)
+        self.esc_mid.setValue(esc_mid)
+        self.esc_max.setValue(esc_max)
+        self.esc_brake.setValue(esc_brake)
+
+        # PORT
+        self.comm_port.setValue(broad_port)
 
     def set_curve_selection(self, sel:str):
         selected_curve = None
@@ -1091,7 +1116,8 @@ class CalibrationWidget(QWidget):
         print(f"Min: {self.esc_min.value()} µs")
         print(f"Mid: {self.esc_mid.value()} µs")
         print(f"Max: {self.esc_max.value()} µs")
-        self.escTuneSignal.emit("test_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
+        print(f"Brake: {self.esc_brake.value()} µs")
+        self.escTuneSignal.emit("test_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value(), self.esc_brake.value())
     
     def save_esc(self):
         '''
@@ -1102,7 +1128,8 @@ class CalibrationWidget(QWidget):
         print(f"Min: {self.esc_min.value()} µs")
         print(f"Mid: {self.esc_mid.value()} µs")
         print(f"Max: {self.esc_max.value()} µs")
-        self.escTuneSignal.emit("save_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value())
+        print(f"Brake: {self.esc_brake.value()} µs")
+        self.escTuneSignal.emit("save_esc", self.esc_min.value(), self.esc_mid.value(), self.esc_max.value(), self.esc_brake.value())
 
     def apply_port_settings(self):
         """
@@ -1113,8 +1140,7 @@ class CalibrationWidget(QWidget):
         self.comm_label.setText(f"Current: {comm}")
         #self.cam_label.setText(f"Current: {cam}")
         #print(f"[PORT] Comm: {comm} | Webcam: {cam}")
-        # TODO: Send updated config to networking system
-        self.updateBroadcastPortSignal.emit("broadcast_port", comm)
+        self.updateBroadcastPortSignal.emit("update_port", 0,0,0,0, comm)
 
 class DescriptionWidget(QWidget):
     """

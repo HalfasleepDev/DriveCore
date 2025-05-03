@@ -23,41 +23,46 @@ class FrameProcessor:
 
     '''Main function to detect the floor region, obstacles, and update tracking'''
     def detect_floor_region(self, frame):
-        self.mainWindow.frame_counter += 1
-        self.mainWindow.alert_triggered = False
+        # If openCV is enabled
+        if self.mainWindow.IS_DRIVE_ASSIST_ENABLED:
+            self.mainWindow.frame_counter += 1
+            self.mainWindow.alert_triggered = False
 
-        height, width = frame.shape[:2]
+            height, width = frame.shape[:2]
 
-        # Step 1: Detect obstacles in bottom half
-        self.detect_obstacles(frame, height)
+            # Step 1: Detect obstacles in bottom half
+            self.detect_obstacles(frame, height)
 
-        # Step 2: Sample ambient light for color correction
-        hsv, ambient_hue_shift, ambient_val_shift = self.sample_ambient_light(frame)
+            # Step 2: Sample ambient light for color correction
+            hsv, ambient_hue_shift, ambient_val_shift = self.sample_ambient_light(frame)
 
-        # Step 3: Sample floor color and compute adaptive HSV thresholds
-        lower_floor, upper_floor, sample_box_coords = self.sample_floor_color(frame, hsv, ambient_hue_shift, ambient_val_shift)
+            # Step 3: Sample floor color and compute adaptive HSV thresholds
+            lower_floor, upper_floor, sample_box_coords = self.sample_floor_color(frame, hsv, ambient_hue_shift, ambient_val_shift)
 
-        # Step 4: Draw sample region on frame for debugging
+            # Step 4: Draw sample region on frame for debugging
+            
+            self.draw_floor_sampling_box(frame, sample_box_coords)
+
+            # Step 5: Draw alert line if obstacles are near
+            if self.mainWindow.COLLISION_ASSIST_ENABLED:
+                self.draw_alert_line(frame, width)
+
+            # Step 6: Display alert zone GUI message
+            self.check_alert_popup(frame)
+
+            # Step 7: Create mask to isolate floor area
+            floor_mask = self.create_floor_mask(hsv, lower_floor, upper_floor, height)
+
+            # Step 8: Find and track largest floor contour
+            largest = self.get_largest_floor_contour(floor_mask)
+
+            if largest is not None:
+                self.update_kalman_path(frame, largest)
+
+            return frame
         
-        self.draw_floor_sampling_box(frame, sample_box_coords)
-
-        # Step 5: Draw alert line if obstacles are near
-        if self.mainWindow.COLLISION_ASSIST_ENABLED:
-            self.draw_alert_line(frame, width)
-
-        # Step 6: Display alert zone GUI message
-        self.check_alert_popup(frame)
-
-        # Step 7: Create mask to isolate floor area
-        floor_mask = self.create_floor_mask(hsv, lower_floor, upper_floor, height)
-
-        # Step 8: Find and track largest floor contour
-        largest = self.get_largest_floor_contour(floor_mask)
-
-        if largest is not None:
-            self.update_kalman_path(frame, largest)
-
-        return frame
+        else:
+            return frame
 
     '''Detect obstacles using background subtraction and edge detection'''
     def detect_obstacles(self, frame, height):

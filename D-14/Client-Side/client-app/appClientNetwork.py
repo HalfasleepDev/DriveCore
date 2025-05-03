@@ -4,7 +4,7 @@ import threading
 import time
 import asyncio
 
-from PySide6.QtCore import QObject, Signal,QCoreApplication
+from PySide6.QtCore import QObject, Signal,QCoreApplication, Qt
 from PySide6.QtWidgets import QApplication
 
 from udpProtocols import (credential_packet, version_request_packet, 
@@ -264,14 +264,12 @@ class NetworkManager(QObject):
         elif payload.get("type") == "":
             return
 
-    # Step 3: Send Different Types of Commands
-
-    # Step 4: Send Keyboard Commands
+    # Step 3: Send Keyboard Commands
     def send_keyboard_command(self, cmd: str, esc_intensity, servo_intensity):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)
         packet = keyboard_command_packet(cmd, esc_intensity, servo_intensity)
-        now = int(time.time() * 1000)                                   # TODO: Maybe replace with 'current_time()'
+        now = int(time.time() * 1000)
         sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.control_port))
 
         try:
@@ -280,8 +278,11 @@ class NetworkManager(QObject):
             ack = json.loads(data.decode())
 
             if ack.get("type") == "command_ack":
+                if ack.get("command") == "Ignored command during emergency":
+                    self.app.logSignal.emit(f"[ACK] DriveAssist: {ack.get("command")}", "WARN")
+                    
                 #now = time.time()
-                delay = now - ack["timestamp"]
+                delay = ack["timestamp"] - now
                 esc_pw = ack["esc_pw"]
                 servo_pw = ack["servo_pw"]
                 # If servo pwm is == to center
@@ -291,17 +292,10 @@ class NetworkManager(QObject):
 
                 # UPDATE UI EELEMRNTS
                 self.app.updateVehicleMovement("UPDATE", esc_pw, servo_pw)
-                self.app.logSignal.emit(f"[ACK] Command: {ack['command']} | ESC: {ack["esc_pw"]} | SERVO: {ack["servo_pw"]} | RTT: {delay}ms", "INFO")
+                self.app.logSignal.emit(f"[ACK] Command: {ack['command']} | ESC: {esc_pw} | SERVO: {servo_pw} | RTT: {delay}ms", "INFO")
 
             # EMERGENCY STOP FEATURES
             #elif ack.get("type") == "":
-
-            # TUNNING RESPONSE
-            #elif ack.get("type") == "end_servo_test":
-                # TELL THE TUNNER AND SYSTEM THAT THE VEHICLE IS READY
-
-            #elif ack.get("type") == "end_esc_test":
-                # TELL THE TUNNER AND SYSTEM THAT THE VEHICLE IS READY
 
         except socket.timeout:
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "INFO")
@@ -310,19 +304,18 @@ class NetworkManager(QObject):
         #sock.close()
         return
 
-    # Step 5: Send Drive Assist Commands
+    # Step 4: Send Drive Assist Commands
     def send_drive_assist_command(self, cmd: str):
         if cmd == "EMERGENCY_STOP":
-            self.send_keyboard_command(cmd, None)
+            self.send_keyboard_command(cmd, None, None)
             # Todo: Add more triggers for UI?
         elif cmd == "CLEAR_EMERGENCY":
             pass
 
-    # Step 6: Applying Tune Data
+    # Step 5: Applying Tune Data
     def tune_vehicle_command(self, mode:str, min_duty_servo=0, max_duty_servo=0, neutral_servo=0, 
-                            min_duty_esc=0, max_duty_esc=0, neutral_duty_esc=0, brake_esc=0
-                            ):
-        print("send")
+                            min_duty_esc=0, neutral_duty_esc=0, max_duty_esc=0, brake_esc=0):
+        
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         packet = send_tune_data_packet(mode, min_duty_servo, max_duty_servo, neutral_servo, 
                                         min_duty_esc, max_duty_esc, neutral_duty_esc, brake_esc)
@@ -330,12 +323,17 @@ class NetworkManager(QObject):
         self.settings = load_settings(self.SETTINGS_FILE)
 
         async def waitForTest():
+            QApplication.setOverrideCursor(Qt.WaitCursor)
             self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
-            await asyncio.sleep(5)
-            # TODO: LOG WHEN TESTING IS DONE   
+            await asyncio.sleep(6)  
             self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
+            QApplication.restoreOverrideCursor()
 
         if mode == "test_servo":
             asyncio.run(waitForTest())
-
+            self.app.logSignal.emit(f"[SERVO] Tested with {min_duty_servo}µs, {neutral_servo}µs, {max_duty_servo}µs", "DEBUG")
+        
+        elif mode == "test_esc":
+            asyncio.run(waitForTest())
+            self.app.logSignal.emit(f"[ESC] Tested with {min_duty_esc}µs, {neutral_duty_esc}µs, {max_duty_servo}µs, {brake_esc}µs", "DEBUG")
     # Step 7: 

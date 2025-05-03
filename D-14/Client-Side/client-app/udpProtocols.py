@@ -41,16 +41,30 @@ def send_tune_data_packet(PHASE: str, MIN_DUTY_SERVO=0, MAX_DUTY_SERVO=0, NEUTRA
             # Add more ltr
         }
     
-    elif PHASE == "servo_mid_cal" or "save_mid_servo":
+    elif PHASE in ["servo_mid_cal", "save_mid_servo"]:
         return {
             "type": "sent_tune",
             "action": PHASE,
             "servo": MIN_DUTY_SERVO
         }
     
-    elif PHASE == "test_servo":
+    elif PHASE in ["test_servo", "save_servo"]:
         return {
-            "type": "sent_tune"
+            "type": "sent_tune",
+            "action": PHASE,
+            "left": MIN_DUTY_SERVO,
+            "center": NEUTRAL_SERVO,
+            "right": MAX_DUTY_SERVO
+        }
+    
+    elif PHASE in ["test_esc", "save_esc"]:
+        return {
+            "type": "sent_tune",
+            "action": PHASE,
+            "min": MIN_DUTY_ESC,
+            "neutral": NEUTRAL_DUTY_ESC,
+            "max": MAX_DUTY_ESC,
+            "brake": BRAKE_ESC
         }
     
 
