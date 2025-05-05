@@ -242,3 +242,21 @@
 ### Log Page
 
 ### Settings page
+
+### Other
+<details>
+
+<summary>Error Message Popup</summary>
+
+#### Features
+- A simple error popup for any notification
+
+#### How will this be applied?
+- It will be used to notify the user of important events. 
+
+![Username Password Field](ver-1-3/popupMsgGuiVis.png)
+
+[Username Password Field](ver-1-3/popupMsgGuiVis.py)
+
+
+</details>
