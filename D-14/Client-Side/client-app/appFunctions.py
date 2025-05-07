@@ -8,6 +8,8 @@ import math
 
 #from MainWindow import Ui_MainWindow
 
+from appUiAnimations import MsgPopup
+
 DEFAULT_SETTINGS = {
     "min_duty_servo": 900,
     "max_duty_servo": 2100,
@@ -177,12 +179,9 @@ def toggleDebugCV(button, currentState, text):
     return newState
 
 '''Error popup'''
-def showError(self, title: str, message: str):
-    msg_box = QMessageBox(self)
-    msg_box.setIcon(QMessageBox.Critical)
-    msg_box.setWindowTitle(title)
-    msg_box.setText(message)
-    msg_box.exec()
+def showError(self, title: str, message: str, duration =0):
+    msg_box = MsgPopup(self, title, message)
+    msg_box.show_popup(duration)
 
 def load_settings(SETTINGS_FILE):
     if os.path.exists(SETTINGS_FILE):
@@ -208,4 +207,4 @@ def curve(x, type="quadratic"):
     elif type == "sigmoid":
         k = 10
         return 1 / (1 + math.exp(-k * (x - 0.5)))
-    return x  # linear fallback
+    return x  # fallback

@@ -78,6 +78,11 @@ class DriveCoreHost:
         self.emergency_active = False
         self.emergency_trigger_time = time.time()
 
+        # ====== Heartbeat ======
+        self.last_seen_timestamp = time.time()
+        self.client_online = False
+
+
     def setup_pigpio(self):
         if not self.pi.connected:
             print("ERROR: pigpio daemon is not running!")
@@ -137,13 +142,62 @@ class DriveCoreHost:
             return int(self.neutral_servo + (self.max_duty_servo - self.neutral_servo) * intensity)
         else:
             return int(self.neutral_servo - (self.neutral_servo - self.min_duty_servo) * intensity)
-    
+        
     def run(self):
+        while True:
+            print("Starting system...")
+            self._start_system()
+
+            while self.client_online:
+                time.sleep(0.5)
+
+            print("Client disconnected — restarting system...")
+            self._stop_system()  # Clean shutdown
+    
+    def _start_system(self):
+        #self.network.reset_connection_state()  # clear timestamps, flags
+
+        # === Start broadcast ===
         threading.Thread(target=self.network.broadcast_ip, daemon=True).start()
+
+        # === Start handshake ===
         self.network.listen_for_handshake()
         self.handshake_complete.wait()
+
+        # === Start subsystems ===
+        # Heartbeat thread
+        threading.Thread(target=self.network.listen_for_heartbeats, daemon=True).start()
+        threading.Thread(target=self.network.heartbeat_watchdog, daemon=True).start()
+
+        # Command listener thread
         threading.Thread(target=self.network.command_listener, daemon=True).start()
-        threading.Thread(target=self.network.video_stream(), daemon=True).start()
+
+        # Video stream thread
+        threading.Thread(target=self.network.video_stream, daemon=True).start()
+
+    def _stop_system(self):
+        self.handshake_complete.clear()
+        self.network.client_online = False
+        # Close sockets, reset values, etc.
+
+        
+    '''def run(self):
+        # Broadcast
+        threading.Thread(target=self.network.broadcast_ip, daemon=True).start()
+
+        # Handshake
+        self.network.listen_for_handshake()
+        self.handshake_complete.wait()
+
+        # Start heartbeat thread
+        threading.Thread(target=self.network.listen_for_heartbeats, daemon=True).start()
+        threading.Thread(target=self.network.heartbeat_watchdog, daemon=True).start()
+
+        # Start command listener thread
+        threading.Thread(target=self.network.command_listener, daemon=True).start()
+
+        # Start the video stream thread
+        threading.Thread(target=self.network.video_stream(), daemon=True).start()'''
         
     def shutdown(self):
         self.reset_pwm()

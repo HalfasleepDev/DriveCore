@@ -17,8 +17,8 @@ from appFunctions import save_settings, load_settings
 - [x] Search for broadcast
 - [x] Handshake
 - [x] Send keyboard commands
-- [ ] Send Drive Assist Commands
-- [ ] Applying tune settings
+- [x] Send Drive Assist Commands
+- [x] Applying tune settings
 - [x] Recieve video 
 """
 
@@ -45,6 +45,7 @@ class NetworkManager(QObject):
         self.server_ip = None
         self.video_port = None
         self.control_port = None
+        self.heartbeat_port = None
         #self.app.handshake_done = threading.Event()
         self.discovery_done = threading.Event()
 
@@ -68,7 +69,8 @@ class NetworkManager(QObject):
                     self.server_ip = addr[0]
                     self.video_port = payload.get("video_port")
                     self.control_port = payload.get("control_port")
-                    self.app.logSignal.emit(f"Found host: {self.server_ip}, Video: {self.video_port}, Control: {self.control_port}", "BROADCAST")
+                    self.heartbeat_port = payload.get("heartbeat_port")
+                    self.app.logSignal.emit(f"Found host: {self.server_ip}, Video: {self.video_port}, Control: {self.control_port}, HeartBeat: {self.heartbeat_port}", "BROADCAST")
                     
                     QCoreApplication.processEvents()
                     self.discovery_done_signal.emit()
@@ -179,8 +181,8 @@ class NetworkManager(QObject):
                 self.app.VEHICLE_CONNECTION = True
                 '''# FOR TUNE SETUP
                 self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True'''
-                QCoreApplication.processEvents()
                 self.handshake_done_signal.emit()
+                QCoreApplication.processEvents()
                 #self.app.handshake_done.set()
                 
 

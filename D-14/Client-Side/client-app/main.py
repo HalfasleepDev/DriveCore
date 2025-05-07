@@ -36,9 +36,51 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
 """ 
 This Codebase sucks and I hate sockets
-Time wasted here since 26-04-2025: 30Hrs
+Time wasted here since 26-04-2025: 40Hrs
 """
-# TODO: Style error popups
+# TODO: Implement Error Popups
+
+# Finish the heartbeat system for client!!! Class is all that was modified
+class HeartbeatWorker(QObject):
+    finished = Signal()
+    
+    def __init__(self, server_ip, heartbeat_port):
+        super().__init__()
+        self.server_ip = server_ip
+        self.heartbeat_port = heartbeat_port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.send_heartbeat)
+        self.running = False
+
+    def start(self):
+        self.running = True
+        print("Pulse Start")
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.send_heartbeat)
+        self.timer.start(4000) # maybe every 5 seconds?
+
+    def send_heartbeat(self):
+        if not self.running:
+            return
+        packet = {
+            "type": "heartbeat",
+            "timestamp": int(time.time() * 1000)
+        }
+        try:
+            self.sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.heartbeat_port))
+            print("pulse")
+            # Optional: emit a signal if needed
+        except Exception as e:
+            print(f"[Heartbeat] Error: {e}")
+
+    def stop(self):
+        self.running = False
+        self.wait()
+        self.timer.stop()
+        self.sock.close()
+        #self.finished.emit()
+
 class Worker(QRunnable):
     """Worker thread.
 
@@ -64,16 +106,21 @@ class Worker(QRunnable):
 
 class VideoThread(QThread):
     frame_received = Signal(QImage)
+    heartbeat_signal = Signal(bool)
 
     def __init__(self, server_ip, video_port):
         super().__init__()
         self.server_ip = server_ip
         self.video_port = video_port
         self.running = True
-        self.processor = None  # Optional processor
+        self.processor = None  # Processor
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
+
+        # Vehicle connection timeout
+        self.sock.settimeout(8.0)
+
         self.sock.bind(('', self.video_port))
 
         self.total_chunks = 0
@@ -106,6 +153,9 @@ class VideoThread(QThread):
                     self.current_chunks = 0
                     continue
                 except (json.JSONDecodeError, UnicodeDecodeError):
+                    pass
+                except socket.timeout:
+                    self.heartbeat_signal.emit(False)
                     pass
 
                 # Accumulate frame chunks
@@ -296,6 +346,7 @@ class MainWindow(QMainWindow):
         self.server_ip = None
         self.video_port = None
         '''
+        
         
         #! Depreciated for Ver1.3
         #self.ui.inputIp.editingFinished.connect(self.setIp)
@@ -523,19 +574,51 @@ class MainWindow(QMainWindow):
         else:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
+
             self.threadpool.start(Worker(self.network.discover_host))
             #self.threadpool.waitForDone()
             self.network.discovery_done_signal.connect(lambda: self.threadpool.start(Worker(lambda: self.network.perform_handshake(username, password))))
+            #self.threadpool.waitForDone()
+            self.network.handshake_done_signal.connect(lambda: self.connection_done(username, password))
+            
+            #QApplication.restoreOverrideCursor()
 
-            self.threadpool.waitForDone()
-            QApplication.restoreOverrideCursor()
+            '''if self.VEHICLE_CONNECTION:
+                print("ok")
+                self.heartbeat_thread = QThread()
+                self.heartbeat_worker = HeartbeatWorker(self.network.server_ip, self.network.heartbeat_port)
+                self.heartbeat_worker.moveToThread(self.heartbeat_thread)
 
-            if self.VEHICLE_CONNECTION:
-                
+                self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
+                self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
+                self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
+                self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
+
+                self.heartbeat_thread.start()
+
+                self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
                 self.settings["username"] = username
                 self.settings["password"] = password
-                save_settings(self.settings, self.SETTINGS_FILE)
-        
+                save_settings(self.settings, self.SETTINGS_FILE)'''
+
+    def connection_done(self, username, password):
+       QApplication.restoreOverrideCursor()
+       #QCoreApplication.processEvents()
+       print("1ok")
+       if self.VEHICLE_CONNECTION:
+                print("ok")
+                self.heartbeat_thread = QThread()
+                self.heartbeat_worker = HeartbeatWorker(self.network.server_ip, self.network.heartbeat_port)
+                self.heartbeat_worker.moveToThread(self.heartbeat_thread)
+
+                self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
+
+                self.heartbeat_thread.start()
+
+                self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
+                self.settings["username"] = username
+                self.settings["password"] = password
+                save_settings(self.settings, self.SETTINGS_FILE)     
     #! Depreciated for Ver1.3
 
     '''
@@ -640,11 +723,13 @@ class MainWindow(QMainWindow):
         if self.VEHICLE_CONNECTION and self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY:
             print(self.network.server_ip)
             print(self.network.video_port)
+
             self.thread = VideoThread(self.network.server_ip, self.network.video_port)
             self.processor = FrameProcessor(self, self.thread)
             self.processor.initKalmanFilter()
             self.thread.set_processor(self.processor)
             self.thread.frame_received.connect(self.update_frame)
+            self.thread.heartbeat_signal.connect(self.checkHeartBeat)
 
             if not self.OPENED_DRIVE_PAGE:
                 self.thread.start()
@@ -808,6 +893,11 @@ class MainWindow(QMainWindow):
     def enableDriveAssist(self):
         pass
 
+    def checkHeartBeat(self, online:bool):
+        if not online:
+            self.VEHICLE_CONNECTION = False
+            self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
+            self.logToSystem("Vehicle disconnected", "ERROR")
 
     #! Depreciated for Ver1.3
     def send_command(self, command):
@@ -844,9 +934,16 @@ class MainWindow(QMainWindow):
         if self.VEHICLE_CONNECTION:
             self.send_command("DISCONNECT")
         self.VEHICLE_CONNECTION = False
-        self.client_socket.close()
+        #self.client_socket.close()
         if self.THREAD_RUNNING == True:
             self.thread.stop()
+
+            #self.heartbeat_worker.finished.connect(self.heartbeat_thread.wait)
+            #self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
+            self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
+            self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
+
+            self.heartbeat_thread.stop()
         event.accept()
         #self.client_socket.close()
         
