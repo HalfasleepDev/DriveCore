@@ -9,6 +9,7 @@ from picamera2 import Picamera2
 from PIL import Image               # pillow
 import numpy as np
 import pigpio
+from threading import Event
 
 from driveCoreNetwork import NetworkManager
 
@@ -61,6 +62,8 @@ class DriveCoreHost:
         #self.setup_pigpio()
 
         self.network = NetworkManager(self)
+
+        self.restart_flag = Event()
 
         # ====== PWM Duty Cycles ======
         self.min_duty_servo = self.settings["min_duty_servo"]
@@ -177,7 +180,10 @@ class DriveCoreHost:
 
     def _stop_system(self):
         self.handshake_complete.clear()
-        self.network.client_online = False
+        self.client_online = False
+        self.network.handshake_status = False
+        self.restart_flag.clear()
+        time.sleep(1)
         # Close sockets, reset values, etc.
 
         

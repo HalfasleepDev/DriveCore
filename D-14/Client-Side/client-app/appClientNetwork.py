@@ -56,7 +56,7 @@ class NetworkManager(QObject):
     def discover_host(self):
         #global server_ip, video_port, control_port
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(('', self.BROADCAST_PORT)) #'<broadcast>'
         self.app.logSignal.emit("Listening for broadcast. Please wait...", "BROADCAST")
 
@@ -303,7 +303,7 @@ class NetworkManager(QObject):
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "INFO")
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "ERROR")
             #print("No ACK for command:", cmd)
-        #sock.close()
+        sock.close()
         return
 
     # Step 4: Send Drive Assist Commands

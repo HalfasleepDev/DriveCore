@@ -41,6 +41,11 @@ Time wasted here since 26-04-2025: 40Hrs
 # TODO: Implement Error Popups
 
 # Finish the heartbeat system for client!!! Class is all that was modified
+from PySide6.QtCore import QObject, QTimer, Signal
+import socket
+import json
+import time
+
 class HeartbeatWorker(QObject):
     finished = Signal()
     
@@ -49,17 +54,20 @@ class HeartbeatWorker(QObject):
         self.server_ip = server_ip
         self.heartbeat_port = heartbeat_port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #self.timer = QTimer()
-        #self.timer.timeout.connect(self.send_heartbeat)
+        self.timer = None
         self.running = False
 
     def start(self):
-        self.running = True
         print("Pulse Start")
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.send_heartbeat)
-        self.timer.start(4000) # maybe every 5 seconds?
 
+        # Safe QTimer creation after moveToThread
+        self.timer = QTimer(self)
+        self.timer.setInterval(4000)  # every 4 seconds
+        self.timer.timeout.connect(self.send_heartbeat)
+
+        self.running = True
+        self.timer.start()
+    
     def send_heartbeat(self):
         if not self.running:
             return
@@ -70,16 +78,20 @@ class HeartbeatWorker(QObject):
         try:
             self.sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.heartbeat_port))
             print("pulse")
-            # Optional: emit a signal if needed
         except Exception as e:
             print(f"[Heartbeat] Error: {e}")
-
+            
+    @Slot()
     def stop(self):
+        print("Stopping HeartbeatWorker")
         self.running = False
-        self.wait()
-        self.timer.stop()
+
+        if self.timer:
+            self.timer.stop()
+            self.timer.deleteLater()
+
         self.sock.close()
-        #self.finished.emit()
+        self.finished.emit()
 
 class Worker(QRunnable):
     """Worker thread.
@@ -115,12 +127,14 @@ class VideoThread(QThread):
         self.running = True
         self.processor = None  # Processor
 
+        self.disconnect = False
+
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
 
         # Vehicle connection timeout
         self.sock.settimeout(8.0)
-
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', self.video_port))
 
         self.total_chunks = 0
@@ -153,9 +167,6 @@ class VideoThread(QThread):
                     self.current_chunks = 0
                     continue
                 except (json.JSONDecodeError, UnicodeDecodeError):
-                    pass
-                except socket.timeout:
-                    self.heartbeat_signal.emit(False)
                     pass
 
                 # Accumulate frame chunks
@@ -215,6 +226,11 @@ class VideoThread(QThread):
 
             except BlockingIOError:
                 pass  # No data received; socket is non-blocking
+
+            except socket.timeout:
+                    self.running = False
+                    self.heartbeat_signal.emit(False)
+                    self.sock.close()
 
     def stop(self):
         self.running = False
@@ -613,6 +629,10 @@ class MainWindow(QMainWindow):
 
                 self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
 
+                self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
+                self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
+                self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
+
                 self.heartbeat_thread.start()
 
                 self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
@@ -894,6 +914,7 @@ class MainWindow(QMainWindow):
         pass
 
     def checkHeartBeat(self, online:bool):
+        print("disconnect")
         if not online:
             self.VEHICLE_CONNECTION = False
             self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
@@ -933,17 +954,14 @@ class MainWindow(QMainWindow):
         """Release resources when closing the window."""
         if self.VEHICLE_CONNECTION:
             self.send_command("DISCONNECT")
+            QMetaObject.invokeMethod(self.heartbeat_worker, "stop", Qt.QueuedConnection)
         self.VEHICLE_CONNECTION = False
         #self.client_socket.close()
         if self.THREAD_RUNNING == True:
             self.thread.stop()
 
-            #self.heartbeat_worker.finished.connect(self.heartbeat_thread.wait)
-            #self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
-            self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
-            self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
+            
 
-            self.heartbeat_thread.stop()
         event.accept()
         #self.client_socket.close()
         
