@@ -179,9 +179,10 @@ def toggleDebugCV(button, currentState, text):
     return newState
 
 '''Error popup'''
-def showError(self, title: str, message: str, duration =0):
-    msg_box = MsgPopup(self, title, message)
-    msg_box.show_popup(duration)
+def showError(window, title: str, message: str, severity: str, duration =0):
+    # severity = "INFO", "WARNING", "ERROR", "SUCCESS"
+    msg_box = MsgPopup(title, message, severity, window)
+    msg_box.show_popup(duration, window)
 
 def load_settings(SETTINGS_FILE):
     if os.path.exists(SETTINGS_FILE):

@@ -11,7 +11,7 @@ from udpProtocols import (credential_packet, version_request_packet,
                                setup_request_packet, send_tune_data_packet,
                                current_time, keyboard_command_packet)
 
-from appFunctions import save_settings, load_settings
+from appFunctions import save_settings, load_settings, showError
 
 """ TODO:
 - [x] Search for broadcast
@@ -56,33 +56,45 @@ class NetworkManager(QObject):
     def discover_host(self):
         #global server_ip, video_port, control_port
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(20.0)
         #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(('', self.BROADCAST_PORT)) #'<broadcast>'
         self.app.logSignal.emit("Listening for broadcast. Please wait...", "BROADCAST")
 
         while True:
-            data, addr = sock.recvfrom(1024)
             try:
-                #causes a decode error
-                payload = json.loads(data.decode())
-                if payload.get("type") == "advertise":
-                    self.server_ip = addr[0]
-                    self.video_port = payload.get("video_port")
-                    self.control_port = payload.get("control_port")
-                    self.heartbeat_port = payload.get("heartbeat_port")
-                    self.app.logSignal.emit(f"Found host: {self.server_ip}, Video: {self.video_port}, Control: {self.control_port}, HeartBeat: {self.heartbeat_port}", "BROADCAST")
-                    
-                    QCoreApplication.processEvents()
-                    self.discovery_done_signal.emit()
-                    print("1")
+                data, addr = sock.recvfrom(1024)
+                try:
+                    #causes a decode error
+                    payload = json.loads(data.decode())
+                    if payload.get("type") == "advertise":
+                        self.server_ip = addr[0]
+                        self.video_port = payload.get("video_port")
+                        self.control_port = payload.get("control_port")
+                        self.heartbeat_port = payload.get("heartbeat_port")
+                        self.app.logSignal.emit(f"Found host: {self.server_ip}, Video: {self.video_port}, Control: {self.control_port}, HeartBeat: {self.heartbeat_port}", "BROADCAST")
+                        
+                        QCoreApplication.processEvents()
+                        self.discovery_done_signal.emit()
+                        print("1")
+                        break
+                except ConnectionRefusedError:
+                    #! Error message
+                    self.app.logSignal.emit("ConnectionRefusedError", "BROADCAST")
+                    self.app.logSignal.emit("[BROADCAST] ConnectionRefusedError", "ERROR")
+                    self.app.showErrorSignal.emit("CONNECTION ERROR", "ConnectionRefusedError. Could not connect to host.", "ERROR", 6000)
+                    QApplication.restoreOverrideCursor()
                     break
-            except ConnectionRefusedError:
-                #! Error message
-                self.app.logSignal.emit("ConnectionRefusedError", "BROADCAST")
-                self.app.logSignal.emit("[BROADCAST] ConnectionRefusedError", "ERROR")
-                self.app.ui.showError(self, "CONNECTION ERROR", "ConnectionRefusedError. Could not connect to host.")
-            except Exception as e:
-                continue
+                except Exception as e:
+                    continue
+
+            except socket.timeout:
+                QCoreApplication.processEvents()
+                self.app.logSignal.emit("Socket Timeout. 20s", "BROADCAST")
+                self.app.logSignal.emit("[BROADCAST] Socket Timeout. 20s", "ERROR")
+                self.app.showErrorSignal.emit("Broadcast Timeout", "Unable to locate broadcast from vehicle. Please make sure vehicle is online.", "WARNING", 8000)
+                QApplication.restoreOverrideCursor()
+                break
             
         sock.close()
         return     
@@ -319,6 +331,7 @@ class NetworkManager(QObject):
                             min_duty_esc=0, neutral_duty_esc=0, max_duty_esc=0, brake_esc=0):
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         packet = send_tune_data_packet(mode, min_duty_servo, max_duty_servo, neutral_servo, 
                                         min_duty_esc, max_duty_esc, neutral_duty_esc, brake_esc)
         sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.control_port))

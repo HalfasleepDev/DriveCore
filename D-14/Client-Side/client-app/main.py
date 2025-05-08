@@ -80,7 +80,7 @@ class HeartbeatWorker(QObject):
             print("pulse")
         except Exception as e:
             print(f"[Heartbeat] Error: {e}")
-            
+
     @Slot()
     def stop(self):
         print("Stopping HeartbeatWorker")
@@ -320,6 +320,7 @@ class MainWindow(QMainWindow):
 
     logSignal = Signal(str, str)
     displayVehicleMovementSignal = Signal(str, int, int)
+    showErrorSignal = Signal(str, str, str, int) # Title, Message, Severity, Duration
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -383,6 +384,8 @@ class MainWindow(QMainWindow):
         self.logSignal.connect(self.logToSystem)
 
         self.ui.projectInfoWidgetCustom.logErrorSignal.connect(self.logToSystem)
+        
+        self.showErrorSignal.connect(self.showGlobalError)
         #self.discoverHostSignal.connect(self.network.discover_host)
         #self.performHandshakeSignal.connect(self.network.perform_handshake)
         
@@ -524,13 +527,13 @@ class MainWindow(QMainWindow):
             # Switch page
             self.ui.stackedWidget.setCurrentWidget(target_page)
 
-    def stop_thread_safely(self):
+    '''def stop_thread_safely(self):
         if self.THREAD_RUNNING:
             try:
                 self.thread.stop()
             except Exception as e:
                 showError(self, "Program Error!", f"Error stopping thread: {e}")
-                #print(f"Error stopping thread: {e}")
+                #print(f"Error stopping thread: {e}")'''
     
     def toggleSettingOpenCvBtns(self, select):
         self.IS_DRIVE_ASSIST_ENABLED = True
@@ -553,7 +556,8 @@ class MainWindow(QMainWindow):
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
                 self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
                 self.IS_DRIVE_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
-
+    
+    #? Vehicle control logs could slow down the thread
     def logToSystem(self, message: str, type: str):
         self.ui.systemLogPage.log(message, type)
         match type:
@@ -566,6 +570,9 @@ class MainWindow(QMainWindow):
             case "WARN":
                 self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
         QCoreApplication.processEvents()
+
+    def showGlobalError(self, title: str, message: str, severity: str, duration =0):
+        showError(self.ui.centralwidget, title, message, severity, duration)
 
     # Set and save the selected curve from the settings page
     def setSaveCurveType(self, curve: str):
@@ -587,6 +594,7 @@ class MainWindow(QMainWindow):
         # Check that username and/or password is not empty
         if not username or not password:
             self.ui.carConnectLoginWidget.show_error("Please enter both username and password.")
+            showError(self.ui.centralwidget, "Login Error", "Please enter both username and password.", "INFO", 6000)
         else:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
@@ -620,9 +628,7 @@ class MainWindow(QMainWindow):
     def connection_done(self, username, password):
        QApplication.restoreOverrideCursor()
        #QCoreApplication.processEvents()
-       print("1ok")
        if self.VEHICLE_CONNECTION:
-                print("ok")
                 self.heartbeat_thread = QThread()
                 self.heartbeat_worker = HeartbeatWorker(self.network.server_ip, self.network.heartbeat_port)
                 self.heartbeat_worker.moveToThread(self.heartbeat_thread)
@@ -638,7 +644,9 @@ class MainWindow(QMainWindow):
                 self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
                 self.settings["username"] = username
                 self.settings["password"] = password
-                save_settings(self.settings, self.SETTINGS_FILE)     
+                save_settings(self.settings, self.SETTINGS_FILE)
+
+                showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)     
     #! Depreciated for Ver1.3
 
     '''
@@ -759,6 +767,7 @@ class MainWindow(QMainWindow):
             self.updateVehicleMovement("SET")
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
+            #? Maybe hindering performance because it is running on the same main thread?
             self.ui.drivePage.commandSignal.connect(self.network.send_keyboard_command)
             
         else:
@@ -836,9 +845,13 @@ class MainWindow(QMainWindow):
                         self.ui.PRNDWidget.set_gear("P")
                     else:
                         self.ui.PRNDWidget.set_gear("R")
+            
+            case "RESET":
+                self.ui.vehicleSpeedometerWidget.vehicleConnect = False
     
     def iniSettingsPage(self):
         if self.VEHICLE_CONNECTION:
+            #? Check if vehicle heartbeat is alive --> send a command such as "heartbeat"
             self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
 
     def tuneVehicle(self, mode: str, min=0, mid=0, max=0, brake=0, port=0):
@@ -916,9 +929,21 @@ class MainWindow(QMainWindow):
     def checkHeartBeat(self, online:bool):
         print("disconnect")
         if not online:
+            #! RESET SYSTEMS, CALL ERROR, POPUP
+            # Vehicle Status
             self.VEHICLE_CONNECTION = False
             self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
             self.logToSystem("Vehicle disconnected", "ERROR")
+            self.ui.vehicleTypeLabel.setText("Unknown")
+            QMetaObject.invokeMethod(self.heartbeat_worker, "stop", Qt.QueuedConnection)
+            
+            # Video stream
+            if self.THREAD_RUNNING == True:
+                self.thread.stop()
+                self.ui.videoStreamLabel.setText("No Conncection")
+                self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color: #f1f3f3;}")
+            
+            # Popup
 
     #! Depreciated for Ver1.3
     def send_command(self, command):

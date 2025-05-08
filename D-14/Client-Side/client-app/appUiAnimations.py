@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QLabel, QWidget, QGraphicsOpacityEffect, QVBoxLayout, QHBoxLayout, QPushButton, QGraphicsColorizeEffect
 from PySide6.QtCore import QTimer, QPropertyAnimation, Qt, QEasingCurve, QRectF, QThread, QEvent
-from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen, QConicalGradient
+from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen, QConicalGradient, QLinearGradient
 
 import math
 
@@ -221,18 +221,14 @@ def install_hover_animation(button: QPushButton):
     button.eventFilter = event_filter  # Monkey-patch filter into button instance
 
 class MsgPopup(QWidget):
-    def __init__(self, title="Notice", message="Something happened!", parent=None):
+    def __init__(self, title="Notice", message="Something happened!", severity= "INFO", parent=None):
         super().__init__(parent)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        #self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.setFixedSize(360, 160)
 
         # === Styles ===
         self.setStyleSheet("""
-            QWidget {
-                background-color: #0c0c0d;
-                border-radius: 15px;
-            }
             QLabel#title {
                 color: #f1f3f3;
                 font-size: 20px;
@@ -287,13 +283,34 @@ class MsgPopup(QWidget):
         self.auto_close_timer = QTimer()
         self.auto_close_timer.setSingleShot(True)
         self.auto_close_timer.timeout.connect(self.close_popup)
+
+        # Sevarity
+        self.severity = severity
+
+        self.glow_color = {
+            "INFO": QColor(116, 225, 239, 90),      # soft cyan
+            "WARNING": QColor(255, 180, 0, 100),    # amber
+            "ERROR": QColor(255, 85, 85, 120),      # red
+            "SUCCESS": QColor(100, 255, 160, 90)    # greenish
+        }.get(self.severity, QColor(116, 225, 239, 90))  # fallback to info color
     
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor("#0c0c0d"))
-        painter.setPen(Qt.NoPen)
-        painter.drawRoundedRect(self.rect(), 15, 15)
+
+        # === Linear gradient from left side based on severity
+        gradient = QLinearGradient(0, self.height(), self.width(), 0)  # horizontal gradient
+        base_color = QColor("#0c0c0d")
+        blend_color = self.glow_color  # subtle color from severity
+
+        gradient.setColorAt(0.1, blend_color)
+        #gradient.setColorAt(0.3, blend_color)
+        gradient.setColorAt(0.3, base_color)
+        #gradient.setColorAt(1.0, base_color)
+
+        painter.setPen(QPen(QColor("#7a63ff"), 2))
+        painter.setBrush(gradient)
+        painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 15, 15)
 
     def show_popup(self, duration=0, near_widget=None):
         """Show popup near another widget or centered, with optional auto-dismiss."""
