@@ -646,9 +646,10 @@ class MainWindow(QMainWindow):
                 self.settings["password"] = password
                 save_settings(self.settings, self.SETTINGS_FILE)
 
-                showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)     
+                showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)
+                
+                     
     #! Depreciated for Ver1.3
-
     '''
     def add_ip(self):
         """ Adds the entered IP to the combo box and saves it. """

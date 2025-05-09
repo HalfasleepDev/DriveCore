@@ -278,7 +278,7 @@
 - [x] Client-Host communication & verification
 - [x] Acceleration curves *(CLIENT)*
 - [x] Vehicle status info *(CLIENT)*
-- [ ] Restarting connection
+- [x] Restarting connection
 - [ ] Error messages
 - [ ] Application packaging
 - [x] Client-Host logging
