@@ -1,14 +1,24 @@
+"""
+main.py
+
+The main file for the Client App and system hooks.
+
+Author: HalfasleepDev
+Created: 22-02-2025
+"""
+
+# === Imports ===
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect, QTimer,
-    QSize, QTime, QUrl, QThread, Signal, QEvent, Qt, QThreadPool,QRunnable, Slot)
+    QMetaObject, QObject, QPoint, QRect, QTimer, Signal, QSize, QTime, 
+    QUrl, QThread, Signal, QEvent, Qt, QThreadPool, QRunnable, Slot)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform, QKeyEvent)
+    QFont, QFontDatabase, QGradient, QIcon,QImage, QKeySequence, 
+    QLinearGradient, QPainter, QPalette, QPixmap, QRadialGradient, 
+    QTransform, QKeyEvent)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QGroupBox, QHBoxLayout, QLabel, QLayout,
-    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+    QGroupBox, QHBoxLayout, QLabel, QLayout, QLineEdit, QMainWindow, 
+    QPushButton, QSizePolicy, QSpacerItem, QStackedWidget, QVBoxLayout, 
+    QWidget)
 
 import os
 import sys
@@ -21,35 +31,43 @@ import json
 import threading
 
 from appFunctions import toggleDebugCV, showError, load_settings, save_settings
-
 from appClientNetwork import NetworkManager
-
 from appUiAnimations import AnimatedToolTip, LoadingScreen, install_hover_animation
-
 from openCVFunctions import FrameProcessor
-
 from MainWindow import Ui_MainWindow
 
-#PORT = 4444 #move to settings
-
+# === Environment Variables ===
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
-""" 
-This Codebase sucks and I hate sockets
-Time wasted here since 26-04-2025: 40Hrs
-"""
-# TODO: Implement Error Popups
 
-# Finish the heartbeat system for client!!! Class is all that was modified
-from PySide6.QtCore import QObject, QTimer, Signal
-import socket
-import json
-import time
-
+# === Heartbeat Worker ===
 class HeartbeatWorker(QObject):
+    """
+    A QObject-based worker class that periodically sends heartbeat packets to a server via UDP.
+
+    This class is designed to run in a separate QThread and use QTimer to emit heartbeat signals
+    at regular intervals.
+
+    Attributes:
+        finished (Signal): Emitted when the worker is stopped and cleaned up.
+        server_ip (str): The IP address of the server to send heartbeat packets to.
+        heartbeat_port (int): The port on the server to send heartbeat packets to.
+        sock (socket.socket): The UDP socket used to send heartbeat messages.
+        timer (QTimer): The timer used to schedule periodic heartbeat emissions.
+        running (bool): Indicates whether the worker is actively sending heartbeats.
+    """
+
+    # === Signals ===
     finished = Signal()
-    
+
     def __init__(self, server_ip, heartbeat_port):
+        """
+        Initializes the HeartbeatWorker with server information.
+
+        Args:
+            server_ip (str): IP address of the heartbeat server.
+            heartbeat_port (int): UDP port for sending heartbeat messages.
+        """
         super().__init__()
         self.server_ip = server_ip
         self.heartbeat_port = heartbeat_port
@@ -58,31 +76,50 @@ class HeartbeatWorker(QObject):
         self.running = False
 
     def start(self):
+        """
+        Starts the QTimer to emit heartbeat signals at fixed intervals.
+        This function should be called after moving the worker to a QThread.
+        """
+        # TODO: Move to log
         print("Pulse Start")
 
-        # Safe QTimer creation after moveToThread
-        self.timer = QTimer(self)
-        self.timer.setInterval(4000)  # every 4 seconds
-        self.timer.timeout.connect(self.send_heartbeat)
+        self.timer = QTimer(self)  # Create timer with self as parent (safe post-moveToThread)
+        self.timer.setInterval(4000)  # Emit heartbeat every 4 seconds
+        self.timer.timeout.connect(self.sendHeartbeat)
 
         self.running = True
         self.timer.start()
-    
-    def send_heartbeat(self):
+
+    def sendHeartbeat(self):
+        """
+        Sends a heartbeat packet to the server via UDP.
+
+        The packet includes a type identifier and the current timestamp in milliseconds.
+        """
         if not self.running:
             return
+
         packet = {
             "type": "heartbeat",
             "timestamp": int(time.time() * 1000)
         }
+
         try:
             self.sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.heartbeat_port))
+            # FIXME: Remove print()
             print("pulse")
+
         except Exception as e:
+            # TODO: Move to log
             print(f"[Heartbeat] Error: {e}")
 
     @Slot()
     def stop(self):
+        """
+        Stops the timer and socket, performs cleanup, and emits the `finished` signal.
+        This is safe to call from another thread.
+        """
+        # TODO: Move to log
         print("Stopping HeartbeatWorker")
         self.running = False
 
@@ -93,19 +130,29 @@ class HeartbeatWorker(QObject):
         self.sock.close()
         self.finished.emit()
 
+# === Generic QRunnable Worker ===
 class Worker(QRunnable):
-    """Worker thread.
+    """
+    A QRunnable-based worker that executes a given function with provided arguments.
 
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+    This class is meant to be submitted to a QThreadPool for concurrent execution. It 
+    is useful for offloading work without blocking the GUI thread.
 
-    :param callback: The function callback to run on this worker thread.
-                     Supplied args and kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
+    Args:
+        fn (Callable): The function to execute.
+        *args: Positional arguments for the function.
+        **kwargs: Keyword arguments for the function.
     """
 
     def __init__(self, fn, *args, **kwargs):
+        """
+        Initializes the Worker with the target function and arguments.
+
+        Args:
+            fn (Callable): The function to run in the background.
+            *args: Positional arguments passed to the function.
+            **kwargs: Keyword arguments passed to the function.
+        """
         super().__init__()
         self.fn = fn
         self.args = args
@@ -113,26 +160,54 @@ class Worker(QRunnable):
 
     @Slot()
     def run(self):
-        """Initialise the runner function with passed args, kwargs."""
+        """
+        Executes the target function with the provided arguments.
+        This method is automatically called when the QRunnable is executed.
+        """
         self.fn(*self.args, **self.kwargs)
 
+# === Video Thread (UDP Video Receiver) ===
 class VideoThread(QThread):
+    """
+    A threaded UDP video receiver that reconstructs JPEG frames from chunked packets.
+
+    This class listens on a specified UDP port, handles header metadata to reassemble
+    frames, decodes them, and emits QImage frames for GUI display. If the connection
+    times out, it emits a heartbeat signal to indicate disconnection.
+
+    Signals:
+        frame_received (QImage): Emitted when a new video frame is reconstructed.
+        heartbeat_signal (bool): Emitted with False when server disconnect is detected.
+
+    Attributes:
+        server_ip (str): IP of the video stream server.
+        video_port (int): Port to listen on for video data.
+        processor (Optional): A processing pipeline for image enhancement or AI.
+        fps (float): Current frame rate (frames per second).
+        last_video_latency_ms (int): Time in ms between sending and receiving frame.
+    """
+
     frame_received = Signal(QImage)
-    heartbeat_signal = Signal(bool)
+    heartbeat_signal = Signal(bool)  # Sends a flag that the Host has been disconnected
 
     def __init__(self, server_ip, video_port):
+        """
+        Initializes the UDP socket and sets up receiver state.
+
+        Args:
+            server_ip (str): IP address of the server.
+            video_port (int): UDP port to bind and receive video frames.
+        """
         super().__init__()
         self.server_ip = server_ip
         self.video_port = video_port
         self.running = True
-        self.processor = None  # Processor
+        self.processor = None
 
         self.disconnect = False
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
-
-        # Vehicle connection timeout
         self.sock.settimeout(8.0)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', self.video_port))
@@ -146,19 +221,29 @@ class VideoThread(QThread):
         self.frame_counter = 0
         self.fps = 0
         self.last_video_latency_ms = 0
-        self.last_frame_timestamp = 0
 
     def set_processor(self, processor):
+        """
+        Sets the processor instance used for frame enhancement or AI processing.
+
+        Args:
+            processor: A class with a method `detect_floor_region(frame)` that processes frames.
+        """
         self.processor = processor
 
     def run(self):
+        """
+        Main thread loop: receives packets, assembles frames, processes them, and emits the result.
+
+        Handles JSON headers, collects JPEG frame chunks, and manages timeout-triggered disconnects.
+        """
         BUFFER_SIZE = 65536
 
         while self.running:
             try:
                 data, _ = self.sock.recvfrom(BUFFER_SIZE)
 
-                # Header packet (first packet = JSON info)
+                # Try decoding a JSON header packet
                 try:
                     header = json.loads(data.decode())
                     self.total_chunks = header["chunks"]
@@ -169,30 +254,28 @@ class VideoThread(QThread):
                 except (json.JSONDecodeError, UnicodeDecodeError):
                     pass
 
-                # Accumulate frame chunks
+                # Collect JPEG chunks
                 self.frame_chunks.append(data)
                 self.current_chunks += 1
 
-                # === Drop frame if excessive chunks ===
+                # Drop the frame if too many chunks are received
                 if self.current_chunks > self.total_chunks:
                     self.frame_chunks.clear()
                     self.current_chunks = 0
                     continue
 
-                # Frame complete
+                # Reassemble and display complete frame
                 if self.current_chunks == self.total_chunks:
                     frame_data = b''.join(self.frame_chunks)
-
-                    # Decode JPEG
                     now = int(time.time() * 1000)
                     self.last_video_latency_ms = now - self.last_frame_timestamp
 
-                    ###! self.display_frame(frame_data)
+                    # Decode JPEG to OpenCV frame
                     nparr = np.frombuffer(frame_data, np.uint8)
                     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
                     if frame is not None:
-                        # === FPS calculation ===
+                        # --- Update FPS ---
                         self.frame_counter += 1
                         now = time.time()
                         elapsed = now - self.last_frame_time
@@ -201,105 +284,52 @@ class VideoThread(QThread):
                             self.frame_counter = 0
                             self.last_frame_time = now
 
-                        # === Overlay text ===
+                        # --- Overlay FPS and latency ---
                         overlay = f"FPS: {self.fps:.1f} | Latency: {self.last_video_latency_ms} ms"
                         cv2.putText(frame, overlay, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.5, (0, 255, 0), 1, cv2.LINE_AA) 
-                           
-                        #AI or floor detection
+                                    0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+                        # --- Optional Frame Processing (AI/Floor Detection) ---
                         if self.processor:
-                            # IF DriveAssist Enabled
                             frame = self.processor.detect_floor_region(frame)
 
+                        # Convert to QImage and emit
                         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
                         h, w, ch = frame.shape
                         bytes_per_line = ch * w
                         q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
-
                         self.frame_received.emit(q_img)
-                    ###! end
 
-                    # Reset for next frame
+                    # Reset state for next frame
                     self.frame_chunks = []
                     self.current_chunks = 0
 
             except BlockingIOError:
-                pass  # No data received; socket is non-blocking
+                # No data yet — non-blocking mode
+                pass
 
             except socket.timeout:
-                    self.running = False
-                    self.heartbeat_signal.emit(False)
-                    self.sock.close()
+                # Server likely disconnected
+                self.running = False
+                self.heartbeat_signal.emit(False)
+                self.sock.close()
 
     def stop(self):
+        """
+        Stops the video thread and closes the UDP socket.
+        """
         self.running = False
         self.wait()
         self.sock.close()
 
-'''
-class VideoThread(QThread):
-    frame_received = Signal(QImage)  # Signal to send new frame to UI
 
-    def __init__(self, stream_url):
-        super().__init__() 
-        self.stream_url = stream_url
-        self.running = True  # Control flag for stopping thread
-
-    def set_processor(self, processor):
-        self.processor = processor
-
-    def run(self):
-        cap = cv2.VideoCapture(self.stream_url)
-
-        while self.running:
-            ret, frame = cap.read()
-            if ret:
-                frame = self.processor.detect_floor_region(frame)   #OpenCV processes
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert to RGB
-                h, w, ch = frame.shape
-                bytes_per_line = ch * w
-                q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
-                self.frame_received.emit(q_img)  # Emit the frame
-            #else:
-                #print("Failed to retrieve frame")
-        
-        cap.release()
-    
-    def try_video_stream(self, streamURL):
-        cap = cv2.VideoCapture(streamURL)
-        
-        ret, frame = cap.read()
-        if ret:
-            cap.release() 
-        else:
-            cap.release()
-            raise ConnectionRefusedError
-
-    def stop(self):
-        self.running = False
-        self.wait()  # Ensure the thread is properly closed
-'''
 class MainWindow(QMainWindow):
     # Load Settings
     SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
-    #client_ver = "1.3"
-    #supported_ver = ["1.3"]
-
-    # Network Variables
-    #server_ip = None
-    #video_port = None
-    #control_port = None
-    #handshake_done = threading.Event()
-
 
     # Vehicle Status
     VEHICLE_CONNECTION = False
     OPENED_DRIVE_PAGE = False
-
-    # Vehicle Info
-    #control_scheme = str
-    #vehicle_model = str
 
     # Thread Status
     THREAD_RUNNING = False
@@ -330,9 +360,9 @@ class MainWindow(QMainWindow):
 
         ''' ====== App Details ======'''
         # Current Client App Version
-        self.client_ver = "1.3"
+        self.client_ver = "1.3.0"
         # Supported Host Versions
-        self.supported_ver = ["1.3"]
+        self.supported_ver = ["1.3.0"]
 
         # Load Settings From Json
         self.settings = load_settings(self.SETTINGS_FILE)
@@ -957,6 +987,13 @@ class MainWindow(QMainWindow):
             # send driveAssist Command
         pass
     
+    def emergencyDisconnect(self):
+        if self.VEHICLE_CONNECTION == True:
+            self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+            #TODO: RESET ALL SYSTEMS, SEND A DISCONNECT/Shutdown Command to Host
+            #self.send_command("DISCONNECT")
+            #VEHICLE_CONNECTION = False
+    
     #! FIX DRIVE ASSIST Functions
     def update_frame(self, q_img):
         """Update QLabel with new frame."""
@@ -979,7 +1016,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Release resources when closing the window."""
         if self.VEHICLE_CONNECTION:
-            self.send_command("DISCONNECT")
+            #self.send_command("DISCONNECT")
             QMetaObject.invokeMethod(self.heartbeat_worker, "stop", Qt.QueuedConnection)
         self.VEHICLE_CONNECTION = False
         #self.client_socket.close()
@@ -991,7 +1028,7 @@ class MainWindow(QMainWindow):
         event.accept()
         #self.client_socket.close()
         
-
+# === Main Execution ===
 if __name__ == '__main__':
     #QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)

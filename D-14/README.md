@@ -290,8 +290,10 @@
 <summary>Version 1.4</summary>
 
 ### Version 1.4 – “Intelligent Perception Update”
- - [ ] Integrate MiDaS depth estimation for floor & obstacle awareness
- - [ ] Use MiDaS depth to improve obstacle detection & safety logic
+ - [ ] Integrate monoculear depth estimation for floor & obstacle awareness
+ - [ ] Use depth to improve obstacle detection & safety logic
+ - [ ] Vehicle imu intergration
+ - [ ] Vehicle flood light upgrade
  ...
 
  </details>

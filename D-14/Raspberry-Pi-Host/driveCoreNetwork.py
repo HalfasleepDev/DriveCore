@@ -491,7 +491,7 @@ class NetworkManager:
                 if self.core.client_online:
                     print("Client disconnected. Restarting broadcast or handshake...")
                     self.core.client_online = False # Should break the run() loop
-                    #TODO: fix the retart system
+
             else:
                 if not self.core.client_online:
                     print("Client connection re-established.")
