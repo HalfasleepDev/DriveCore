@@ -714,7 +714,6 @@ class CalibrationWidget(QWidget):
                 border-bottom: 2px solid #f1f3f3;
                 margin: 1px;
             }
-            /* Hover effects (optional) */
             QSpinBox::up-button:hover, QSpinBox::down-button:hover {
                 background: #7a63ff;
             }

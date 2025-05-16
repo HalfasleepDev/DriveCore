@@ -244,11 +244,11 @@ class VideoThread(QThread):
                 data, _ = self.sock.recvfrom(BUFFER_SIZE)
 
                 # Try decoding a JSON header packet
-                try:
+                '''try:
                     header = json.loads(data.decode())
                     self.total_chunks = header["chunks"]
                     self.last_frame_timestamp = header["timestamp"]
-                    self.frame_chunks = []
+                    self.frame_chunks = [None] * self.total_chunks  # Preallocate
                     self.current_chunks = 0
                     continue
                 except (json.JSONDecodeError, UnicodeDecodeError):
@@ -256,7 +256,21 @@ class VideoThread(QThread):
 
                 # Collect JPEG chunks
                 self.frame_chunks.append(data)
-                self.current_chunks += 1
+                self.current_chunks += 1'''
+                try:
+                    header = json.loads(data.decode())
+                    self.total_chunks = header["chunks"]
+                    self.last_frame_timestamp = header["timestamp"]
+                    self.frame_chunks = [None] * self.total_chunks  # Preallocated
+                    self.current_chunks = 0
+                    continue
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    pass
+
+                # Insert into preallocated list
+                if self.current_chunks < self.total_chunks:
+                    self.frame_chunks[self.current_chunks] = data
+                    self.current_chunks += 1
 
                 # Drop the frame if too many chunks are received
                 if self.current_chunks > self.total_chunks:
@@ -322,19 +336,39 @@ class VideoThread(QThread):
         self.wait()
         self.sock.close()
 
-
+# === Main Application Window ===
 class MainWindow(QMainWindow):
-    # Load Settings
+    """
+    The primary application window for the client GUI.
+
+    Manages the full lifecycle of the client-side application, including:
+    - Loading and saving settings from a JSON file
+    - Managing vehicle connection and authentication
+    - Displaying video streams and telemetry from the host vehicle
+    - Configuring OpenCV debug overlays and drive assist features
+    - Controlling navigation and layout of UI pages
+    - Handling threaded background operations (heartbeat, handshake, tuning)
+
+    Attributes:
+        SETTINGS_FILE (str): Path to the settings JSON file.
+        VEHICLE_CONNECTION (bool): Whether the vehicle is currently connected.
+        OPENED_DRIVE_PAGE (bool): Flag indicating if the drive page has been opened.
+        THREAD_RUNNING (bool): Flag for thread activity.
+        OBJECT_VIS_ENABLED, FLOOR_VIS_ENABLED, ... (bool): OpenCV visual debug flags.
+        IS_DRIVE_ASSIST_ENABLED (bool): State of Drive Assist mode.
+        logSignal (Signal): Emits log messages to system log widgets.
+        displayVehicleMovementSignal (Signal): Updates vehicle movement UI.
+        showErrorSignal (Signal): Triggers global error popups.
+    """
+    # === Configuration Paths ===
     SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
 
-    # Vehicle Status
+    # === Status Flags ===
     VEHICLE_CONNECTION = False
     OPENED_DRIVE_PAGE = False
-
-    # Thread Status
     THREAD_RUNNING = False
 
-    # OpenCV Settings Variables
+    # === OpenCV Debug Visuals ===
     OBJECT_VIS_ENABLED = False
     FLOOR_VIS_ENABLED = False
     KALMAN_CENTER_VIS_ENABLED = False
@@ -345,9 +379,10 @@ class MainWindow(QMainWindow):
     alert_triggered = False
     alert_cooldown = False
 
-    # Drive Assist
+    # === Drive Assist State ===
     IS_DRIVE_ASSIST_ENABLED = False
 
+    # === UI Signals ===
     logSignal = Signal(str, str)
     displayVehicleMovementSignal = Signal(str, int, int)
     showErrorSignal = Signal(str, str, str, int) # Title, Message, Severity, Duration
@@ -358,22 +393,19 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.threadpool = QThreadPool.globalInstance()
 
-        ''' ====== App Details ======'''
-        # Current Client App Version
+        # === App Version Info ===
         self.client_ver = "1.3.0"
-        # Supported Host Versions
-        self.supported_ver = ["1.3.0"]
+        self.supported_ver = ["1.3.0"]  # Supported Host Versions
 
-        # Load Settings From Json
+        # === Load Configuration ===
         self.settings = load_settings(self.SETTINGS_FILE)
 
-        ''' ====== Host Details ======'''
+        # === Host Info Placeholders ===
         self.vehicle_model = str
         self.control_scheme = str
+        self.curveType = str    # Accel curve
 
-        self.curveType = str
-
-        ''' ====== Animated Button Setup ======'''
+        # === Button Animations ===
         animButtons = [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn, self.ui.openCVSettingsBtn,
             self.ui.vehicleTuningBtn, self.ui.ObjectVisBtn, self.ui.FloorVisBtn, self.ui.KalmanCenterVisBtn, 
             self.ui.AmbientVisBtn, self.ui.FloorSampleVisBtn, self.ui.PathVisBtn, self.ui.CollisionAssistBtn,
@@ -383,43 +415,20 @@ class MainWindow(QMainWindow):
         for btn in animButtons:
             install_hover_animation(btn)
 
-        ''' ====== Network Setup ======'''
+        # === Networking Setup ===
         self.handshake_done = threading.Event()
-
         self.network = NetworkManager(self)
 
-        # TODO: if network doesnt update use these 
-        '''
-        self.server_ip = None
-        self.video_port = None
-        '''
+        # === Load Saved Credentials ===
+        self.load_credentials() # Load Credentials On Startup
+
+        # === Signal & UI Connections ===
+        self.ui.carConnectLoginWidget.connect_btn.clicked.connect(self.attempt_connection)  # Car Login Button
+        self.logSignal.connect(self.logToSystem)    # Log to all systems
+        self.ui.projectInfoWidgetCustom.logErrorSignal.connect(self.logToSystem)    # Car Login Error to system
+        self.showErrorSignal.connect(self.showGlobalError)  # Global popup
         
-        
-        #! Depreciated for Ver1.3
-        #self.ui.inputIp.editingFinished.connect(self.setIp)
-        #self.ui.inputIp.editingFinished.connect(self.add_ip)
-        #self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)       # Use UDP communication
-
-        #self.recent_ips = self.load_recent_ips()
-        #self.ui.recentIpCombo.addItems(self.recent_ips)
-
-        #self.load_recent_ips()
-        #self.ui.ipComboBtn.clicked.connect(self.setIpCombo)
-
-        ''' ====== Home Page ======'''
-        # Load Credentials On Startup
-        self.load_credentials()
-
-        self.ui.carConnectLoginWidget.connect_btn.clicked.connect(self.attempt_connection)
-        self.logSignal.connect(self.logToSystem)
-
-        self.ui.projectInfoWidgetCustom.logErrorSignal.connect(self.logToSystem)
-        
-        self.showErrorSignal.connect(self.showGlobalError)
-        #self.discoverHostSignal.connect(self.network.discover_host)
-        #self.performHandshakeSignal.connect(self.network.perform_handshake)
-        
-        ''' ====== Logic For Left Menu Buttons ====== '''
+        # === Main Left Menu Navigation ===
         self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
         self.ui.homeBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.homeBtn, self.ui.homePage))
         self.ui.settingsBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.settingsBtn, self.ui.settingsPage))
@@ -428,14 +437,12 @@ class MainWindow(QMainWindow):
         self.ui.driveBtn.clicked.connect(lambda: self.iniDrivePage())
         self.ui.logBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.logBtn, self.ui.systemLogPage))
 
-        ''' ====== Settings Page ====== '''
-        # ------ Top Nav Buttons ------ 
+        # === Settings Page Navigation === 
         self.ui.openCVSettingsBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
         self.ui.openCVSettingsBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.openCVSettingsBtn, self.ui.OpenCVSettingsPage, 2))
         self.ui.vehicleTuningBtn.clicked.connect(lambda: self.handleSettingsNav(self.ui.vehicleTuningBtn, self.ui.VehicleTuningSettingsPage, 3))
         
-        # ------ OpenCV ------
-        # OpenCV Setting Buttons
+        # === OpenCV Toggle Buttons ===
         self.ui.ObjectVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(1))
         self.ui.FloorVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(2))
         self.ui.KalmanCenterVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(3))
@@ -444,8 +451,8 @@ class MainWindow(QMainWindow):
         self.ui.PathVisBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(6))
         self.ui.CollisionAssistBtn.clicked.connect(lambda: self.toggleSettingOpenCvBtns(7))
 
-        # HSV Sliders
-        # - Set range for sensitivity tuning
+        # === HSV Sliders (OpenCV) ===
+        # --- Set range for sensitivity tuning ---
         self.ui.HRowSlider.setRange(0, 50)
         self.ui.SRowSlider.setRange(0, 100)
         self.ui.VRowSlider.setRange(0, 100)
@@ -454,63 +461,71 @@ class MainWindow(QMainWindow):
         self.ui.SRowSlider.valueChanged.connect(lambda val: self.ui.SRowValueLabel.setText(str(val)))
         self.ui.VRowSlider.valueChanged.connect(lambda val: self.ui.VRowValueLabel.setText(str(val)))
 
-        # - Set default values
+        # --- Set default values ---
         self.ui.HRowSlider.setValue(35)
         self.ui.SRowSlider.setValue(40)
         self.ui.VRowSlider.setValue(50)
 
-        # ------ Vehicle Tuning ------
+        # === Vehicle Tuning Page Setup ===
         self.ui.VehicleTuningSettingsPage.set_curve_selection(self.settings["acceleration_curve"])
         self.ui.VehicleTuningSettingsPage.previewServoSignal.connect(self.tuneVehicle)
-
         self.ui.VehicleTuningSettingsPage.servo_mid_tuner.saveServoMidpointSignal.connect(self.tuneVehicle)
-
         self.ui.VehicleTuningSettingsPage.accelCurveSignal.connect(self.setSaveCurveType) #* DONE
-
         self.ui.VehicleTuningSettingsPage.servoTuneSignal.connect(self.tuneVehicle)
         self.ui.VehicleTuningSettingsPage.escTuneSignal.connect(self.tuneVehicle)
-
-        self.ui.VehicleTuningSettingsPage.set_default_tune_page(self.settings["min_duty_esc"], self.settings["neutral_duty_esc"], 
-                                                                self.settings["max_duty_esc"], self.settings["brake_esc"], 
-                                                                self.settings["min_duty_servo"], self.settings["neutral_duty_servo"], 
-                                                                self.settings["max_duty_servo"], self.settings["broadcast_port"])
-
+        self.ui.VehicleTuningSettingsPage.set_default_tune_page(
+            self.settings["min_duty_esc"], self.settings["neutral_duty_esc"], 
+            self.settings["max_duty_esc"], self.settings["brake_esc"], 
+            self.settings["min_duty_servo"], self.settings["neutral_duty_servo"], 
+            self.settings["max_duty_servo"], self.settings["broadcast_port"]
+        )
         self.ui.VehicleTuningSettingsPage.updateBroadcastPortSignal.connect(self.tuneVehicle)
-
         self.ui.VehicleTuningSettingsPage.logToSystemSignal.connect(self.logToSystem) #* DONE
 
-        # ------ Emergency Dissconnect ------
+        # === Emergency Disconnect Button ===
         self.ui.emergencyDisconnectBtn.clicked.connect(lambda: self.emergencyDisconnect())
 
-        ''' ====== OpenCV Variables & Functions ====== '''
+        # === OpenCV Runtime Variables ===
         self.timer = QTimer()
-        
         self.timer.start(30)
-
         self.frame_counter = 0
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=200, varThreshold=100, detectShadows=False)
         self.last_floor_contour = None
+        self.alert_line_y = 680 # Trigger line for object detection
 
-        self.alert_line_y = 680 # Set where an object enters it stops the vehicle, could move to settings?
-
-        ''' ====== Drive Page ====== '''
-        # ------ tooltip ------
+        # === Drive Assist Widget ===
         self.tooltip = AnimatedToolTip("", self)
         self.ui.alertAssistWidget.installEventFilter(self)
         self.ui.alertAssistWidget.setToolTip("Turn On/Off collision braking")
         self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
 
-        # ------ Drive Assist Widget ------
-        self.ui.driveAssistWidget.toggle_button.clicked.connect(lambda: self.toggleSettingOpenCvBtns(8))
+        # === Alert Cooldown Timer ===
         self.alert_cooldown_timer = QTimer()
         self.alert_cooldown_timer.setSingleShot(True)
         self.alert_cooldown_timer.timeout.connect(self.reset_alert_cooldown)
 
+    # === Startup Logging ===
     def onStartup(self):
+        """
+        Logs the available thread count on startup.
+    
+        Used to verify multithreading capabilities on client launch.
+        """
         thread_count = self.threadpool.maxThreadCount()
         self.logToSystem(f"Multithreading with maximum {thread_count} threads", "DEBUG")
-        
+    
+    # === Tooltip Event Filter for Custom Hover Popups ===
     def eventFilter(self, watched, event):
+        """
+        Custom tooltip event filter for UI widgets.
+
+        Args:
+            watched (QObject): The object being observed.
+            event (QEvent): The event that occurred.
+
+        Returns:
+            bool: True if custom tooltip was shown, False otherwise.
+        """
         if event.type() == QEvent.ToolTip:
             if isinstance(watched, QWidget):
                 tooltip_text = watched.toolTip()
@@ -519,24 +534,34 @@ class MainWindow(QMainWindow):
                 # Show beside the widget
                 pos = watched.mapToGlobal(watched.rect().topRight())
                 self.tooltip.show_tooltip(pos)
-                return True  # prevent default tooltip from showing
+                return True  # Override default tooltip behavior
 
         elif event.type() == QEvent.Leave:
             self.tooltip.hide_tooltip()
 
         return super().eventFilter(watched, event)
     
+    # === Settings Page Navigation ===
     def handleSettingsNav(self, active_btn, target_page, infoIndex: int):
+        """
+        Handles switching between settings sub-pages and their corresponding info views.
+
+        Args:
+            active_btn (QPushButton): The button that triggered the change.
+            target_page (QWidget): The target stacked page widget.
+            infoIndex (int): Index of the information view in the side panel.
+        """
+        # Reset all button styles
         for btn in [self.ui.openCVSettingsBtn, self.ui.vehicleTuningBtn]:
             btn.setStyleSheet("QPushButton{background-color: #1e1e21;}")
 
             # Highlight active button
             active_btn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
 
-            # Switch page
+            # Switch stacked widget page
             self.ui.settingsStackedWidget.setCurrentWidget(target_page)
 
-            # Switch to info page (1) is no page
+            # Adjust spacing based on index
             self.ui.settingsInfoStackedWidget.setCurrentIndex(infoIndex)
             if infoIndex == 3:
                 self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
@@ -546,8 +571,16 @@ class MainWindow(QMainWindow):
                 self.ui.verticalLayout_15.removeItem(self.ui.verticalSpacer_8)
                 self.ui.verticalSpacer_8 = QSpacerItem(20, 431, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
                 self.ui.verticalLayout_15.insertItem(3, self.ui.verticalSpacer_8)
-        
+    
+    # === Main Page Navigation ===
     def handleLeftMenuNav(self, active_btn, target_page):
+        """
+        Handles navigation from the left-side main menu.
+
+        Args:
+            active_btn (QPushButton): The button clicked.
+            target_page (QWidget): The page to display.
+        """
         for btn in [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn]:
             btn.setStyleSheet("QPushButton{background-color: #f1f3f3;}")
 
@@ -556,16 +589,15 @@ class MainWindow(QMainWindow):
 
             # Switch page
             self.ui.stackedWidget.setCurrentWidget(target_page)
-
-    '''def stop_thread_safely(self):
-        if self.THREAD_RUNNING:
-            try:
-                self.thread.stop()
-            except Exception as e:
-                showError(self, "Program Error!", f"Error stopping thread: {e}")
-                #print(f"Error stopping thread: {e}")'''
     
+    # === Toggle OpenCV Debug Modes ===
     def toggleSettingOpenCvBtns(self, select):
+        """
+        Toggles visualization/debug settings for OpenCV modes.
+
+        Args:
+            select (int): Identifier for the selected OpenCV mode.
+        """
         self.IS_DRIVE_ASSIST_ENABLED = True
         match select:
             case 1:
@@ -580,48 +612,72 @@ class MainWindow(QMainWindow):
                 self.FLOOR_SAMPLE_VIS_ENABLED = toggleDebugCV(self.ui.FloorSampleVisBtn, self.FLOOR_SAMPLE_VIS_ENABLED, "Floor Sample Vis: ")
             case 6:
                 self.PATH_VIS_ENABLED = toggleDebugCV(self.ui.PathVisBtn, self.PATH_VIS_ENABLED, "Path Vis: ")
-            case 7:
-                self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
-            case 8:
+            case 7 | 8:
                 self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
                 self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
                 self.IS_DRIVE_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
     
-    #? Vehicle control logs could slow down the thread
-    def logToSystem(self, message: str, type: str):
+    # === Central Logging Handler ===
+    def logToSystem(self, message: str, type: str): #? FIXME: Vehicle control logs could slow down the thread
+        """
+        Logs a message to the system and auxiliary log widgets.
+
+        Args:
+            message (str): The message to log.
+            type (str): Log type (e.g., INFO, WARN, BROADCAST).
+        """
         self.ui.systemLogPage.log(message, type)
         match type:
-            case "BROADCAST":
+            case "BROADCAST" | "HANDSHAKE":
                 self.ui.networkConnectionLogWidget.add_log(f"[{type}] {message}")
-            case "HANDSHAKE":
-                self.ui.networkConnectionLogWidget.add_log(f"[{type}] {message}")
-            case "INFO":
+            case "INFO" | "WARN":
                 self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
-            case "WARN":
-                self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
-        QCoreApplication.processEvents()
+                QCoreApplication.processEvents()
+        #QCoreApplication.processEvents()
 
+    # === Show Error Dialog Globally ===
     def showGlobalError(self, title: str, message: str, severity: str, duration =0):
+        """
+        Displays a global error popup over the central widget.
+
+        Args:
+            title (str): Title of the error.
+            message (str): Body of the error.
+            severity (str): Type of error (INFO, ERROR, etc).
+            duration (int, optional): Duration in milliseconds to show the popup. Defaults to 0.
+        """
         showError(self.ui.centralwidget, title, message, severity, duration)
 
-    # Set and save the selected curve from the settings page
+    # === Save Selected Curve Type ===
     def setSaveCurveType(self, curve: str):
+        """
+        Sets the curve type and saves it to the settings file.
+
+        Args:
+            curve (str): Name of the selected acceleration curve.
+        """
         self.ui.drivePage.setCurveType = curve
         self.settings["acceleration_curve"] = curve
         save_settings(self.settings, self.SETTINGS_FILE)
 
-    # Automatically load the previously used credentials from settings.json
+    # === Auto-fill Credentials on Startup ===
     def load_credentials(self):
+        """
+        Loads saved credentials from settings and fills in the login form.
+        """
         self.ui.carConnectLoginWidget.username_input.setText(self.settings["username"])
         self.ui.carConnectLoginWidget.password_input.setText(self.settings["password"])
 
-    # Attempt a connection to the vehicle
+    # === Begin Connection Sequence ===
     def attempt_connection(self):
-        # Get username and password from the input fields
+        """
+        Validates login fields and begins vehicle discovery and handshake.
+        """
+        # --- Get username and password from the input fields ---
         username = self.ui.carConnectLoginWidget.username_input.text().strip()
         password = self.ui.carConnectLoginWidget.password_input.text().strip()
 
-        # Check that username and/or password is not empty
+        # --- Check that username and/or password is not empty ---
         if not username or not password:
             self.ui.carConnectLoginWidget.show_error("Please enter both username and password.")
             showError(self.ui.centralwidget, "Login Error", "Please enter both username and password.", "INFO", 6000)
@@ -637,25 +693,15 @@ class MainWindow(QMainWindow):
             
             #QApplication.restoreOverrideCursor()
 
-            '''if self.VEHICLE_CONNECTION:
-                print("ok")
-                self.heartbeat_thread = QThread()
-                self.heartbeat_worker = HeartbeatWorker(self.network.server_ip, self.network.heartbeat_port)
-                self.heartbeat_worker.moveToThread(self.heartbeat_thread)
-
-                self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
-                self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
-                self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
-                self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
-
-                self.heartbeat_thread.start()
-
-                self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
-                self.settings["username"] = username
-                self.settings["password"] = password
-                save_settings(self.settings, self.SETTINGS_FILE)'''
-
+    # === Finalize Connection ===
     def connection_done(self, username, password):
+       """
+        Called after successful connection; sets up heartbeat thread and saves credentials.
+
+        Args:
+            username (str): The username entered by the user.
+            password (str): The password entered by the user.
+        """
        QApplication.restoreOverrideCursor()
        #QCoreApplication.processEvents()
        if self.VEHICLE_CONNECTION:
@@ -677,108 +723,14 @@ class MainWindow(QMainWindow):
                 save_settings(self.settings, self.SETTINGS_FILE)
 
                 showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)
-                
-                     
-    #! Depreciated for Ver1.3
-    '''
-    def add_ip(self):
-        """ Adds the entered IP to the combo box and saves it. """
-        ip = self.ui.inputIp.text().strip()
-        if self.is_ip_address(ip):
-            if ip and ip not in self.recent_ips:
-                self.recent_ips.insert(0, ip)  # Add to the top of the list
-                self.ui.recentIpCombo.insertItem(0, ip)  # Add to QComboBox
-                self.save_recent_ips()
-
-        # Clear input field
-        self.ui.inputIp.clear()
-
-    #! Depreciated for Ver1.3
-    def load_recent_ips(self):
-        """ Loads recent IP addresses from a file. """
-        filename = "D-14/Client-Side/client-app/recent_ips.txt"
-        if os.path.exists(filename):
-            with open(filename, "r") as file:
-                return [line.strip() for line in file.readlines()]
-        return []
-    
-    #! Depreciated for Ver1.3
-    def save_recent_ips(self):
-        """ Saves recent IP addresses to a file. """
-        with open("D-14/Client-Side/client-app/recent_ips.txt", "w") as file:
-            for ip in self.recent_ips[:10]:  # Keep only the last 10 entries
-                file.write(ip + "\n")
-        
-    def emergencyDisconnect(self):
-        if self.VEHICLE_CONNECTION == True:
-            self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
-            self.send_command("DISCONNECT")
-            VEHICLE_CONNECTION = False
-
-    #! Depreciated for Ver1.3
-    def is_ip_address(self, s):
-        try:
-            ipaddress.ip_address(s)  # Try converting the string to an IP address
-            return True
-        except ValueError:
-            showError(self, "CONNECTION ERROR", "Not a valid IP address")
-            return False  # Not a valid IP address
-    
-    #! Depreciated for Ver1.3
-    def setIp(self):
-        
-        if self.is_ip_address(self.ui.inputIp.text()):
-            self.IP_ADDR = self.ui.inputIp.text()
-            self.STREAM_URL = "http://" + self.IP_ADDR + ":5000/video-feed"
-            #self.STREAM_URL = self.IP_ADDR + ":5000/video_feed"
-            print(self.STREAM_URL)
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            try:
-                VideoThread.try_video_stream(self, self.STREAM_URL)
-                self.client_socket.connect((self.IP_ADDR, PORT))
-                print("Connected to Raspberry Pi")
-                self.VEHICLE_CONNECTION = True
-                self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}")
-                self.ui.vehicleTypeLabel.setText("RPI_D14")
-                self.ui.ipInputBox.setStyleSheet("QGroupBox::title{color: #32CD32;}")
-            except ConnectionRefusedError:
-                QApplication.restoreOverrideCursor()
-                showError(self, "CONNECTION ERROR", "Failed to connect to Raspberry Pi")
-                self.VEHICLE_CONNECTION = False
-                self.ui.ipInputBox.setStyleSheet("QGroupBox::title{color: #FFA500;}")
-            QApplication.restoreOverrideCursor()
-
-        else:
-            self.ui.ipInputBox.setStyleSheet("QGroupBox::title{color: #FF0000;}")
-            
-    #! Depreciated for Ver1.3
-    def setIpCombo(self):
-        if self.is_ip_address(self.ui.recentIpCombo.currentText()):
-            self.IP_ADDR = self.ui.recentIpCombo.currentText()
-            self.STREAM_URL = "http://" + self.IP_ADDR + ":5000/video-feed"
-            #self.STREAM_URL = self.IP_ADDR + ":5000/video_feed"
-            print(self.STREAM_URL)
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            try:
-                VideoThread.try_video_stream(self, self.STREAM_URL)
-                self.client_socket.connect((self.IP_ADDR, PORT))
-                print("Connected to Raspberry Pi")
-                self.VEHICLE_CONNECTION = True
-                self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #f1f3f3;}")
-                self.ui.recentIpBox.setStyleSheet("QGroupBox::title{color: #32CD32;}")
-                self.ui.vehicleTypeLabel.setText("RPI_D14")
-            except ConnectionRefusedError:
-                QApplication.restoreOverrideCursor()
-                showError(self, "CONNECTION ERROR", "Failed to connect to Raspberry Pi")
-                self.VEHICLE_CONNECTION = False
-                self.ui.recentIpBox.setStyleSheet("QGroupBox::title{color: #FFA500;}")
-            QApplication.restoreOverrideCursor()
-                
-        else:
-            self.ui.recentIpBox.setStyleSheet("QGroupBox::title{color: #FF0000;}")'''
-        
-
+    # === Initialize Drive Page ===
     def iniDrivePage(self):
+        """
+        Initializes and starts the video stream, processor, and drive UI.
+
+        Checks for vehicle connection and hardware readiness before launching the
+        drive view. Starts the video thread and connects signals to update the UI.
+        """
         if self.VEHICLE_CONNECTION and self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY:
             print(self.network.server_ip)
             print(self.network.video_port)
@@ -804,7 +756,15 @@ class MainWindow(QMainWindow):
         else:
             self.ui.videoStreamLabel.setStyleSheet("QLabel{color: #1e1e21;}")
 
+    # === Update Directional Button States ===
     def changeKeyInfo(self, command, intensity):
+        """
+        Updates the UI to highlight the active directional control based on command.
+
+        Args:
+            command (str): The driving command (e.g., 'UP', 'LEFT', 'BRAKE').
+            intensity (int): The intensity of the command (currently unused).
+        """
         if command == "UP":
             self.ui.accelerateBtn.setStyleSheet("QPushButton{color: #7a63ff;}")
             #print('t')
@@ -843,8 +803,16 @@ class MainWindow(QMainWindow):
             self.ui.turnRightBtn.setStyleSheet("QPushButton{color: #f1f3f3;}")
             self.ui.brakeBtn.setStyleSheet("QPushButton{color: #7a63ff;}") 
 
+    # === Update or Reset Vehicle Display Widgets ===
     def updateVehicleMovement(self, mode: str, esc_pw=None, servo_pw=None):
+        """
+        Updates vehicle telemetry widgets (speedometer, steering, gear selector).
 
+        Args:
+            mode (str): One of 'SET', 'UPDATE', or 'RESET' to determine update type.
+            esc_pw (int, optional): ESC pulse width, used in 'UPDATE' mode.
+            servo_pw (int, optional): Servo pulse width, used in 'UPDATE' mode.
+        """
         match mode:
             case "SET":
                 # Update Settings to get current
@@ -879,13 +847,31 @@ class MainWindow(QMainWindow):
             
             case "RESET":
                 self.ui.vehicleSpeedometerWidget.vehicleConnect = False
-    
+
+    # === Prepare Settings Page ===
     def iniSettingsPage(self):
+        """
+        Initializes the settings page if the vehicle is connected.
+
+        Currently enables vehicle tuning settings if the heartbeat is alive.
+        """
         if self.VEHICLE_CONNECTION:
             #? Check if vehicle heartbeat is alive --> send a command such as "heartbeat"
             self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
 
+    # === Tune Vehicle Parameters ===
     def tuneVehicle(self, mode: str, min=0, mid=0, max=0, brake=0, port=0):
+        """
+        Sends tuning commands to the vehicle and updates settings.
+
+        Args:
+            mode (str): Type of tuning operation (e.g., 'test_servo', 'save_esc').
+            min (int): Minimum PWM value.
+            mid (int): Midpoint PWM value.
+            max (int): Maximum PWM value.
+            brake (int): Brake PWM value.
+            port (int): Broadcast port (used in 'update_port').
+        """
         if self.VEHICLE_CONNECTION:
             match mode:
                 case "servo_mid_cal":
@@ -950,15 +936,37 @@ class MainWindow(QMainWindow):
 
         #self.settings = load_settings(self.SETTINGS_FILE)
     
+    # === General Settings Update ===
     def updateGeneralSettings(self, mode:str, value):
+        """
+        Updates a general settings key in memory and saves to file.
+
+        Args:
+            mode (str): The settings key to update.
+            value (Any): The new value to assign.
+        """
         self.settings[mode] = value
         save_settings(self.settings, self.SETTINGS_FILE)
 
+    # === Enable Drive Assist Mode ===
     def enableDriveAssist(self):
-        pass
+        """
+        Placeholder method to enable drive assist.
 
+        (Not yet implemented.)
+        """
+        pass
+    
+    # === Handle Lost Heartbeat ===
     def checkHeartBeat(self, online:bool):
-        print("disconnect")
+        """
+        Handles loss of heartbeat signal from the vehicle.
+
+        Cleans up threads, resets UI elements, and displays a disconnection popup.
+
+        Args:
+            online (bool): False if the heartbeat is lost.
+        """
         if not online:
             #! RESET SYSTEMS, CALL ERROR, POPUP
             # Vehicle Status
@@ -975,28 +983,31 @@ class MainWindow(QMainWindow):
                 self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color: #f1f3f3;}")
             
             # Popup
-
-    #! Depreciated for Ver1.3
-    def send_command(self, command):
-        """Send command to Raspberry Pi"""
-        # Check For MODE
-        # IF keyboard
-            # calculate intensity
-            # send command
-        # IF driveassist
-            # send driveAssist Command
-        pass
+            showError(self.ui.centralwidget, "Vehicle Error", "Vehicle disconnected or connection timeout", "ERROR")
     
+    # === Emergency Disconnect Logic ===
     def emergencyDisconnect(self):
+        """
+        Manually triggers a disconnect routine for the vehicle.
+
+        Highlights the emergency button and sends shutdown commands.
+        """
         if self.VEHICLE_CONNECTION == True:
             self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
             #TODO: RESET ALL SYSTEMS, SEND A DISCONNECT/Shutdown Command to Host
             #self.send_command("DISCONNECT")
             #VEHICLE_CONNECTION = False
     
-    #! FIX DRIVE ASSIST Functions
+    # === Frame Display and Emergency Stop Check ===
     def update_frame(self, q_img):
-        """Update QLabel with new frame."""
+        """
+        Receives a new frame and updates the video label with it.
+
+        Also triggers emergency stop logic if Drive Assist is enabled.
+
+        Args:
+            q_img (QImage): Frame to display.
+        """
         #pixmap = QPixmap.fromImage(q_img)
         self.ui.videoStreamLabel.setPixmap(QPixmap.fromImage(q_img))
         
@@ -1006,15 +1017,28 @@ class MainWindow(QMainWindow):
             self.alert_cooldown = True
             self.alert_cooldown_timer.start(3000) # 3 seconds
             self.logToSystem("Object detected! Applying command: EMERGENCY_STOP", "WARN")
-        
+    
+    # === Reset Emergency Stop Timer ===
     def reset_alert_cooldown(self):
+        """
+        Resets the alert cooldown after an emergency stop has been triggered.
+
+        Clears the Drive Assist warning and logs the event.
+        """
         self.alert_cooldown = False
         self.ui.driveAssistWidget.clear_warning()
         self.logToSystem("Object Alert has been reset on client", "WARN")
 
-    #! Depreciated for Ver1.3
-    def closeEvent(self, event):
-        """Release resources when closing the window."""
+    # === On Window Close Event ===
+    def closeEvent(self, event):    #! FIXME: Fix for Ver 1.3.0
+        """
+        Handles graceful shutdown when the window is closed.
+
+        Stops background threads, heartbeat, and any remaining processes.
+
+        Args:
+            event (QCloseEvent): The close event passed from Qt.
+        """
         if self.VEHICLE_CONNECTION:
             #self.send_command("DISCONNECT")
             QMetaObject.invokeMethod(self.heartbeat_worker, "stop", Qt.QueuedConnection)
@@ -1023,18 +1047,13 @@ class MainWindow(QMainWindow):
         if self.THREAD_RUNNING == True:
             self.thread.stop()
 
-            
-
         event.accept()
         #self.client_socket.close()
         
 # === Main Execution ===
 if __name__ == '__main__':
-    #QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-    #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-
     app = QApplication(sys.argv)
-    #!ENABLE FOR RELEASE
+    
     def launch_main():
         window = MainWindow()
         window.setWindowTitle(f"Drive Core Client Ver {window.client_ver}")
@@ -1043,10 +1062,5 @@ if __name__ == '__main__':
 
     loading = LoadingScreen(on_finished_callback=launch_main)
     loading.show()
-
-    #!ENABLE FOR TESTING ONLY
-    #window = MainWindow()
-    #window.setWindowTitle("Drive Core Client Ver 1.2")
-    #window.show()
 
     sys.exit(app.exec())
