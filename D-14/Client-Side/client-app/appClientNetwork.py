@@ -1,3 +1,13 @@
+"""
+appClientNetwork.py
+
+Client Host Communication system and operations (APP).
+
+Author: HalfasleepDev
+Created: 05-04-2025
+"""
+
+# === Imports ===
 import socket
 import json
 import threading
@@ -13,18 +23,19 @@ from udpProtocols import (credential_packet, version_request_packet,
 
 from appFunctions import save_settings, load_settings, showError
 
-""" TODO:
-- [x] Search for broadcast
-- [x] Handshake
-- [x] Send keyboard commands
-- [x] Send Drive Assist Commands
-- [x] Applying tune settings
-- [x] Recieve video 
-"""
-
-#SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
-
+# === Network Manager for Client-Host Communication ===
 class NetworkManager(QObject):
+    """
+    Handles all network operations for the client app, including:
+    - Broadcast discovery
+    - Authentication and handshake with vehicle host
+    - Sending control and tuning commands
+    - Listening for acknowledgments and status
+
+    Attributes:
+        discovery_done_signal (Signal): Emitted after host is discovered.
+        handshake_done_signal (Signal): Emitted after handshake succeeds.
+    """
 
     SETTINGS_FILE = "D-14/Client-Side/client-app/settings.json"
     CHUNK_SIZE = 1024 #1024
@@ -34,13 +45,19 @@ class NetworkManager(QObject):
     handshake_done_signal = Signal()
 
     def __init__(self, main_app_reference):
+        """
+        Initialize network manager with app reference and loaded settings.
+
+        Args:
+            main_app_reference main.py: Reference to the main application.
+        """
         super().__init__()
         self.app = main_app_reference
 
         # === Settings ===
         self.settings = load_settings(self.SETTINGS_FILE)
 
-        # --- Network ---
+        # === Network Configuration ===
         self.BROADCAST_PORT = self.settings["broadcast_port"]
         self.server_ip = None
         self.video_port = None
@@ -49,23 +66,23 @@ class NetworkManager(QObject):
         #self.app.handshake_done = threading.Event()
         self.discovery_done = threading.Event()
 
-        # --- App Settings ---
-
-    #self.app.logSignal.emit()
-    # Step 1: Discover Broadcast
+    # === Step 1: Discover Vehicle Host Over UDP Broadcast ===
     def discover_host(self):
-        #global server_ip, video_port, control_port
+        """
+        Listens for UDP broadcast packets to detect the host vehicle.
+        Emits discovery_done_signal upon successful connection.
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(20.0)
         #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(('', self.BROADCAST_PORT)) #'<broadcast>'
+        
         self.app.logSignal.emit("Listening for broadcast. Please wait...", "BROADCAST")
 
         while True:
             try:
                 data, addr = sock.recvfrom(1024)
                 try:
-                    #causes a decode error
                     payload = json.loads(data.decode())
                     if payload.get("type") == "advertise":
                         self.server_ip = addr[0]
@@ -76,10 +93,9 @@ class NetworkManager(QObject):
                         
                         QCoreApplication.processEvents()
                         self.discovery_done_signal.emit()
-                        print("1")
                         break
                 except ConnectionRefusedError:
-                    #! Error message
+                    ##! Connection refused by server
                     self.app.logSignal.emit("ConnectionRefusedError", "BROADCAST")
                     self.app.logSignal.emit("[BROADCAST] ConnectionRefusedError", "ERROR")
                     self.app.showErrorSignal.emit("CONNECTION ERROR", "ConnectionRefusedError. Could not connect to host.", "ERROR", 6000)
@@ -89,6 +105,7 @@ class NetworkManager(QObject):
                     continue
 
             except socket.timeout:
+                #! Broadcast timeout
                 QCoreApplication.processEvents()
                 self.app.logSignal.emit("Socket Timeout. 20s", "BROADCAST")
                 self.app.logSignal.emit("[BROADCAST] Socket Timeout. 20s", "ERROR")
@@ -99,10 +116,16 @@ class NetworkManager(QObject):
         sock.close()
         return     
 
-    # Step 2: Preform Handshake ---> pass the json settings
+    # === Step 2: Perform Handshake With Server ===
     def perform_handshake(self, username, password):
-        handshake_status = True
+        """
+        Sends authentication and configuration packets to the host in sequence.
 
+        Args:
+            username (str): Login username.
+            password (str): Login password.
+        """
+        handshake_status = True
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(5.0)
         print(self.server_ip)
@@ -112,18 +135,16 @@ class NetworkManager(QObject):
 
         pending_action = "send_credentials"
 
-        #while (not self.app.handshake_done.is_set()) & handshake_status:
         while handshake_status:
-
+            # === Outbound Client Commands ===
             if pending_action == "send_credentials":
                 send(credential_packet(username, password))
                 self.app.logSignal.emit("Sent credentials to host", "HANDSHAKE")
-                print("2")
                 pending_action = None
                 QCoreApplication.processEvents()
 
             elif pending_action == "auth_failed":
-                #! Error message
+                #! Invalid credential
                 self.app.logSignal.emit("Authentication failed", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Authentication failed", "ERROR")
                 self.app.ui.carConnectLoginWidget.show_error("Invalid credentials. Please try again.")
@@ -141,7 +162,7 @@ class NetworkManager(QObject):
                 QCoreApplication.processEvents()
             
             elif pending_action == "version_request_failed":
-                #! Error message
+                #! Host version incompatibility
                 self.app.logSignal.emit("Incompatable host version", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Incompatable host version", "ERROR")
                 self.app.ui.showError("COMPATABILITY ERROR", "Incompatable host version.")
@@ -150,7 +171,7 @@ class NetworkManager(QObject):
                 QCoreApplication.processEvents()
 
             elif pending_action == "send_client_version_failed":
-                #! Error message
+                #! Client version rejected
                 self.app.logSignal.emit("Incompatable client version", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Incompatable client version", "ERROR")
                 self.app.ui.showError("COMPATABILITY ERROR", "Incompatable client version.")
@@ -183,7 +204,7 @@ class NetworkManager(QObject):
                 QCoreApplication.processEvents()
 
             elif pending_action == "handshake_complete":
-                #* Done message
+                #* Finalize handshake
                 self.app.logSignal.emit("Handshake is complete", "HANDSHAKE")
                 self.app.logSignal.emit(f"Successfully connected to {self.app.vehicle_model}", "DEBUG")
                 self.app.logSignal.emit(f"Using {self.app.control_scheme} control scheme", "DEBUG")
@@ -191,8 +212,10 @@ class NetworkManager(QObject):
                 pending_action = None
                 handshake_status = False
                 self.app.VEHICLE_CONNECTION = True
-                '''# FOR TUNE SETUP
-                self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True'''
+
+                # FOR TUNE SETUP
+                self.app.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
+
                 self.handshake_done_signal.emit()
                 QCoreApplication.processEvents()
                 #self.app.handshake_done.set()
@@ -203,7 +226,7 @@ class NetworkManager(QObject):
             
             # TODO: add other actions
             
-            # === Inbound messages ===
+            # === Incoming Server Payloads ===
             try:
                 data, _ = sock.recvfrom(1048)
                 payload = json.loads(data.decode())
@@ -223,8 +246,18 @@ class NetworkManager(QObject):
         QApplication.restoreOverrideCursor()
         return
 
-    # Step 2.5: Handle Server Response From Handshake
+    # === Step 2.5: Parse Server Payloads ===
     def handle_server_response(self, payload):
+        """
+        Interprets server responses and determines next action in handshake.
+
+        Args:
+            payload (dict): JSON-decoded response from server.
+
+        Returns:
+            str | None: Next action keyword for handshake loop.
+        """
+
         # ------ Authentication ------
         if payload.get("type") == "auth_status":
             if payload.get("status"):
@@ -255,6 +288,7 @@ class NetworkManager(QObject):
                     return "version_request_failed"
             else:
                 return "send_client_version_failed"
+            
         # ------ Gather Vehicle Setup Info ------
         elif payload.get("type") == "setup_info":
             self.app.vehicle_model = payload.get("vehicle_model")
@@ -278,8 +312,16 @@ class NetworkManager(QObject):
         elif payload.get("type") == "":
             return
 
-    # Step 3: Send Keyboard Commands
+    # === Step 3: Send Keyboard Command ===
     def send_keyboard_command(self, cmd: str, esc_intensity, servo_intensity):
+        """
+        Sends keyboard control packet and updates local vehicle movement UI.
+
+        Args:
+            cmd (str): Movement command name.
+            esc_intensity (float): ESC power value.
+            servo_intensity (float): Steering power value.
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.0)
         packet = keyboard_command_packet(cmd, esc_intensity, servo_intensity)
@@ -294,7 +336,12 @@ class NetworkManager(QObject):
             if ack.get("type") == "command_ack":
                 if ack.get("command") == "Ignored command during emergency":
                     self.app.logSignal.emit(f"[ACK] DriveAssist: {ack.get("command")}", "WARN")
-                    
+                
+                if ack.get("command") == "ENABLE_DRIVE_ASSIST":
+                    self.app.logSignal.emit("[ACK] DriveAssist: DriveAssist Enabled", "WARN")
+
+                if ack.get("command") == "DISABLE_DRIVE_ASSIST":
+                    self.app.logSignal.emit("[ACK] DriveAssist: DriveAssist Disabled", "WARN")
                 #now = time.time()
                 delay = ack["timestamp"] - now
                 esc_pw = ack["esc_pw"]
@@ -304,7 +351,7 @@ class NetworkManager(QObject):
                     # change the intensity of servo to 0.0
                     self.app.ui.drivePage.servo_intensity = 0.0
 
-                # UPDATE UI EELEMRNTS
+                # UPDATE UI ELEMENTS
                 self.app.updateVehicleMovement("UPDATE", esc_pw, servo_pw)
                 self.app.logSignal.emit(f"[ACK] Command: {ack['command']} | ESC: {esc_pw} | SERVO: {servo_pw} | RTT: {delay}ms", "INFO")
 
@@ -314,22 +361,38 @@ class NetworkManager(QObject):
         except socket.timeout:
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "INFO")
             self.app.logSignal.emit(f"No ACK for command: {cmd}", "ERROR")
-            #print("No ACK for command:", cmd)
         sock.close()
         return
 
-    # Step 4: Send Drive Assist Commands
+    # === Step 4: Send Drive Assist Control ===
     def send_drive_assist_command(self, cmd: str):
+        """
+        Dispatches control signals related to Drive Assist mode.
+
+        Args:
+            cmd (str): Drive assist command like 'EMERGENCY_STOP'.
+        """
         if cmd == "EMERGENCY_STOP":
             self.send_keyboard_command(cmd, None, None)
             # Todo: Add more triggers for UI?
         elif cmd == "CLEAR_EMERGENCY":
             pass
+        elif cmd == "ENABLE_DRIVE_ASSIST":
+            self.send_keyboard_command(cmd, None, None)
+        elif cmd == "DISABLE_DRIVE_ASSIST":
+            self.send_keyboard_command(cmd, None, None)
 
-    # Step 5: Applying Tune Data
+    # === Step 5: Apply Tune Parameters ===
     def tune_vehicle_command(self, mode:str, min_duty_servo=0, max_duty_servo=0, neutral_servo=0, 
                             min_duty_esc=0, neutral_duty_esc=0, max_duty_esc=0, brake_esc=0):
-        
+        """
+        Sends tuning values for servo or ESC to the host vehicle.
+
+        Args:
+            mode (str): The mode (e.g., 'test_servo', 'save_esc').
+            min_duty_servo (int): Min servo PWM.
+            ...
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         packet = send_tune_data_packet(mode, min_duty_servo, max_duty_servo, neutral_servo, 
@@ -350,5 +413,4 @@ class NetworkManager(QObject):
         
         elif mode == "test_esc":
             asyncio.run(waitForTest())
-            self.app.logSignal.emit(f"[ESC] Tested with {min_duty_esc}µs, {neutral_duty_esc}µs, {max_duty_servo}µs, {brake_esc}µs", "DEBUG")
-    # Step 7: 
+            self.app.logSignal.emit(f"[ESC] Tested with {min_duty_esc}µs, {neutral_duty_esc}µs, {max_duty_servo}µs, {brake_esc}µs", "DEBUG") 

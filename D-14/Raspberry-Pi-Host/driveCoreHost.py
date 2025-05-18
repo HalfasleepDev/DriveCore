@@ -43,8 +43,9 @@ class DriveCoreHost:
     VEHICLE_MODEL = "D-14"
     CONTROL_SCHEME = "wasd"
 
-    SERVO_PIN = 26  # GPIO pin for connected servo
-    ESC_PIN = 19    # GPIO pin for connected ESC
+    SERVO_PIN = 26          # GPIO pin for connected servo
+    ESC_PIN = 19            # GPIO pin for connected ESC
+    FLOOD_LIGHT_PIN = 13    # GPIO pin for connected Flood Light Leds
 
     FREQ_SERVO = 100  # Servo frequency (Standard for servos)
     FREQ_ESC = 100    # ESC frequency (Match your ESC calibration)
@@ -86,18 +87,22 @@ class DriveCoreHost:
         self.client_online = False
 
 
-    def setup_pigpio(self):
+    def setup_pigpio(self, mode=None):
         if not self.pi.connected:
             print("ERROR: pigpio daemon is not running!")
             exit(1)
-
-        # Set initial values for servo and ESC
-        self.pi.set_servo_pulsewidth(self.SERVO_PIN, self.neutral_servo)    # Start at center
-        self.pi.set_servo_pulsewidth(self.ESC_PIN, self.neutral_duty_esc)   # Start ESC at neutral
+        if mode == "FLASH":
+            self.pi.set_mode(self.FLOOD_LIGHT_PIN, pigpio.OUTPUT)               # Setup Flood lights
+        else:
+            # Set initial values for servo and ESC
+            self.pi.set_servo_pulsewidth(self.SERVO_PIN, self.neutral_servo)    # Start at center
+            self.pi.set_servo_pulsewidth(self.ESC_PIN, self.neutral_duty_esc)   # Start ESC at neutral
+            self.pi.set_mode(self.FLOOD_LIGHT_PIN, pigpio.OUTPUT)               # Setup Flood lights
     
     def reset_pwm(self):
         self.pi.set_servo_pulsewidth(self.SERVO_PIN, self.neutral_servo)    # Start at center
         self.pi.set_servo_pulsewidth(self.ESC_PIN, self.neutral_duty_esc)   # Start ESC at neutral
+        self.pi.write(self.FLOOD_LIGHT_PIN, 0)                              # Turn of Flood Light
 
     # === Mapping Helpers ===
     def map_throttle(self, intensity, forward=True):
@@ -210,5 +215,8 @@ class DriveCoreHost:
         self.pi.stop()
         
 if __name__ == "__main__":
-    host = DriveCoreHost()
-    host.run()
+    try:
+        host = DriveCoreHost()
+        host.run()
+    except KeyboardInterrupt:
+        host.shutdown()

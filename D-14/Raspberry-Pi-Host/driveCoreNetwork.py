@@ -61,11 +61,17 @@ class NetworkManager:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         message = json.dumps(broadcast_packet(self.VIDEO_PORT, self.CONTROL_PORT, self.HEARTBEAT_PORT))
+        self.core.setup_pigpio("FLASH")
         while not self.core.handshake_complete.is_set():
+            self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 1)
             sock.sendto(message.encode(), ('<broadcast>', self.BROADCAST_PORT))
             print("Broadcasting...")
-            time.sleep(3)
+            time.sleep(1.5)
+            self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
+            time.sleep(1.5)
         sock.close()
+        self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
+        self.core.pi.stop()
     
     # === HANDLE HANDSHAKE LOGIC ===
     def listen_for_handshake(self):
@@ -108,6 +114,14 @@ class NetworkManager:
                 self.handshake_status = True
                 self.core.client_online = True
                 #sock.close()
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 1)
+                time.sleep(0.2)
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
+                time.sleep(0.2)
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 1)
+                time.sleep(0.2)
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
+
                 self.core.handshake_complete.set()
 
     # === Handle Client responces ===
@@ -432,6 +446,12 @@ class NetworkManager:
             elif command == "CLEAR_EMERGENCY":
                 self.core.emergency_active = False
                 print("Emergency cleared manually.")
+            
+            elif command == "ENABLE_DRIVE_ASSIST":
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 1)
+            
+            elif command == "DISABLE_DRIVE_ASSIST":
+                self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
             
             print(f"Command: {command} | ESC: {self.core.current_esc_pw} | SERVO: {self.core.current_servo_pw} | From: {addr} | Time diff: {now - incoming_time}ms")
             ack = keyboard_command_ack_packet(command, self.core.current_esc_pw, self.core.current_servo_pw)

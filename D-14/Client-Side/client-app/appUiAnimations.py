@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QLabel, QWidget, QGraphicsOpacityEffect, QVBoxLayo
 from PySide6.QtCore import QTimer, QPropertyAnimation, Qt, QEasingCurve, QRectF, QThread, QEvent
 from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen, QConicalGradient, QLinearGradient
 
-import math
 
 class AnimatedToolTip(QLabel):
     def __init__(self, text, parent=None):

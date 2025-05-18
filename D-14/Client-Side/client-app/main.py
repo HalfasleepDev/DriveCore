@@ -594,28 +594,35 @@ class MainWindow(QMainWindow):
     def toggleSettingOpenCvBtns(self, select):
         """
         Toggles visualization/debug settings for OpenCV modes.
+        Works as a pseudo Drive Assist Enable
 
         Args:
             select (int): Identifier for the selected OpenCV mode.
         """
-        self.IS_DRIVE_ASSIST_ENABLED = True
-        match select:
-            case 1:
-                self.OBJECT_VIS_ENABLED = toggleDebugCV(self.ui.ObjectVisBtn, self.OBJECT_VIS_ENABLED, "Object Vis: ")
-            case 2:
-                self.FLOOR_VIS_ENABLED = toggleDebugCV(self.ui.FloorVisBtn, self.FLOOR_VIS_ENABLED, "Floor Vis: ")
-            case 3:
-                self.KALMAN_CENTER_VIS_ENABLED = toggleDebugCV(self.ui.KalmanCenterVisBtn, self.KALMAN_CENTER_VIS_ENABLED, "Kalman Center Vis: ")
-            case 4:
-                self.AMBIENT_VIS_ENABLED = toggleDebugCV(self.ui.AmbientVisBtn, self.AMBIENT_VIS_ENABLED, "Ambient Vis: ")
-            case 5:
-                self.FLOOR_SAMPLE_VIS_ENABLED = toggleDebugCV(self.ui.FloorSampleVisBtn, self.FLOOR_SAMPLE_VIS_ENABLED, "Floor Sample Vis: ")
-            case 6:
-                self.PATH_VIS_ENABLED = toggleDebugCV(self.ui.PathVisBtn, self.PATH_VIS_ENABLED, "Path Vis: ")
-            case 7 | 8:
-                self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
-                self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
-                self.IS_DRIVE_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
+        #self.IS_DRIVE_ASSIST_ENABLED = True
+        if self.VEHICLE_CONNECTION:
+            match select:
+                case 1:
+                    self.OBJECT_VIS_ENABLED = toggleDebugCV(self.ui.ObjectVisBtn, self.OBJECT_VIS_ENABLED, "Object Vis: ")
+                case 2:
+                    self.FLOOR_VIS_ENABLED = toggleDebugCV(self.ui.FloorVisBtn, self.FLOOR_VIS_ENABLED, "Floor Vis: ")
+                case 3:
+                    self.KALMAN_CENTER_VIS_ENABLED = toggleDebugCV(self.ui.KalmanCenterVisBtn, self.KALMAN_CENTER_VIS_ENABLED, "Kalman Center Vis: ")
+                case 4:
+                    self.AMBIENT_VIS_ENABLED = toggleDebugCV(self.ui.AmbientVisBtn, self.AMBIENT_VIS_ENABLED, "Ambient Vis: ")
+                case 5:
+                    self.FLOOR_SAMPLE_VIS_ENABLED = toggleDebugCV(self.ui.FloorSampleVisBtn, self.FLOOR_SAMPLE_VIS_ENABLED, "Floor Sample Vis: ")
+                case 6:
+                    self.PATH_VIS_ENABLED = toggleDebugCV(self.ui.PathVisBtn, self.PATH_VIS_ENABLED, "Path Vis: ")
+                case 7 | 8:
+                    self.COLLISION_ASSIST_ENABLED = toggleDebugCV(self.ui.CollisionAssistBtn, self.COLLISION_ASSIST_ENABLED, "")
+                    self.COLLISION_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
+                    self.IS_DRIVE_ASSIST_ENABLED = self.ui.driveAssistWidget.toggle_assist()
+                    if self.IS_DRIVE_ASSIST_ENABLED:
+                        self.network.send_drive_assist_command("ENABLE_DRIVE_ASSIST")
+                    else:
+                        self.network.send_drive_assist_command("DISABLE_DRIVE_ASSIST")
+
     
     # === Central Logging Handler ===
     def logToSystem(self, message: str, type: str): #? FIXME: Vehicle control logs could slow down the thread
