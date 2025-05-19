@@ -27,7 +27,7 @@ class NetworkManager:
     VIDEO_PORT = 5555
     CONTROL_PORT = 4444
     BROADCAST_PORT = 9999
-    HEARTBEAT_PORT = 8888 #TODO: Finish heartbeat/pulse system
+    HEARTBEAT_PORT = 8888 
 
     CHUNK_SIZE = 1024 #1024
     
@@ -56,6 +56,10 @@ class NetworkManager:
         self.heartbeat_socket.bind(("0.0.0.0", self.HEARTBEAT_PORT))
         self.heartbeat_socket.settimeout(2.0) #0.5
 
+        # === Steering ===
+        self.centering_thread = None
+        self.centering_cancel = threading.Event()
+
     # === ADVERTISE HOST IP ===
     def broadcast_ip(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -71,7 +75,7 @@ class NetworkManager:
             time.sleep(1.5)
         sock.close()
         self.core.pi.write(self.core.FLOOD_LIGHT_PIN, 0)
-        self.core.pi.stop()
+        #self.core.pi.stop()
     
     # === HANDLE HANDSHAKE LOGIC ===
     def listen_for_handshake(self):
@@ -369,26 +373,32 @@ class NetworkManager:
             if command == "UP":
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=True)
                 self.core.pi.set_servo_pulsewidth(self.core.ESC_PIN, self.core.current_esc_pw)
-                self.smooth_servo_center()
+                self.smooth_servo_center_accel()
 
             elif command == "DOWN":
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=False)
                 self.core.pi.set_servo_pulsewidth(self.core.ESC_PIN, self.core.current_esc_pw)
-                self.smooth_servo_center()
+                self.smooth_servo_center_accel()
 
             elif command == "LEFT":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=True)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
                 self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
                 self.core.pi.set_servo_pulsewidth(self.core.ESC_PIN, self.core.neutral_duty_esc)
 
             elif command == "RIGHT":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=False)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
                 self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
                 self.core.pi.set_servo_pulsewidth(self.core.ESC_PIN, self.core.neutral_duty_esc)
 
             elif command == "LEFTUP":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=True)
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=True)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
@@ -396,6 +406,8 @@ class NetworkManager:
                 self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
 
             elif command == "LEFTDOWN":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=False)
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=True)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
@@ -403,6 +415,8 @@ class NetworkManager:
                 self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
 
             elif command == "RIGHTUP":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=True)
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=False)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
@@ -410,6 +424,8 @@ class NetworkManager:
                 self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
 
             elif command == "RIGHTDOWN":
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
                 self.core.current_esc_pw = self.core.map_throttle(esc_intensity, forward=False)
                 self.core.current_servo_pw = self.core.map_steering(servo_intensity, left=False)
                 #self.core.current_servo_pw = self.core.map_steering(self.core.current_esc_pw)
@@ -425,8 +441,12 @@ class NetworkManager:
                 self.core.pi.set_servo_pulsewidth(self.core.ESC_PIN, self.core.current_esc_pw)
 
             elif command == "CENTER":
-                self.core.current_servo_pw = self.core.neutral_servo
-                self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
+                # FIXME: REMOVE!
+                #self.core.current_servo_pw = self.core.neutral_servo
+                #self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
+                # TODO: Cancel any active smooth steering if new CENTER is issued
+                self.centering_cancel.set()
+                self.smooth_servo_center()
 
             elif command == "EMERGENCY_STOP":
                 self.core.current_esc_pw = self.core.brake_esc
@@ -464,7 +484,7 @@ class NetworkManager:
         sock.sendto(json.dumps(ack).encode(), addr)
         sock.close()
     
-    def smooth_servo_center(self, base_step=5, base_delay=0.005):
+    def smooth_servo_center_accel(self, base_step=5, base_delay=0.005):
         """
         Gradually move the servo back to the neutral position.
         - step_size: PWM microseconds per adjustment
@@ -483,6 +503,33 @@ class NetworkManager:
 
             self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, self.core.current_servo_pw)
             time.sleep(base_delay)
+    
+    def smooth_servo_center(self, step_size=10, delay=0.01):
+        self.centering_cancel.clear()
+
+        def run():
+            while not self.centering_cancel.is_set():
+                current = self.core.current_servo_pw
+                target = self.core.neutral_servo
+
+                if current == target:
+                    break  # Done
+
+                if current < target:
+                    current = min(current + step_size, target)
+                else:
+                    current = max(current - step_size, target)
+
+                self.core.current_servo_pw = current
+                self.core.pi.set_servo_pulsewidth(self.core.SERVO_PIN, current)
+                time.sleep(delay)
+
+        # Start only if no other centering is active
+        if self.centering_thread and self.centering_thread.is_alive():
+            return
+
+        self.centering_thread = threading.Thread(target=run, daemon=True)
+        self.centering_thread.start()
     
     def listen_for_heartbeats(self):
         while True:

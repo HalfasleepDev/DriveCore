@@ -59,6 +59,7 @@ class HeartbeatWorker(QObject):
 
     # === Signals ===
     finished = Signal()
+    heartbeat_log_signal = Signal(str,str)
 
     def __init__(self, server_ip, heartbeat_port):
         """
@@ -106,12 +107,10 @@ class HeartbeatWorker(QObject):
 
         try:
             self.sock.sendto(json.dumps(packet).encode(), (self.server_ip, self.heartbeat_port))
-            # FIXME: Remove print()
-            print("pulse")
 
         except Exception as e:
-            # TODO: Move to log
-            print(f"[Heartbeat] Error: {e}")
+            self.heartbeat_log_signal(f"[Heartbeat] Error: {e}", "ERROR")
+            
 
     @Slot()
     def stop(self):
@@ -119,8 +118,7 @@ class HeartbeatWorker(QObject):
         Stops the timer and socket, performs cleanup, and emits the `finished` signal.
         This is safe to call from another thread.
         """
-        # TODO: Move to log
-        print("Stopping HeartbeatWorker")
+        self.heartbeat_log_signal("[Heartbeat] Stopping HeartbeatWorker", "ERROR")
         self.running = False
 
         if self.timer:
@@ -267,10 +265,16 @@ class VideoThread(QThread):
                 except (json.JSONDecodeError, UnicodeDecodeError):
                     pass
 
-                # Insert into preallocated list
-                if self.current_chunks < self.total_chunks:
+                # Only accept chunk if frame is initialized
+                if self.frame_chunks and 0 <= self.current_chunks < self.total_chunks:
                     self.frame_chunks[self.current_chunks] = data
                     self.current_chunks += 1
+                else:
+                    # Desync or uninitialized — reset
+                    print("Dropped chunk due to out-of-range or uninitialized state")
+                    self.frame_chunks = []
+                    self.current_chunks = 0
+                    self.total_chunks = 0
 
                 # Drop the frame if too many chunks are received
                 if self.current_chunks > self.total_chunks:
@@ -717,6 +721,7 @@ class MainWindow(QMainWindow):
                 self.heartbeat_worker.moveToThread(self.heartbeat_thread)
 
                 self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
+                self.heartbeat_thread.heartbeat_log_signal.connect(self.logToSystem)
 
                 self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
                 self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
@@ -730,6 +735,7 @@ class MainWindow(QMainWindow):
                 save_settings(self.settings, self.SETTINGS_FILE)
 
                 showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)
+                self.threadpool.stop()
     # === Initialize Drive Page ===
     def iniDrivePage(self):
         """

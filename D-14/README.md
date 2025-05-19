@@ -279,7 +279,7 @@
 - [x] Acceleration curves *(CLIENT)*
 - [x] Vehicle status info *(CLIENT)*
 - [x] Restarting connection
-- [ ] Error messages
+- [x] Error messages
 - [ ] Application packaging
 - [x] Client-Host logging
 
