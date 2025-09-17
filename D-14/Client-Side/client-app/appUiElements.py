@@ -28,18 +28,6 @@ import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
 
-#! IMPORTANT:
-'''
-- All of these Widgets do not have interactive signals yet
-- Everything is held together with duct tape
-- Ver 1.3 is needed for Client to Host communication
-'''
-""" TODO:
-- [x] Speedometer linking
-- [x] Steering linking
-- [ ] Drive Assist linking
-- [x] Fix CarConnectWidget styling
-"""
 
 class GitHubInfoPanel(QWidget):
     """

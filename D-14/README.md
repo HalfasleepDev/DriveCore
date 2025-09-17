@@ -263,8 +263,8 @@
 ## Current issues:
 - [ ] `Emergency Disconnect` does not work properly.
 - [x] Sometimes multiple commands are sent at once.
-- [ ] The servo needs to be re-calibrated.
-- [ ] The automatic brake creates an info backup
+- [x] The servo needs to be re-calibrated.
+- [x] The automatic brake creates an info backup
 
 ---
 
@@ -282,6 +282,7 @@
 - [x] Error messages
 - [ ] Application packaging
 - [x] Client-Host logging
+- [ ] `Emergency Disconnect` system implementation
 
 </details>
 

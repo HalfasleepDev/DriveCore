@@ -156,7 +156,7 @@ class DepthViewer(QWidget):
 
 # --- Main Execution ---
 if __name__ == "__main__":
-    stream_url = "http://10.0.0.11:5000/video-feed" #! USE BACKUP FLASK STREAM FOR TESTING
+    stream_url = "http://192.168.0.125:5000/video-feed" #! USE BACKUP FLASK STREAM FOR TESTING
     app = QApplication(sys.argv)
     viewer = DepthViewer(stream_url)
     viewer.resize(800, 600)

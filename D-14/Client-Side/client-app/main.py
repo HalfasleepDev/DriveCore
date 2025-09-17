@@ -83,6 +83,7 @@ class HeartbeatWorker(QObject):
         """
         # TODO: Move to log
         print("Pulse Start")
+        self.heartbeat_log_signal(f"[Heartbeat] Info: Pulse Start", "INFO")
 
         self.timer = QTimer(self)  # Create timer with self as parent (safe post-moveToThread)
         self.timer.setInterval(4000)  # Emit heartbeat every 4 seconds
@@ -271,10 +272,10 @@ class VideoThread(QThread):
                     self.current_chunks += 1
                 else:
                     # Desync or uninitialized — reset
-                    print("Dropped chunk due to out-of-range or uninitialized state")
+                    #print("Dropped chunk due to out-of-range or uninitialized state")
                     self.frame_chunks = []
                     self.current_chunks = 0
-                    self.total_chunks = 0
+                    #self.total_chunks = 0
 
                 # Drop the frame if too many chunks are received
                 if self.current_chunks > self.total_chunks:
@@ -643,8 +644,8 @@ class MainWindow(QMainWindow):
                 self.ui.networkConnectionLogWidget.add_log(f"[{type}] {message}")
             case "INFO" | "WARN":
                 self.ui.vehicleSystemAlertLogWidget.add_log(f"[{type}] {message}")
-                QCoreApplication.processEvents()
-        #QCoreApplication.processEvents()
+                #QCoreApplication.processEvents()
+        QCoreApplication.processEvents()
 
     # === Show Error Dialog Globally ===
     def showGlobalError(self, title: str, message: str, severity: str, duration =0):
@@ -721,13 +722,15 @@ class MainWindow(QMainWindow):
                 self.heartbeat_worker.moveToThread(self.heartbeat_thread)
 
                 self.heartbeat_thread.started.connect(self.heartbeat_worker.start)
-                self.heartbeat_thread.heartbeat_log_signal.connect(self.logToSystem)
+                
 
                 self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
                 self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
                 self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
 
                 self.heartbeat_thread.start()
+
+                self.heartbeat_worker.heartbeat_log_signal.connect(self.logToSystem)
 
                 self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
                 self.settings["username"] = username
@@ -748,18 +751,24 @@ class MainWindow(QMainWindow):
             print(self.network.server_ip)
             print(self.network.video_port)
 
-            self.thread = VideoThread(self.network.server_ip, self.network.video_port)
+            '''self.thread = VideoThread(self.network.server_ip, self.network.video_port)
             self.processor = FrameProcessor(self, self.thread)
             self.processor.initKalmanFilter()
-            self.thread.set_processor(self.processor)
-            self.thread.frame_received.connect(self.update_frame)
-            self.thread.heartbeat_signal.connect(self.checkHeartBeat)
+            self.thread.set_processor(self.processor)'''
+            '''self.thread.frame_received.connect(self.update_frame)
+            self.thread.heartbeat_signal.connect(self.checkHeartBeat)'''
 
             if not self.OPENED_DRIVE_PAGE:
+                self.thread = VideoThread(self.network.server_ip, self.network.video_port)
+                self.processor = FrameProcessor(self, self.thread)
+                self.processor.initKalmanFilter()
+                self.thread.set_processor(self.processor)
                 self.thread.start()
                 self.THREAD_RUNNING = True
                 self.OPENED_DRIVE_PAGE = True
             
+            self.thread.frame_received.connect(self.update_frame)
+            self.thread.heartbeat_signal.connect(self.checkHeartBeat)
             self.updateVehicleMovement("SET")
             self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color:  #0c0c0d;}")
             self.ui.drivePage.commandSignal.connect(self.changeKeyInfo)
@@ -1008,6 +1017,18 @@ class MainWindow(QMainWindow):
         if self.VEHICLE_CONNECTION == True:
             self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
             #TODO: RESET ALL SYSTEMS, SEND A DISCONNECT/Shutdown Command to Host
+            # Vehicle Status
+
+
+            # Video stream
+            if self.THREAD_RUNNING == True:
+                self.thread.stop()
+                self.ui.videoStreamLabel.setText("No Conncection")
+                self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color: #f1f3f3;}")
+
+            # Popup 
+            showError(self.ui.centralwidget, "Vehicle Error", "Vehicle disconnected or connection timeout", "ERROR") #TODO <--- fix the popup msg
+
             #self.send_command("DISCONNECT")
             #VEHICLE_CONNECTION = False
     
