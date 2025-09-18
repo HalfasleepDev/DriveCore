@@ -125,6 +125,29 @@ Each script is treated as a standalone experiment or iteration, with its purpose
 
 </details>
 
+### Iteration 09 (optimized) - `pathDetectT9o.py`
+- **Goal:** Optimizing the blob and grid object classification system from `pathDetectT9.py`.
+- **Technique:** Using vectorized calculations, batch rendering, and memory allocation. 
+- **Result:** No more lagging from detection of multiple alert-cells with increased stable framerate. 
+<details>
+
+<summary>GUI Demo 09 (optimized):</summary>
+
+![Iteration 09o GUI](T9o_GUI.gif)
+
+</details>
+
+### Iteration 09-path - `pathDetectT9path.py`
+- **Goal:** Prototyping a framework for a path navigation system using the data collected from `pathDetectT9.py`, with a drop-in for steering input. 
+- **Technique:** Creates and uses an openness map where either Potential Fzield or A* method can be applied. From there, the steering angle is calculated to follow the generated path. 
+- **Result:** Limited path plotting to avoid obstacles and walls with generated steering input.
+<details>
+<summary>GUI Demo 09-path:</summary>
+
+![Iteration 09path GUI](T9-path_GUI.gif)
+
+</details>
+
 ---
 
 ## Next Steps
@@ -134,7 +157,7 @@ Each script is treated as a standalone experiment or iteration, with its purpose
 - [ ] IMU vehicle position awareness.
 - [ ] Speed estimation (m/s) using the depth model.
 - [ ] Map Manager system for environment awareness.
-
+- [ ] Trained dataset integration.
 ---
 
 ## How to Run
