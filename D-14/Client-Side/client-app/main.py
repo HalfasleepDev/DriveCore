@@ -4,7 +4,7 @@ main.py
 The main file for the Client App and system hooks.
 
 Author: HalfasleepDev
-Created: 22-02-2025
+Created: 19-02-2025
 """
 
 # === Imports ===
@@ -899,64 +899,56 @@ class MainWindow(QMainWindow):
                 case "servo_mid_cal":
                     self.network.tune_vehicle_command(mode, min)
                     self.logToSystem(f"[SERVO] Servo tested at {min} µs", "DEBUG")
-                    #TEST PRINT
-                    #print(min)
                 
                 case "save_mid_servo":
                     self.network.tune_vehicle_command(mode, min)
-                    # TODO: Uncomment if it works
-                    #self.settings["neutral_duty_servo"] = min
-                    #save_settings(self.settings, self.SETTINGS_FILE)
+                    #? Comment if it fails
+                    self.settings["neutral_duty_servo"] = min
+                    save_settings(self.settings, self.SETTINGS_FILE)
+                    #? --- END ---
 
                     self.logToSystem(f"[SERVO] New servo midpoint is set to {min} µs", "DEBUG")
-                        
-                    #TEST PRINT
-                    #print(f"TEST save servo mid {min}")
 
                 case "test_servo":
                     self.network.tune_vehicle_command(mode, min, max, mid)
                     # SEND TEST COMMAND ---> Send via WAIT and Send command, ACK should re enable the button
-                    
-                    # TEST PRINT
-                    #print(f"SERVO:\nMin: {min} µs\nMid: {mid} µs\nMax: {max} µs")
 
                 case "save_servo":
-                    # TODO: Uncomment if it works
-                    #self.network.tune_vehicle_command(mode, min, max, mid)
-                    #self.settings["neutral_duty_servo"] = mid
-                    #self.settings["max_duty_servo"] = max
-                    #self.settings["min_duty_servo"] = min
-                    #save_settings(self.settings, self.SETTINGS_FILE)
+                    #? Comment if it fails
+                    self.network.tune_vehicle_command(mode, min, max, mid)
+                    self.settings["neutral_duty_servo"] = mid
+                    self.settings["max_duty_servo"] = max
+                    self.settings["min_duty_servo"] = min
+                    save_settings(self.settings, self.SETTINGS_FILE)
+                    #? --- END ---
 
                     self.logToSystem(f"[SERVO] New servo is set to {min}µs, {mid}µs, {max}µs", "DEBUG") 
 
-
-                
                 case "test_esc":
                     self.network.tune_vehicle_command(mode, 0,0,0, min, mid, max, brake)
-                        
-                    # TEST PRINT
-                    #print(f"ESC:\nMin: {min} µs\nMid: {mid} µs\nMax: {max} µs\nBRAKE {brake} µs")
 
                 case "save_esc":
-                    # TODO: Uncomment if it works
-                    #self.network.tune_vehicle_command(mode, 0,0,0, min, mid, max, brake)
-                    #self.settings["min_duty_esc"] = min
-                    #self.settings["max_duty_esc"] = max
-                    #self.settings["neutral_duty_esc"] = mid
-                    #self.settings["brake_esc"] = brake
-                    #save_settings(self.settings, self.SETTINGS_FILE)
+                    #? Comment if it fails
+                    self.network.tune_vehicle_command(mode, 0,0,0, min, mid, max, brake)
+                    self.settings["min_duty_esc"] = min
+                    self.settings["max_duty_esc"] = max
+                    self.settings["neutral_duty_esc"] = mid
+                    self.settings["brake_esc"] = brake
+                    save_settings(self.settings, self.SETTINGS_FILE)
+                    #? --- END ---
 
                     self.logToSystem(f"[ESC] New esc is set to {min}µs, {mid}µs, {max}µs, {brake}µs", "DEBUG")
 
         elif mode == "update_port":
-            # TODO: Uncomment if it works
-            #self.settings["broadcast_port"] = port
-            #save_settings(self.settings, self.SETTINGS_FILE)
+            #? Comment if it fails
+            self.settings["broadcast_port"] = port
+            save_settings(self.settings, self.SETTINGS_FILE)
+            #? --- END ---
                     
             self.logToSystem(f"[NETWORK] Updated broadcast port on client to {port}", "DEBUG")
-
-        #self.settings = load_settings(self.SETTINGS_FILE)
+        #? Comment if it fails
+        self.settings = load_settings(self.SETTINGS_FILE)
+        #? --- END ---
     
     # === General Settings Update ===
     def updateGeneralSettings(self, mode:str, value):
@@ -1017,8 +1009,13 @@ class MainWindow(QMainWindow):
         if self.VEHICLE_CONNECTION == True:
             self.ui.emergencyDisconnectBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
             #TODO: RESET ALL SYSTEMS, SEND A DISCONNECT/Shutdown Command to Host
-            # Vehicle Status
 
+            # Vehicle Status
+            self.VEHICLE_CONNECTION = False
+            self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = False
+            self.logToSystem("Vehicle forcefully disconnected", "ERROR")
+            self.ui.vehicleTypeLabel.setText("Unknown")
+            QMetaObject.invokeMethod(self.heartbeat_worker, "stop", Qt.QueuedConnection)
 
             # Video stream
             if self.THREAD_RUNNING == True:
@@ -1027,7 +1024,7 @@ class MainWindow(QMainWindow):
                 self.ui.videoStreamWidget.setStyleSheet("QWidget{background-color: #f1f3f3;}")
 
             # Popup 
-            showError(self.ui.centralwidget, "Vehicle Error", "Vehicle disconnected or connection timeout", "ERROR") #TODO <--- fix the popup msg
+            showError(self.ui.centralwidget, "Vehicle Error", "Vehicle forcefully disconnected", "ERROR")
 
             #self.send_command("DISCONNECT")
             #VEHICLE_CONNECTION = False

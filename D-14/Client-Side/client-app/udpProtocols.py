@@ -1,3 +1,12 @@
+"""
+udpProtocols.py
+
+Client Host Communication protocol templates.
+
+Author: HalfasleepDev
+Created: 24-04-2025
+"""
+
 import time
 
 def current_time():

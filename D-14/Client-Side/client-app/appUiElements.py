@@ -1,3 +1,12 @@
+"""
+appUiElements.py
+
+UI element implementation from the ver-1-2 & ver-1-3 ui-prototypes
+
+Author: HalfasleepDev
+Created: 18-04-2025
+"""
+
 import sys
 import requests
 from bs4 import BeautifulSoup

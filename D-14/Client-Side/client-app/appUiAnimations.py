@@ -1,3 +1,13 @@
+"""
+appUiAnimations.py
+
+Main app-wide animations and popups.
+
+Author: HalfasleepDev
+Created: 18-04-2025
+"""
+
+# === Imports ===
 from PySide6.QtWidgets import QLabel, QWidget, QGraphicsOpacityEffect, QVBoxLayout, QHBoxLayout, QPushButton, QGraphicsColorizeEffect
 from PySide6.QtCore import QTimer, QPropertyAnimation, Qt, QEasingCurve, QRectF, QThread, QEvent
 from PySide6.QtGui import QFont, QPixmap, QPainter, QColor, QPen, QConicalGradient, QLinearGradient

@@ -1,3 +1,12 @@
+"""
+openCVFunctions.py
+
+OpenCv functions implementation from pathDetectT4.py
+
+Author: HalfasleepDev
+Created: 04-04-2025
+"""
+
 import sys
 import cv2
 import numpy as np

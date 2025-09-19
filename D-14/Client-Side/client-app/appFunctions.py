@@ -4,7 +4,7 @@ appFunctions.py
 Background app functions and systems.
 
 Author: HalfasleepDev
-Created: 22-02-2025
+Created: 19-02-2025
 """
 
 # === Imports ===
