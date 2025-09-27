@@ -1,36 +1,43 @@
 # WPL D-14 
 ![Modified WPL D-14 Host](D-14-Mod.jpg)
 
-## Currently running Ver 1.2 - *"Control Tuning & UI Foundations"*
+## Currently running Ver 1.3.0 - *"Control System & Communication Layer"*
 
 ---
 
-![Ver 1.2 Demo](Diagrams-Concepts/Ver-1-2/DemoV1-2.gif)
+![Ver 1.3.0 Demo](Diagrams-Concepts/Ver-1-3-0/DemoV1-3-0.gif)
 
 ---
 ## Features:
 ### Host:
-- Can move forward, backward, and any combination with left or right
-- Connection timeout safety stop
-- Command queue for reducing input lag
-- Ease of acceleration for servo and esc
-- 720p video stream using a flask server
+- Can move forward, backward, and any combination with left or right.
+- Connection timeout safety stop/disconnecct.
+- Command ack for latency tracking.
+- Acceleration curves for esc.
+- Servo return to center for natural drive control. 
+- 720p video stream using a UDP protocol.
+- Network broadcast system.
+- Client communication.
+- Vehicle settings.
 
 ### Client:
-- Uses pyside6 UI library
-- Store recently connected IPs in history
-- Video stream
-- Inputs using `W` `A` `S` `D`
-- On exit, the host "should" stop running
-- OpenCV HUD & settings
-- UI Foundations for upcomming Ver 1.3
+- Uses pyside6 UI library.
+- Store most recent vehicle username and password in history.
+- App settings
+- Video stream.
+- Inputs using `W` `A` `S` `D`.
+- On exit, the host "should" stop running.
+- OpenCV HUD & settings.
+- Vehicle inspired UI.
+- Vehicle tunning system. 
+- System logging for debugging.
 
-### UI Demo (Ver 1.2):
+### UI Demo (Ver 1.3.0):
 <details>
 
 <summary>Home Page</summary>
 
-![Home Page Ver 1.2](Diagrams-Concepts/Ver-1-2/HomePageV1-2.gif)
+![Home Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/HomePageV1-3-0.gif)
 
 </details>
 
@@ -38,7 +45,7 @@
 
 <summary>Drive Page</summary>
 
-![Drive Page Ver 1.2](Diagrams-Concepts/Ver-1-2/DrivePageV1-2.gif)
+![Drive Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/DrivePageV1-3-0.gif)
 
 </details>
 
@@ -46,7 +53,7 @@
 
 <summary>Log Page</summary>
 
-![Log Page Ver 1.2](Diagrams-Concepts/Ver-1-2/LogPageV1-2.gif)
+![Log Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/LogPageV1-3-0.gif)
 
 </details>
 
@@ -54,7 +61,7 @@
 
 <summary>Settings Page</summary>
 
-![Settings Page Ver 1.2](Diagrams-Concepts/Ver-1-2/SettingsPageV1-2.gif)
+![Settings Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/SettingsPageV1-3-0.gif)
 
 </details>
 
@@ -62,7 +69,7 @@
 
 <summary>OpenCV Overlay</summary>
 
-![OpenCV Overlay Ver 1.2](Diagrams-Concepts/Ver-1-2/CvOverlayV1-2.gif)
+![OpenCV Overlay Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/CvOverlayV1-3-0.gif)
 
 </details>
 
@@ -246,6 +253,78 @@
 
 </details>
 
+<details>
+
+<summary>Ver 1.3.0</summary>
+
+#### Ver 1.3.0 - "Control System & Communication Layer"
+
+##### Host:
+- **New** network manager system.
+- **New** broadcast and verification for easier connection on wireless networks.
+- **New** UDP video stream.
+- **New** protocols.
+- **New** Settings implementation. 
+- **New** floodlight status implementation.
+
+##### Client
+- Added a **new** communication layer & full UI implementation for the widgets from Ver 1.2.
+- Acceleration curves.
+- Vehicle status info display.
+- Connection restart protocols
+- **New** System Error messages and popups. 
+- **New** System logs.
+- **New** Username and password connection.
+- App settings and calibration integration.
+- Drive Mode framework. (Client based)
+- UDP video stream integration.
+- Command stream system.
+
+##### UI Demo (Ver 1.3.0):
+<details>
+
+<summary>Home Page</summary>
+
+![Home Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/HomePageV1-3-0.gif)
+
+</details>
+
+<details>
+
+<summary>Drive Page</summary>
+
+![Drive Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/DrivePageV1-3-0.gif)
+
+</details>
+
+<details>
+
+<summary>Log Page</summary>
+
+![Log Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/LogPageV1-3-0.gif)
+
+</details>
+
+<details>
+
+<summary>Settings Page</summary>
+
+![Settings Page Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/SettingsPageV1-3-0.gif)
+
+</details>
+
+<details>
+
+<summary>OpenCV Overlay</summary>
+
+![OpenCV Overlay Ver 1.3.0](Diagrams-Concepts/Ver-1-3-0/CvOverlayV1-3-0.gif)
+
+</details>
+
+---
+
+</details>
+
 ---
 
 ## Hardware requirements:
@@ -257,44 +336,31 @@
 - wifi extender
 - led kit (optional)
 - Follow the [Electronic Diagram](Diagrams-Concepts/D-14-Electronic-Diagram.pdf)
+    - *Flood light guide comming soon*
 
 ---
 
 ## Current issues:
 - [ ] `Emergency Disconnect` does not work properly.
-- [x] Sometimes multiple commands are sent at once.
-- [x] The servo needs to be re-calibrated.
-- [x] The automatic brake creates an info backup
+    - Should send a disconnect command to vehicle.
+- [ ] The Re-Connect system is unreliable.
+    - Threading issue.
+- [ ] Floodlights are faulty
 
 ---
 
 ## Version Roadmap **(Upcomming)**:
-<details>
-
-<summary>Version 1.3</summary>
-
-### Version 1.3 – “Control System & Communication Layer”
-- [x] Drive model *(HOST)*
-- [x] Client-Host communication & verification
-- [x] Acceleration curves *(CLIENT)*
-- [x] Vehicle status info *(CLIENT)*
-- [x] Restarting connection
-- [x] Error messages
-- [ ] Application packaging
-- [x] Client-Host logging
-- [ ] `Emergency Disconnect` system implementation
-
-</details>
 
 <details>
 
 <summary>Version 1.4</summary>
 
 ### Version 1.4 – “Intelligent Perception Update”
- - [ ] Integrate monoculear depth estimation for floor & obstacle awareness
- - [ ] Use depth to improve obstacle detection & safety logic
- - [ ] Vehicle imu intergration
- - [ ] Vehicle flood light upgrade
+ - [ ] Integrate monoculear depth estimation for floor & obstacle awareness.
+ - [ ] Use depth to improve obstacle detection & safety logic.
+ - [ ] Vehicle imu intergration.
+ - [x] Vehicle flood light upgrade.
+ - [ ] Steering input.
  ...
 
  </details>
@@ -328,12 +394,20 @@
 - [x] Path detection (opencv) **(Ver 1.1)**
 - [x] Reduced input lag **(Ver 1.1)**
 - [x] Error popups for critical issues **(Ver 1.1)**
+
 - [x] Framework for steering and max throttle tuning on the `settings` page **(Ver 1.2)**
 - [X] UI design consistency **(Ver 1.2)**
 - [x] Add UI element foundations for *Ver 1.3* **(Ver 1.2)**
 - [x] Upgrade `settings` page **(Ver 1.2)**
 - [x] Created the front-end for the `log` page **(Ver 1.2)**
 
+- [x] Drive model *(HOST)* **(Ver 1.3.0)**
+- [x] Client-Host communication & verification **(Ver 1.3.0)**
+- [x] Acceleration curves *(CLIENT)* **(Ver 1.3.0)**
+- [x] Vehicle status info *(CLIENT)* **(Ver 1.3.0)**
+- [x] Restarting connection **(Ver 1.3.0)**
+- [x] Error messages **(Ver 1.3.0)**
+- [x] Client-Host logging **(Ver 1.3.0)**
 </details>
 
 ---

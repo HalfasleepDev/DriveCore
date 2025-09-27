@@ -83,7 +83,7 @@ class HeartbeatWorker(QObject):
         """
         # TODO: Move to log
         print("Pulse Start")
-        self.heartbeat_log_signal(f"[Heartbeat] Info: Pulse Start", "INFO")
+        #self.heartbeat_log_signal(f"[Heartbeat] Info: Pulse Start", "INFO")
 
         self.timer = QTimer(self)  # Create timer with self as parent (safe post-moveToThread)
         self.timer.setInterval(4000)  # Emit heartbeat every 4 seconds
@@ -119,7 +119,7 @@ class HeartbeatWorker(QObject):
         Stops the timer and socket, performs cleanup, and emits the `finished` signal.
         This is safe to call from another thread.
         """
-        self.heartbeat_log_signal("[Heartbeat] Stopping HeartbeatWorker", "ERROR")
+        #self.heartbeat_log_signal("[Heartbeat] Stopping HeartbeatWorker", "ERROR")
         self.running = False
 
         if self.timer:
@@ -291,7 +291,15 @@ class VideoThread(QThread):
 
                     # Decode JPEG to OpenCV frame
                     nparr = np.frombuffer(frame_data, np.uint8)
-                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    try:
+                        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    except cv2.error:
+                        frame = None
+                    if frame is None:
+                        self.frame_chunks = []
+                        self.current_chunks = 0
+                        continue
+                    #frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
                     if frame is not None:
                         # --- Update FPS ---
@@ -730,7 +738,8 @@ class MainWindow(QMainWindow):
 
                 self.heartbeat_thread.start()
 
-                self.heartbeat_worker.heartbeat_log_signal.connect(self.logToSystem)
+                #TODO: Fix the log signal for heartbeat
+                #self.heartbeat_worker.heartbeat_log_signal.connect(self.logToSystem)
 
                 self.ui.VehicleTuningSettingsPage.IS_VEHICLE_READY = True
                 self.settings["username"] = username
@@ -738,7 +747,13 @@ class MainWindow(QMainWindow):
                 save_settings(self.settings, self.SETTINGS_FILE)
 
                 showError(self.ui.centralwidget, "Connection Succes!", f"Established and secured connection to vehicle {self.vehicle_model}", "SUCCESS", 3000)
-                self.threadpool.stop()
+                
+                try:
+                    self.threadpool.clear()
+                except AttributeError:
+                    pass
+                self.threadpool.waitForDone()
+
     # === Initialize Drive Page ===
     def iniDrivePage(self):
         """
@@ -998,6 +1013,9 @@ class MainWindow(QMainWindow):
             
             # Popup
             showError(self.ui.centralwidget, "Vehicle Error", "Vehicle disconnected or connection timeout", "ERROR")
+        #TODO: Temp fix for heartbeat log signal?
+        else:
+            self.heartbeat_worker.heartbeat_log_signal.connect(self.logToSystem)
     
     # === Emergency Disconnect Logic ===
     def emergencyDisconnect(self):

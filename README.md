@@ -25,13 +25,13 @@ DriveCore is a modular and scalable platform designed for controlling RC vehicle
 - Edge Computing with TensorFlow Lite
 - Advanced SLAM (Simultaneous Localization and Mapping)
 
-DriveCore is built for enthusiasts, researchers, and developers looking to push the boundaries of AI-driven RC control. Whether experimenting with computer vision, autonomous navigation, or real-time control, DriveCore provides the flexibility and power to bring ideas to life.
+DriveCore is built for enthusiasts, researchers, and developers looking to expirement with AI-driven RC control. Whether experimenting with computer vision, autonomous navigation, or real-time control, DriveCore provides the flexibility to explore multiple concepts.
 
 ---
 
-# Current Version: 1.2 - *"Control Tuning & UI Foundations"* for D-14
+# Current Version: 1.3.0 - *"Control System & Communication Layer"* for D-14
 
-![Ver 1.2 Demo](D-14/Diagrams-Concepts/Ver-1-2/DemoV1-2.gif)
+![Ver 1.3.0 Demo](D-14/Diagrams-Concepts/Ver-1-3-0/DemoV1-3-0.gif)
 
 - [D-14 Client and Host Section](D-14/README.md)
 
@@ -39,7 +39,7 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 
 <summary>Important Notes</summary>
 
-- Many UI elements are functional, but they require backend functionality **(Ver 1.3)**
+- The program becomes unstable after multiple disconnects and reconnects.
 
 </details>
 
@@ -55,25 +55,27 @@ DriveCore is built for enthusiasts, researchers, and developers looking to push 
 ## Getting Started
 
 ### Clone the Repository
-`git clone https://github.com/YourUsername/DriveCore.git cd DriveCore`
+`git clone https://github.com/HalfasleepDev/DriveCore.git cd DriveCore`
 
 
 ### Install Dependencies
 `pip install -r requirements.txt`
-- For host and client
+- For host and client.
 
 
 ### Configure RC Car Control Server
-- create `DriveCore` folder on the raspberry pi
-- copy `drive-core-host.sh`, `driveCoreHost.py`, `getIpAddr.py`, and `webStream.py` to the raspberry pi's folder called DriveCore
+- Create `DriveCore` folder on the Raspberry Pi.
+- Create a python venv.
+- Copy `drive-core-host.sh`, `driveCoreHost.py`, `driveCoreNetwork.py`,`coreFunctions.py`, `settings.json`, and `udpHostProtocols.py` to the raspberry pi's folder called DriveCore.
 
 ### Run the RC Car Control Server
 `cd Drivecore`
 `sudo ./drive-core-host.sh`
-- wait a minute or so for the flask server to start streaming
+- Wait a minute or so for the system to start broadcasting.
 
 ### Launch the Client Application
 `python3 DriveCore/D-14/Client-Side/client-app/main.py`
+- Log into the Control Server using the configured credentials set in `DriveCore/settings.json` on the Raspberry pi.
 
 ---
 

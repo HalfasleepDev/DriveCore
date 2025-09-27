@@ -616,7 +616,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(320, 240))
         self.label_2.setMaximumSize(QSize(320, 240))
-        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-2.png"))
+        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-3-0.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout_9.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -1412,7 +1412,7 @@ class Ui_MainWindow(object):
         self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
         self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
         self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
-        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.3.0 (12-05-2025)", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.3.0 (27-09-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
         self.accelerateBtn.setText(QCoreApplication.translate("MainWindow", u"Accelerate : [W]", None))
         self.turnLeftBtn.setText(QCoreApplication.translate("MainWindow", u"Turn Left : [A]", None))
