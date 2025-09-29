@@ -345,7 +345,8 @@
     - Should send a disconnect command to vehicle.
 - [ ] The Re-Connect system is unreliable.
     - Threading issue.
-- [ ] Floodlights are faulty
+- [x] Floodlights are faulty
+    - Wiring issue.
 
 ---
 

@@ -45,7 +45,7 @@ class DriveCoreHost:
 
     SERVO_PIN = 26          # GPIO pin for connected servo
     ESC_PIN = 19            # GPIO pin for connected ESC
-    FLOOD_LIGHT_PIN = 13    # GPIO pin for connected Flood Light Leds
+    FLOOD_LIGHT_PIN = 12    # GPIO pin for connected Flood Light Leds
 
     FREQ_SERVO = 100  # Servo frequency (Standard for servos)
     FREQ_ESC = 100    # ESC frequency (Match your ESC calibration)
