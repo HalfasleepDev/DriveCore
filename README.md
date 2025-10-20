@@ -102,6 +102,14 @@ DriveCore is built for enthusiasts, researchers, and developers looking to expir
 
 ---
 
+## Next Big Feature - *"Mapping Engine"*
+
+The next big feature for the DriveCore project will be a new mapping engine.
+This system will convert monocular depth information into a system for calculating obstacles and provide:
+- Navigation
+- Advanced Cruise Control
+- Object classification
+
 ## License
 
 This project is licensed under the MIT License.

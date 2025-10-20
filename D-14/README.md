@@ -351,17 +351,29 @@
 ---
 
 ## Version Roadmap **(Upcomming)**:
+<details>
+
+<summary>Version 1.3.5</summary>
+
+### Version 1.3.1 - 1.3.5 – “UI Tune-up”
+ - [ ] Refresh the UI colours
+ - [ ] Alter the widget positions
+ ...
+
+ </details>
 
 <details>
 
-<summary>Version 1.4</summary>
+<summary>Version 1.4.0</summary>
 
 ### Version 1.4 – “Intelligent Perception Update”
  - [ ] Integrate monoculear depth estimation for floor & obstacle awareness.
  - [ ] Use depth to improve obstacle detection & safety logic.
+ - [ ] Mapping Engine
  - [ ] Vehicle imu intergration.
  - [x] Vehicle flood light upgrade.
- - [ ] Steering input.
+ - [ ] Steering input via Mapping Engine
+ - [ ] DriveCore OS
  ...
 
  </details>
