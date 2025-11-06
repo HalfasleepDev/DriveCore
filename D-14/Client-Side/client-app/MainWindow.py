@@ -219,12 +219,12 @@ class Ui_MainWindow(object):
 "\n"
 "/*Emergency Disconnect*/\n"
 "QPushButton#emergencyDisconnectBtn{\n"
-"	background-color: #f1f3f3;\n"
-"	color: #1e1e21;\n"
+"	background-color: #0c0c0d;\n"
+"	color: #f1f3f3;\n"
 "    border-style: outset;\n"
-"    border-width: 2px;\n"
-"    border-radius: 30px;\n"
-"    border-color: #f1f3f3;\n"
+#"    border-width: 2px;\n"
+"    border-radius: 15px;\n"
+#"    border-color: #f1f3f3;\n"
 "    padding: 6px;\n"
 "}\n"
 "QPushButton#emergencyDisconnectBtn:pressed{\n"
@@ -261,7 +261,8 @@ class Ui_MainWindow(object):
 "\n"
 "/*=======Drive page=======*/\n"
 "QWidget#videoStreamWidget{\n"
-"	background-color: #f1f3f3;\n"
+"	background-color: #80f1f3f3;\n"
+"   border-radius: 15px;\n"
 "}\n"
 "QWidget#prndWidget{\n"
 "	background-color: #1e1e21;\n"
@@ -348,7 +349,7 @@ class Ui_MainWindow(object):
 "\n"
 "/*=======Left home widget=======*/\n"
 "QWidget#loginWidget{\n"
-"	background-color: #7a63ff;\n"
+"	background-color: #907a63ff;\n"
 "	border-radius: 15px;\n"
 "}\n"
 "\n"
@@ -381,7 +382,7 @@ class Ui_MainWindow(object):
 "\n"
 "/*=======Left menu buttons=======*/\n"
 "QPushButton#homeBtn {\n"
-"	background-color: #f1f3f3;\n"
+"	background-color: #1e1e21;\n"
 #"    border-style: outset;\n"
 #"    border-width: 2px;\n"
 "    border-radius: 30px;\n"
@@ -389,7 +390,7 @@ class Ui_MainWindow(object):
 "    padding: 6px;\n"
 "}\n"
 "QPushButton#driveBtn {\n"
-"	background-color: #f1f3f3;\n"
+"	background-color: #1e1e21;\n"
 #"    border-style: outset;\n"
 #"    border-width: 2px;\n"
 "    border-radius: 30px;\n"
@@ -397,7 +398,7 @@ class Ui_MainWindow(object):
 "    padding: 6px;\n"
 "}\n"
 "QPushButton#settingsBtn {\n"
-"	background-color: #f1f3f3;\n"
+"	background-color: #1e1e21;\n"
 #"    border-style: outset;\n"
 #"    border-width: 2px;\n"
 "    border-radius: 30px;\n"
@@ -406,7 +407,7 @@ class Ui_MainWindow(object):
 "}\n"
 "QPushButton#logBtn {\n"
 "	background-col"
-                        "or: #f1f3f3;\n"
+                        "or: #1e1e21;\n"
 #"    border-style: outset;\n"
 #"    border-width: 2px;\n"
 "    border-radius: 30px;\n"
@@ -616,7 +617,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(u"label_2")
         self.label_2.setMinimumSize(QSize(320, 240))
         self.label_2.setMaximumSize(QSize(320, 240))
-        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-3-0.png"))
+        self.label_2.setPixmap(QPixmap(u"D-14/Client-Side/client-app/icons/DriveCore-Logo-V1-3-1.png"))
         self.label_2.setScaledContents(True)
 
         self.verticalLayout_9.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -1412,7 +1413,7 @@ class Ui_MainWindow(object):
         self.emergencyDisconnectBtn.setText(QCoreApplication.translate("MainWindow", u"EMERGENCY DISCONNECT", None))
         self.emergencyDisconnectLabel.setText(QCoreApplication.translate("MainWindow", u"WARNING: WILL STOP PROGRAM ON HOST", None))
         self.currentPgrmVersionHeaderLabel.setText(QCoreApplication.translate("MainWindow", u"Current Program Version: ", None))
-        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.3.0 (27-09-2025)", None))
+        self.currentPgrmVersionLabel.setText(QCoreApplication.translate("MainWindow", u"Ver 1.3.1 (7-11-2025)", None))
         self.videoStreamLabel.setText(QCoreApplication.translate("MainWindow", u"No Conncection", None))
         self.accelerateBtn.setText(QCoreApplication.translate("MainWindow", u"Accelerate : [W]", None))
         self.turnLeftBtn.setText(QCoreApplication.translate("MainWindow", u"Turn Left : [A]", None))

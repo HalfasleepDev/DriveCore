@@ -37,7 +37,7 @@ DELAY = 0.02
 class DriveCoreHost:
     # ====== Program Config ======
     HOST_VER = "1.3.0"
-    SUPPORTED_VER = ["1.3.0"]
+    SUPPORTED_VER = ["1.3.0", "1.3.1"]
 
     # ====== Vehicle Config ======
     VEHICLE_MODEL = "D-14"

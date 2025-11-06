@@ -1475,7 +1475,7 @@ class PRNDWidget(QWidget):
 
         # Highlight bar
         highlight_rect = QRectF(5, self.highlight_y + 5, w - 10, gear_height - 10)
-        painter.setBrush(QColor("#74e1ef"))
+        painter.setBrush(QColor("#8074e1ef"))
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(highlight_rect, 10, 10)
 
@@ -1488,7 +1488,7 @@ class PRNDWidget(QWidget):
             font = QFont("Adwaita Sans", 20)
             if gear == self.current_gear:
                 font.setBold(True)
-                painter.setPen(QColor("#0c0c0d"))
+                painter.setPen(QColor("#f1f3f3"))
             else:
                 font.setBold(False)
                 painter.setPen(QColor("#f1f3f3"))
@@ -1717,9 +1717,10 @@ class CarConnectWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(400)
+        # #7a63ff ---> #807a63ff
         self.setStyleSheet("""
             QWidget {
-                background-color: #7a63ff;
+                background-color: transparent;
                 border-radius: 15px;
             }
             QLabel {
@@ -1727,7 +1728,7 @@ class CarConnectWidget(QWidget):
                 font-family: 'Adwaita Sans';
             }
             QLineEdit {
-                background-color: #f1f3f3;
+                background-color: #80f1f3f3;
                 color: #0c0c0d;
                 border-radius: 5px;
                 padding: 8px;

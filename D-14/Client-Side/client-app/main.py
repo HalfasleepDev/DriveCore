@@ -36,6 +36,15 @@ from appUiAnimations import AnimatedToolTip, LoadingScreen, install_hover_animat
 from openCVFunctions import FrameProcessor
 from MainWindow import Ui_MainWindow
 
+"""#TODO
+Ui colours & style (1.3.1):
+    - [x] Vehicle connect widget
+    - [x] Side bar icons
+    - [x] Fix the emergency disconnect btn
+    - [ ] Fix the "no connection" video label
+
+Widget expand and minimize(1.3.5)
+"""
 # === Environment Variables ===
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_SCALE_FACTOR"] = "0.95"
@@ -407,7 +416,7 @@ class MainWindow(QMainWindow):
         self.threadpool = QThreadPool.globalInstance()
 
         # === App Version Info ===
-        self.client_ver = "1.3.0"
+        self.client_ver = "1.3.1"
         self.supported_ver = ["1.3.0"]  # Supported Host Versions
 
         # === Load Configuration ===
@@ -442,7 +451,7 @@ class MainWindow(QMainWindow):
         self.showErrorSignal.connect(self.showGlobalError)  # Global popup
         
         # === Main Left Menu Navigation ===
-        self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+        self.ui.homeBtn.setStyleSheet("QPushButton{background-color: #807a63ff;}")
         self.ui.homeBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.homeBtn, self.ui.homePage))
         self.ui.settingsBtn.clicked.connect(lambda: self.handleLeftMenuNav(self.ui.settingsBtn, self.ui.settingsPage))
         self.ui.settingsBtn.clicked.connect(lambda: self.iniSettingsPage())
@@ -595,10 +604,10 @@ class MainWindow(QMainWindow):
             target_page (QWidget): The page to display.
         """
         for btn in [self.ui.homeBtn, self.ui.settingsBtn, self.ui.driveBtn, self.ui.logBtn]:
-            btn.setStyleSheet("QPushButton{background-color: #f1f3f3;}")
+            btn.setStyleSheet("QPushButton{background-color: #1e1e21;}")
 
             # Highlight active button
-            active_btn.setStyleSheet("QPushButton{background-color: #7a63ff;}")
+            active_btn.setStyleSheet("QPushButton{background-color: #807a63ff;}")
 
             # Switch page
             self.ui.stackedWidget.setCurrentWidget(target_page)

@@ -148,7 +148,7 @@ class NetworkManager(QObject):
                 self.app.logSignal.emit("Authentication failed", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Authentication failed", "ERROR")
                 self.app.ui.carConnectLoginWidget.show_error("Invalid credentials. Please try again.")
-                self.app.ui.showError(self, "AUTHENTICATION ERROR", "Invalid credentials. Please try again.")
+                self.app.showErrorSignal.emit(self, "AUTHENTICATION ERROR", "Invalid credentials. Please try again.")
                 
                 handshake_status = False
                 pending_action = None
@@ -165,7 +165,7 @@ class NetworkManager(QObject):
                 #! Host version incompatibility
                 self.app.logSignal.emit("Incompatable host version", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Incompatable host version", "ERROR")
-                self.app.ui.showError("COMPATABILITY ERROR", "Incompatable host version.")
+                self.app.showErrorSignal.emit("COMPATABILITY ERROR", "Incompatable host version.")
                 handshake_status = False
                 pending_action = None
                 QCoreApplication.processEvents()
@@ -174,7 +174,7 @@ class NetworkManager(QObject):
                 #! Client version rejected
                 self.app.logSignal.emit("Incompatable client version", "HANDSHAKE")
                 self.app.logSignal.emit("[HANDSHAKE] Incompatable client version", "ERROR")
-                self.app.ui.showError("COMPATABILITY ERROR", "Incompatable client version.")
+                self.app.showErrorSignal.emit("COMPATABILITY ERROR", "Incompatable client version.")
                 handshake_status = False
                 pending_action = None
                 QCoreApplication.processEvents()
