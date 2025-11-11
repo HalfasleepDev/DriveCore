@@ -1,0 +1,4 @@
+opencv-python
+ipaddress
+socket
+pyside6

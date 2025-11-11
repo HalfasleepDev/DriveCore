@@ -1,0 +1,15 @@
+{
+    "min_duty_servo": 900,
+    "max_duty_servo": 2100,
+    "neutral_duty_servo": 1500,
+    "min_duty_esc": 1310,
+    "max_duty_esc": 1750,
+    "neutral_duty_esc": 1500,
+    "brake_esc": 1470,
+    "ramp_up": 0.05,
+    "ramp_down": 0.05,
+    "username": "D-14",
+    "password": "driveCore",
+    "acceleration_curve": "Quadratic",
+    "broadcast_port": 9999
+}
